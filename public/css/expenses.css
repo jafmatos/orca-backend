@@ -1,0 +1,27 @@
+.modal {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(1px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s linear;
+  display: none;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	place-items: center;
+}
+
+.modal-content {
+  background: white;
+}
+
+.modal.modal-active {
+  display: grid;
+  opacity: 1;
+  pointer-events: auto;
+}

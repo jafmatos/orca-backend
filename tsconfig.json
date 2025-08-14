@@ -1,0 +1,39 @@
+{
+	"compilerOptions": {
+		"target": "ES2016",
+		"lib": [
+			"ES5",
+			"ES6",
+			"DOM"
+		],
+		"module": "commonjs",
+		"rootDir": "./src",
+		"moduleResolution": "node",
+		"baseUrl": "./src",
+		"paths": {
+			"Src/*": [
+				"./*"
+			],
+			"Helpers": [
+				"./helpers"
+			],
+			"Middleware": [
+				"./middleware"
+			],
+			"Utils": [
+				"./utils"
+			]
+		},
+		"typeRoots": [
+			"@types",
+			"./node_modules/@types"
+		],
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"outDir": "./dist",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true
+	}
+}
