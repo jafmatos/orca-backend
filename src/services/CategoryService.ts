@@ -1,10 +1,8 @@
 import { dataSource } from "Src/database/data-source";
-import { Category } from "Src/database/entities/Category";
-import { DeepPartial } from "typeorm";
+import { Category } from "Src/database/entities/Category.entity";
+import { DeepPartial, FindManyOptions } from "typeorm";
 
-type ListOptions = {
-  withDeleted: boolean;
-};
+type ListOptions = Partial<FindManyOptions<Category>>;
 
 export class CategoryService {
   private static readonly categoryRepository = dataSource.getRepository(Category);

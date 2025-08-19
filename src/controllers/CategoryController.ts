@@ -7,6 +7,9 @@ export class CategoryController {
   public static async index(request: Request, response: Response) {
     const categories = await CategoryService.list({
       withDeleted: request.query.withDeleted === "true",
+      order: {
+        name: "ASC",
+      },
     });
 
     return response.status(200).json({ data: categories });

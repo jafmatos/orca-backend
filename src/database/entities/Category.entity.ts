@@ -1,5 +1,5 @@
-import { Column, DeleteDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Expense } from "./Expense";
+import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Entry } from "./Entry.entity";
 
 @Entity()
 export class Category {
@@ -15,8 +15,8 @@ export class Category {
   @Column("float", { nullable: true, scale: 2 })
   mark?: number;
 
-  @OneToMany(() => Expense, (expense) => expense.category)
-  expenses?: Expense[];
+  @OneToMany(() => Entry, (entry) => entry.category)
+  entries?: Entry[];
 
   @DeleteDateColumn()
   deletedAt?: Date;
