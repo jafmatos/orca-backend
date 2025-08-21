@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Category } from "./Category.entity";
 import { EntryTypes } from "Src/types/EntryTypes";
+import { User } from "./User.entity";
 
 @Entity()
 export class Entry {
@@ -34,4 +35,16 @@ export class Entry {
     name: "categoryId",
   })
   category?: Category | null;
+
+  @Column({ nullable: false })
+  userId!: string;
+
+  @ManyToOne(() => User, (user) => user.entries, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({
+    name: "userId",
+  })
+  user?: User;
 }

@@ -1,5 +1,6 @@
-import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Entry } from "./Entry.entity";
+import { User } from "./User.entity";
 
 @Entity()
 export class Category {
@@ -14,6 +15,13 @@ export class Category {
 
   @Column("float", { nullable: true, scale: 2 })
   mark?: number;
+
+  @Column({ nullable: false })
+  userId?: string | null;
+
+  @ManyToOne(() => User, (user) => user.categories, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "userId" })
+  user?: User;
 
   @OneToMany(() => Entry, (entry) => entry.category)
   entries?: Entry[];

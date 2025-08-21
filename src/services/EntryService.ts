@@ -2,7 +2,7 @@ import { dataSource } from "Src/database/data-source";
 import { Category } from "Src/database/entities/Category.entity";
 import { Entry } from "Src/database/entities/Entry.entity";
 import { EntryTypes } from "Src/types/EntryTypes";
-import { DeepPartial, SelectQueryBuilder } from "typeorm";
+import { DeepPartial, FindOptionsWhere, SelectQueryBuilder } from "typeorm";
 
 type ListOptions = {
   order?: {
@@ -10,7 +10,8 @@ type ListOptions = {
     column: string;
     mode: "ASC" | "DESC";
   };
-  filter?: {
+  filter: {
+    userId: string;
     type?: EntryTypes;
     text?: string;
     category?: string;
@@ -30,7 +31,8 @@ type SumUpOptions = {
     column?: string;
     mode?: "ASC" | "DESC";
   };
-  filter?: {
+  filter: {
+    userId: string;
     text?: string;
     category?: string;
     when?: {
@@ -44,6 +46,8 @@ export class EntryService {
   private static readonly entryRepository = dataSource.getRepository(Entry);
 
   private static setListFilters(queryBuilder: SelectQueryBuilder<Entry>, filter: ListOptions["filter"]) {
+    filter && queryBuilder.andWhere("entry.userId = :userId", { userId: filter.userId });
+
     if (filter?.type) queryBuilder.andWhere("entry.type = :type", { type: filter!.type! });
     if (filter?.category) queryBuilder.andWhere("category.id = :category", { category: filter!.category! });
     if (filter?.text)
@@ -60,7 +64,7 @@ export class EntryService {
     return queryBuilder;
   }
 
-  public static async list(options?: ListOptions) {
+  public static async list(options: ListOptions) {
     const queryBuilder = this.entryRepository
       .createQueryBuilder("entry")
       .leftJoinAndSelect("entry.category", "category")
@@ -84,22 +88,11 @@ export class EntryService {
     return retult;
   }
 
-  public static async sumUp(options?: SumUpOptions) {
-    // const summarizationQueryBuilder = this.entryRepository
-    //   .createQueryBuilder("entry")
-    //   .select("'BALANÇO' as category, SUM(CASE WHEN type = 'expense' THEN amount * -1 ELSE amount END) as total")
-    //   .where(
-    //     "entry.id IN (SELECT entry.id FROM entry LEFT JOIN category ON entry.categoryId = category.id WHERE category.deletedAt IS NULL)"
-    //   );
-
-    // options?.filter && this.setListFilters(summarizationQueryBuilder, {
-    // 	type: options.filter.type,
-    // 	when: options.filter.when,
-    // });
-
+  public static async sumUp(options: SumUpOptions) {
     const queryBuilder = dataSource
       .createQueryBuilder(Category, "category")
-      .select("category.name as category, COALESCE(category.mark, 0) as mark, COALESCE(ROUND(SUM(entry.amount), 2), 0) as spent")
+      .select("category")
+      .addSelect("COALESCE(ROUND(SUM(entry.amount), 2), 0) as spent")
       .leftJoin(
         "entry",
         "entry",
@@ -109,7 +102,7 @@ export class EntryService {
           le: options?.filter?.when?.le || new Date(new Date().getTime() + 100 * 365 * 24 * 60 * 60 * 1000),
         }
       )
-      .where("category.deletedAt IS NULL")
+      .where("category.deletedAt IS NULL AND category.userId = :userId", { userId: options?.filter.userId })
       .groupBy("category.name");
 
     if (options?.filter?.category) queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
@@ -127,15 +120,29 @@ export class EntryService {
       queryBuilder.orderBy("category.name", "ASC");
     }
 
-    const sumUp = await queryBuilder.getRawMany();
+    const { entities, raw } = await queryBuilder.getRawAndEntities();
 
-    return { data: sumUp };
+    return {
+      data: entities.map((entity, index) => {
+        return {
+          ...entity,
+          mark: entity.mark || 0,
+          spent: raw[index].spent,
+        };
+      }),
+    };
   }
 
   public static async findById(id: Entry["id"]) {
     const entry = await this.entryRepository.findOneBy({
       id,
     });
+
+    return entry;
+  }
+
+  public static async findOneBy(where: FindOptionsWhere<Entry>) {
+    const entry = await this.entryRepository.findOneBy(where);
 
     return entry;
   }

@@ -1,9 +1,9 @@
-import { Role } from "Src/types/Roles";
 import jwt from "jsonwebtoken";
+import { UserRoles } from "Src/database/entities/User.entity";
 
 interface JwtData {
   id: string;
-  role: Role;
+  role: UserRoles;
 }
 
 export class Jwt {

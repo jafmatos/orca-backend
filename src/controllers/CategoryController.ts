@@ -6,6 +6,9 @@ import { z } from "zod";
 export class CategoryController {
   public static async index(request: Request, response: Response) {
     const categories = await CategoryService.list({
+      where: {
+        userId: request.auth!.user.id,
+      },
       withDeleted: request.query.withDeleted === "true",
       order: {
         name: "ASC",
@@ -16,7 +19,10 @@ export class CategoryController {
   }
 
   public static async show(request: Request, response: Response) {
-    const category = await CategoryService.findById(request.params.id);
+    const category = await CategoryService.findOneBy({
+      id: request.params.id,
+      userId: request.auth!.user.id,
+    });
 
     if (!category) throw new NotFoundError("Categoria não encontrada");
 
@@ -33,7 +39,10 @@ export class CategoryController {
 
     if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-    const category = await CategoryService.create(body);
+    const category = await CategoryService.create({
+      ...body,
+      userId: request.auth!.user.id,
+    });
 
     return response.status(200).json({ category });
   }
@@ -51,7 +60,10 @@ export class CategoryController {
 
     if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-    const category = await CategoryService.findById(request.params.id);
+    const category = await CategoryService.findOneBy({
+      id: request.params.id,
+      userId: request.auth!.user.id,
+    });
 
     if (!category) throw new NotFoundError("Categoria não encontrada");
 
@@ -61,7 +73,10 @@ export class CategoryController {
   }
 
   public static async destroy(request: Request, response: Response) {
-    const category = await CategoryService.findById(request.params.id);
+    const category = await CategoryService.findOneBy({
+      id: request.params.id,
+      userId: request.auth!.user.id,
+    });
 
     if (!category) throw new NotFoundError("Categoria não encontrada");
 
@@ -71,7 +86,10 @@ export class CategoryController {
   }
 
   public static async recover(request: Request, response: Response) {
-    const category = await CategoryService.findById(request.params.id);
+    const category = await CategoryService.findOneBy({
+      id: request.params.id,
+      userId: request.auth!.user.id,
+    });
 
     if (!category) throw new NotFoundError("Categoria não encontrada");
 

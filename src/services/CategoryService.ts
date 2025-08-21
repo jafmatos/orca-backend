@@ -1,6 +1,6 @@
 import { dataSource } from "Src/database/data-source";
 import { Category } from "Src/database/entities/Category.entity";
-import { DeepPartial, FindManyOptions } from "typeorm";
+import { DeepPartial, FindManyOptions, FindOptionsWhere } from "typeorm";
 
 type ListOptions = Partial<FindManyOptions<Category>>;
 
@@ -18,6 +18,15 @@ export class CategoryService {
       where: {
         id,
       },
+      withDeleted: true,
+    });
+
+    return category;
+  }
+
+  public static async findOneBy(where: FindOptionsWhere<Category>) {
+    const category = await this.categoryRepository.findOne({
+      where,
       withDeleted: true,
     });
 
