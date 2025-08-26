@@ -3,6 +3,7 @@ import { CategoryController } from "Src/controllers/CategoryController";
 import { EntryController } from "Src/controllers/EntryController";
 import { SignInController } from "Src/controllers/SignInController";
 import { SignUpController } from "Src/controllers/SignUpController";
+import { UserController } from "Src/controllers/UserController";
 import { auth } from "Src/middleware/auth";
 import { pagination } from "Src/middleware/pagination";
 
@@ -12,6 +13,8 @@ router.post("/sign-up", SignUpController.store);
 
 router.post("/sign-in", SignInController.store);
 router.get("/sign-in", auth(), SignInController.show);
+
+router.put("/users", auth(), UserController.update);
 
 router.get("/categories", auth(), CategoryController.index);
 router.get("/categories/:id", auth(), CategoryController.show);

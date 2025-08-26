@@ -32,7 +32,19 @@ export class SignUpController {
 
     if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-    const user = await UserService.create(body as CreateUserAttributes);
+    const defaultPeriodGe = new Date();
+    const defaultPeriodLe = new Date();
+
+    defaultPeriodGe.setHours(0, 0, 0, 0);
+
+    defaultPeriodLe.setMonth(defaultPeriodLe.getMonth() + 1);
+    defaultPeriodLe.setHours(0, 0, 0, 0);
+
+    const user = await UserService.create({
+      ...body,
+      periodGe: defaultPeriodGe,
+      periodLe: defaultPeriodLe,
+    } as CreateUserAttributes);
     const token = Jwt.sign({
       id: user.id,
       role: user.role,

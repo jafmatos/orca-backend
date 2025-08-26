@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Category } from "./Category.entity";
 import { EntryTypes } from "Src/types/EntryTypes";
 import { User } from "./User.entity";
@@ -28,7 +28,7 @@ export class Entry {
   @ManyToOne(() => Category, (category) => category.entries, {
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
-    cascade: ["insert"],
+    cascade: ["insert", "soft-remove", "recover"],
     eager: true,
   })
   @JoinColumn({
@@ -47,4 +47,7 @@ export class Entry {
     name: "userId",
   })
   user?: User;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

@@ -23,9 +23,17 @@ export class User {
   @Column()
   password!: string;
 
+  @Column({ type: "timestamp" })
+  periodGe!: Date;
+
+  @Column({ type: "timestamp" })
+  periodLe!: Date;
+
   @OneToMany(() => Category, (category) => category.user)
   categories?: Category[];
 
   @OneToMany(() => Entry, (entry) => entry.user)
   entries?: Entry[];
+
+  balance?: number;
 }
