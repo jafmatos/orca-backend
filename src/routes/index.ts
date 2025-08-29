@@ -1,20 +1,27 @@
 import { Router } from "express";
 import { CategoryController } from "Src/controllers/CategoryController";
 import { EntryController } from "Src/controllers/EntryController";
-import { SignInController } from "Src/controllers/SignInController";
-import { SignUpController } from "Src/controllers/SignUpController";
-import { UserController } from "Src/controllers/UserController";
+import { SignInController } from "Src/controllers/users/SignInController";
+import { SignUpController } from "Src/controllers/users/SignUpController";
+import { UserController } from "Src/controllers/users/MainController";
 import { auth } from "Src/middleware/auth";
 import { pagination } from "Src/middleware/pagination";
+import multer from "multer";
+import { AvatarController } from "Src/controllers/users/AvatarController";
+import { UploadsController } from "Src/controllers/UploadsController";
 
 export const router = Router({ strict: true });
+const upload = multer();
+
+router.get("/uploads/:fileName", UploadsController.show);
 
 router.post("/sign-up", SignUpController.store);
 
 router.post("/sign-in", SignInController.store);
 router.get("/sign-in", auth(), SignInController.show);
 
-router.put("/users", auth(), UserController.update);
+router.put("/users/avatar", auth(), upload.single("avatar"), AvatarController.update);
+router.delete("/users/avatar", auth(), AvatarController.destroy);
 
 router.get("/categories", auth(), CategoryController.index);
 router.get("/categories/:id", auth(), CategoryController.show);

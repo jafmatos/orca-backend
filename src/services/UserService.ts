@@ -12,10 +12,16 @@ export class UserService {
   }
 
   public static async findOneBy(where: FindOptionsWhere<User>) {
-    const nonMappedUser = await this.userRepository
+    const user = await this.userRepository
       .createQueryBuilder("user")
       .select("user")
-      .addSelect("COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END), 2), 0) as user_balance")
+      .leftJoinAndSelect("user.avatar", "avatar")
+      .where(where)
+      .getOne();
+
+    const { balance } = await this.userRepository
+      .createQueryBuilder("user")
+      .select("COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END), 2), 0) as balance")
       .leftJoin(
         "entry",
         "entry",
@@ -25,13 +31,9 @@ export class UserService {
       .groupBy("user.id")
       .getRawOne();
 
-    if (!nonMappedUser) return null;
+    if (user) user.balance = balance;
 
-    return Object.entries(nonMappedUser).reduce((user, [key, value]) => {
-      (user as any)[key.replace("user_", "")] = value;
-
-      return user;
-    }, {} as User);
+    return user;
   }
 
   public static async create(user: CreateUserAttributes) {
