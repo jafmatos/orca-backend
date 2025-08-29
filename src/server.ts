@@ -4,8 +4,7 @@ import "express-async-errors";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import https from "https";
-import fs from "fs";
+import http from "http";
 import { express_async_errors_middleware } from "./middleware/express_async_errors";
 import { router } from "./routes";
 import { dataSource } from "./database/data-source";
@@ -30,9 +29,7 @@ app.use(
 app.use(router);
 app.use(express_async_errors_middleware);
 
-const key = fs.readFileSync("ssl/key.pem", "utf-8");
-const cert = fs.readFileSync("ssl/cert.pem", "utf-8");
-const server = https.createServer({ key, cert }, app);
+const server = http.createServer(app);
 
 server.listen(port, async () => {
   try {
