@@ -21,7 +21,7 @@ export class UserService {
 
     const { balance } = await this.userRepository
       .createQueryBuilder("user")
-      .select("COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END)::numeric, 2), 0) as balance")
+      .select("COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END)::numeric, 2), 0)::double precision as balance")
       .leftJoin(
         "entry",
         "entry",

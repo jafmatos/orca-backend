@@ -92,7 +92,7 @@ export class EntryService {
     const queryBuilder = dataSource
       .createQueryBuilder(Category, "category")
       .select("category")
-      .addSelect("COALESCE(ROUND(SUM(entry.amount), 2)::numeric, 0) as spent")
+      .addSelect("COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0)::double precision as spent")
       .leftJoin("user", "user", "category.userId = user.id AND category.deletedAt IS NULL")
       .leftJoin(
         "entry",
@@ -104,7 +104,8 @@ export class EntryService {
         }
       )
       .where("category.deletedAt IS NULL AND category.userId = :userId", { userId: options?.filter.userId })
-      .groupBy("category.name");
+      .groupBy("category.name")
+      .addGroupBy("category.id");
 
     if (options?.filter?.category) queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
     if (options?.filter?.text)

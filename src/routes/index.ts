@@ -20,6 +20,8 @@ router.post("/sign-up", SignUpController.store);
 router.post("/sign-in", SignInController.store);
 router.get("/sign-in", auth(), SignInController.show);
 
+router.put("/users", auth(), UserController.update);
+
 router.put("/users/avatar", auth(), upload.single("avatar"), AvatarController.update);
 router.delete("/users/avatar", auth(), AvatarController.destroy);
 
