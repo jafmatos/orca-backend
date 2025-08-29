@@ -24,10 +24,10 @@ export class User {
   @Column()
   password!: string;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   periodGe!: Date;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   periodLe!: Date;
 
   @OneToMany(() => Category, (category) => category.user)

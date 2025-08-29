@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 
 export const dataSource = new DataSource({
-  type: "mysql",
+  type: "postgres",
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT!,
   username: process.env.DB_USER,
@@ -11,5 +11,6 @@ export const dataSource = new DataSource({
   synchronize: true,
   entities: [`${__dirname}/entities/*.{js,ts}`],
   migrations: [`${__dirname}/migrations/*.{js,ts}`],
-	timezone: "-03:00"
+  timezone: "-03:00",
+  ssl: { rejectUnauthorized: false },
 } as DataSourceOptions);
