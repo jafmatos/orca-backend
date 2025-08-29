@@ -92,7 +92,7 @@ export class EntryService {
     const queryBuilder = dataSource
       .createQueryBuilder(Category, "category")
       .select("category")
-      .addSelect("COALESCE(ROUND(SUM(entry.amount), 2), 0) as spent")
+      .addSelect("COALESCE(ROUND(SUM(entry.amount), 2)::numeric, 0) as spent")
       .leftJoin("user", "user", "category.userId = user.id AND category.deletedAt IS NULL")
       .leftJoin(
         "entry",
