@@ -1,13 +1,13 @@
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Avatar } from "./Avatar.entity";
 import { Category } from "./Category.entity";
 import { Entry } from "./Entry.entity";
-import { Avatar } from "./Avatar.entity";
 
 export enum UserRoles {
   User = "user",
 }
 
-@Entity()
+@Entity("users")
 export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;

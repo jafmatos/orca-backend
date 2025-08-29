@@ -27,7 +27,6 @@ export const pagination = ({ defaultPage = 1, defaultPerPage = 10 }) => {
 
       return next();
     } catch (error) {
-      console.log(error);
       return response.status(500).json(error);
     }
   };

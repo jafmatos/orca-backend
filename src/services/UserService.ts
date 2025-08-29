@@ -13,22 +13,26 @@ export class UserService {
 
   public static async findOneBy(where: FindOptionsWhere<User>) {
     const user = await this.userRepository
-      .createQueryBuilder("user")
-      .select("user")
-      .leftJoinAndSelect("user.avatar", "avatar")
+      .createQueryBuilder("users")
+      .select("users")
+      .leftJoinAndSelect("users.avatar", "avatar")
       .where(where)
       .getOne();
 
+    if (!user) return null;
+
     const { balance } = await this.userRepository
-      .createQueryBuilder("user")
-      .select("COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END)::numeric, 2), 0)::double precision as balance")
+      .createQueryBuilder("users")
+      .select(
+        "COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END)::numeric, 2), 0)::double precision as balance"
+      )
       .leftJoin(
         "entry",
         "entry",
-        "entry.userId = user.id AND (DATE(entry.when) BETWEEN DATE(user.periodGe) AND DATE(user.periodLe)) AND entry.deletedAt is null"
+        "entry.userId = users.id AND (DATE(entry.when) BETWEEN DATE(users.periodGe) AND DATE(users.periodLe)) AND entry.deletedAt is null"
       )
       .where(where)
-      .groupBy("user.id")
+      .groupBy("users.id")
       .getRawOne();
 
     if (user) user.balance = balance;

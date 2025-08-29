@@ -45,8 +45,6 @@ export class EntryController {
       };
     }
 
-    console.log(request.query.filter);
-
     const sumUp = await EntryService.sumUp({
       filter: request.query.filter as any,
       order: request.query.order as any,

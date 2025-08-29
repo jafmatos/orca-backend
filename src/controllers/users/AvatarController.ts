@@ -74,7 +74,9 @@ export class AvatarController {
       await transaction.commit();
       await transaction.release();
 
-      return response.status(200).end();
+      user.avatar = undefined;
+
+      return response.status(200).json({ user });
     } catch (error) {
       await transaction.rollback();
       await transaction.release();

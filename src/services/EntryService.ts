@@ -93,11 +93,11 @@ export class EntryService {
       .createQueryBuilder(Category, "category")
       .select("category")
       .addSelect("COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0)::double precision as spent")
-      .leftJoin("user", "user", "category.userId = user.id AND category.deletedAt IS NULL")
+      .leftJoin("users", "users", "category.userId = users.id AND category.deletedAt IS NULL")
       .leftJoin(
         "entry",
         "entry",
-        "category.id = entry.categoryId AND entry.type = 'expense' AND ((DATE(entry.when) BETWEEN user.periodGe AND user.periodLe) OR (DATE(entry.when) BETWEEN DATE(:ge) AND DATE(:le)))",
+        "category.id = entry.categoryId AND entry.type = 'expense' AND ((DATE(entry.when) BETWEEN users.periodGe AND users.periodLe) OR (DATE(entry.when) BETWEEN DATE(:ge) AND DATE(:le)))",
         {
           ge: options?.filter?.when?.ge || new Date(new Date().getTime() - 100 * 365 * 24 * 60 * 60 * 1000),
           le: options?.filter?.when?.le || new Date(new Date().getTime() + 100 * 365 * 24 * 60 * 60 * 1000),
