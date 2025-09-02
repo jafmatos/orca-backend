@@ -28,4 +28,6 @@ export class Category {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  spent?: number;
 }

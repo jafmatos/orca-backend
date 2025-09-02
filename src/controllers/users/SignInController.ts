@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Bcrypt } from "Src/helpers/Bcrypt";
-import { TeapotError, UnauthorizedAccessError, ValidationError } from "Src/helpers/Errors";
+import { ConflictError, TeapotError, UnauthorizedAccessError, ValidationError } from "Src/helpers/Errors";
 import { Jwt } from "Src/helpers/Jwt";
 import { UserService } from "Src/services/UserService";
 import z from "zod";
@@ -30,6 +30,8 @@ export class SignInController {
     const user = await UserService.findOneBy({ email: body.email });
 
     if (!user || !Bcrypt.compare(body.password, user.password)) throw new TeapotError("Credenciais inválidas");
+
+    if (!user.isActive) throw new ConflictError("Você precisa confirmar o E-mail antes de acessar sua conta. Verifique sua caixa de entrada!");
 
     const token = Jwt.sign({
       id: user.id,

@@ -1,7 +1,8 @@
-import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Avatar } from "./Avatar.entity";
 import { Category } from "./Category.entity";
 import { Entry } from "./Entry.entity";
+import { UserKey } from "./UserKey.entity";
 
 export enum UserRoles {
   User = "user",
@@ -21,6 +22,9 @@ export class User {
   @Column()
   name!: string;
 
+  @Column({ type: "boolean", default: false })
+  isActive!: boolean;
+
   @Column()
   password!: string;
 
@@ -30,6 +34,15 @@ export class User {
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   periodLe!: Date;
 
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
+
+  @Column({ type: "timestamp", nullable: true })
+  lastLoggedIn!: Date | null;
+
   @OneToMany(() => Category, (category) => category.user)
   categories?: Category[];
 
@@ -38,6 +51,9 @@ export class User {
 
   @OneToOne(() => Avatar, (avatar) => avatar.user, { eager: true })
   avatar?: Avatar;
+
+  @OneToMany(() => UserKey, (key) => key.user)
+  keys?: UserKey[];
 
   balance?: number;
 }

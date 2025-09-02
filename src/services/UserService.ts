@@ -1,11 +1,18 @@
 import { dataSource } from "Src/database/data-source";
 import { User } from "Src/database/entities/User.entity";
+import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { DeepPartial, FindOptionsWhere } from "typeorm";
 
 export type CreateUserAttributes = Omit<User, "id">;
 
 export class UserService {
   public static readonly userRepository = dataSource.getRepository(User);
+
+  public static async getRepository(transaction?: TypeormTransaction) {
+    if (!transaction) return this.userRepository;
+
+    return transaction.manager.getRepository(User);
+  }
 
   public static async exists(where: FindOptionsWhere<User>) {
     return await this.userRepository.existsBy(where);
@@ -40,11 +47,15 @@ export class UserService {
     return user;
   }
 
-  public static async create(user: CreateUserAttributes) {
-    return await this.userRepository.save(this.userRepository.create(user));
+  public static async create(user: CreateUserAttributes, options?: { transaction: TypeormTransaction }) {
+    const repository = await this.getRepository(options?.transaction);
+		
+    return await repository.save(repository.create(user));
   }
 
-  public static async update(user: User, data: DeepPartial<User>) {
-    return await this.userRepository.save(this.userRepository.merge(user, data));
+  public static async update(user: User, data: DeepPartial<User>, options?: { transaction: TypeormTransaction }) {
+    const repository = await this.getRepository(options?.transaction);
+		
+    return await repository.save(repository.merge(user, data));
   }
 }

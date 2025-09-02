@@ -11,6 +11,6 @@ export const dataSource = new DataSource({
   synchronize: true,
   entities: [`${__dirname}/entities/*.{js,ts}`],
   migrations: [`${__dirname}/migrations/*.{js,ts}`],
-  timezone: "-03:00",
+  timezone: "UTC",
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : null,
 } as DataSourceOptions);

@@ -1,21 +1,25 @@
 import { Request, Response } from "express";
 import { NotFoundError, ValidationError } from "Src/helpers/Errors";
-import { CategoryService } from "Src/services/CategoryService";
+import { CategoryService, ListOptions } from "Src/services/CategoryService";
 import { z } from "zod";
 
 export class CategoryController {
   public static async index(request: Request, response: Response) {
-    const categories = await CategoryService.list({
-      where: {
+    if (!(request.query.filter as any)?.userId) {
+      request.query.filter = {
+        ...((request.query.filter as unknown as object) || {}),
         userId: request.auth!.user.id,
-      },
-      withDeleted: request.query.withDeleted === "true",
-      order: {
-        name: "ASC",
-      },
+      };
+    }
+
+    const categories = await CategoryService.list({
+      filter: request.query.filter as ListOptions["filter"],
+      order: request.query.order as ListOptions["order"],
     });
 
-    return response.status(200).json({ data: categories });
+    return response.status(200).json({
+      data: categories,
+    });
   }
 
   public static async show(request: Request, response: Response) {

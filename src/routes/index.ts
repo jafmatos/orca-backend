@@ -9,6 +9,7 @@ import { pagination } from "Src/middleware/pagination";
 import multer from "multer";
 import { AvatarController } from "Src/controllers/users/AvatarController";
 import { UploadsController } from "Src/controllers/UploadsController";
+import { ResetPasswordController } from "Src/controllers/users/ResetPasswordController";
 
 export const router = Router({ strict: true });
 const upload = multer();
@@ -16,9 +17,14 @@ const upload = multer();
 router.get("/uploads/:fileName", UploadsController.show);
 
 router.post("/sign-up", SignUpController.store);
+router.put("/sign-up/:id", SignUpController.update);
+router.put("/sign-up/resend/:id", SignUpController.resend);
 
 router.post("/sign-in", SignInController.store);
 router.get("/sign-in", auth(), SignInController.show);
+
+router.post("/reset-password", ResetPasswordController.store);
+router.put("/reset-password/:id", ResetPasswordController.update);
 
 router.put("/users", auth(), UserController.update);
 
@@ -33,7 +39,6 @@ router.delete("/categories/:id", auth(), CategoryController.destroy);
 router.put("/categories/recover/:id", auth(), CategoryController.recover);
 
 router.get("/entries", auth(), pagination({ defaultPage: 1, defaultPerPage: 10 }), EntryController.index);
-router.get("/entries/sumup/", auth(), EntryController.sumUp);
 router.get("/entries/:id", auth(), EntryController.show);
 router.post("/entries", auth(), EntryController.store);
 router.put("/entries/:id", auth(), EntryController.update);

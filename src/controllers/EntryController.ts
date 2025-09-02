@@ -36,23 +36,7 @@ export class EntryController {
       meta: { count, pages: Math.ceil(count / request.pagination!.toQuery().take!), ...request.pagination?.toResponse() },
     });
   }
-
-  public static async sumUp(request: Request, response: Response) {
-    if (!(request.query.filter as any)?.userId) {
-      request.query.filter = {
-        ...((request.query.filter as unknown as object) || {}),
-        userId: request.auth!.user.id,
-      };
-    }
-
-    const sumUp = await EntryService.sumUp({
-      filter: request.query.filter as any,
-      order: request.query.order as any,
-    });
-
-    return response.status(200).json(sumUp);
-  }
-
+	
   public static async show(request: Request, response: Response) {
     const entry = await EntryService.findOneBy({
       id: request.params.id,

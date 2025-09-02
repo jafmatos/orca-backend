@@ -45,34 +45,31 @@ type SumUpOptions = {
 export class EntryService {
   private static readonly entryRepository = dataSource.getRepository(Entry);
 
-  private static setListFilters(queryBuilder: SelectQueryBuilder<Entry>, filter: ListOptions["filter"]) {
-    filter && queryBuilder.andWhere("entry.userId = :userId", { userId: filter.userId });
-
-    if (filter?.type) queryBuilder.andWhere("entry.type = :type", { type: filter!.type! });
-    if (filter?.category) queryBuilder.andWhere("category.id = :category", { category: filter!.category! });
-    if (filter?.text)
-      queryBuilder.andWhere(
-        "(category.name LIKE :text OR entry.description LIKE :text OR REPLACE(FORMAT(entry.amount, 2), '.', ',') LIKE :text)",
-        { text: `%${filter!.text!}%` }
-      );
-    if (filter?.when)
-      queryBuilder.andWhere("(DATE(entry.when) BETWEEN DATE(:ge) AND DATE(:le))", {
-        ge: filter.when.ge || new Date(new Date().getTime() - 100 * 365 * 24 * 60 * 60 * 1000),
-        le: filter.when.le || new Date(new Date().getTime() + 100 * 365 * 24 * 60 * 60 * 1000),
-      });
-
-    return queryBuilder;
-  }
-
   public static async list(options: ListOptions) {
     const queryBuilder = this.entryRepository
       .createQueryBuilder("entry")
       .leftJoinAndSelect("entry.category", "category")
+      .leftJoin("users", "users", "entry.userId = users.id")
       .where(
-        "entry.id IN (SELECT entry.id FROM entry LEFT JOIN category ON entry.categoryId = category.id WHERE category.deletedAt IS NULL)"
+        "entry.id IN (SELECT entry.id FROM entry LEFT JOIN category ON entry.categoryId = category.id WHERE category.deletedAt IS NULL) AND entry.userId = :userId",
+        { userId: options.filter.userId }
       );
 
-    options?.filter && this.setListFilters(queryBuilder, options.filter);
+    const checkGe = options.filter.when?.ge ? ":ge::date" : "DATE(users.periodGe)";
+    const checkLe = options.filter.when?.le ? ":le::date" : "DATE(users.periodLe)";
+
+    queryBuilder.andWhere(`(DATE(entry.when) BETWEEN ${checkGe} AND ${checkLe})`, {
+      ge: options.filter.when?.ge,
+      le: options.filter.when?.le,
+    });
+
+    options.filter?.type && queryBuilder.andWhere("entry.type = :type", { type: options.filter!.type! });
+    options.filter?.category && queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
+    options.filter?.text &&
+      queryBuilder.andWhere(
+        "(category.name LIKE :text OR entry.description LIKE :text OR REPLACE(FORMAT(entry.amount, 2), '.', ',') LIKE :text)",
+        { text: `%${options.filter!.text!}%` }
+      );
 
     if (options?.order?.column) {
       queryBuilder.orderBy(`${options.order.entity || "entry"}.${options.order.column}`, options.order.mode || "DESC");
@@ -83,56 +80,9 @@ export class EntryService {
       queryBuilder.take(options.pagination.take);
     }
 
-    const retult = await queryBuilder.getManyAndCount();
+    const result = await queryBuilder.getManyAndCount();
 
-    return retult;
-  }
-
-  public static async sumUp(options: SumUpOptions) {
-    const queryBuilder = dataSource
-      .createQueryBuilder(Category, "category")
-      .select("category")
-      .addSelect("COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0)::double precision as spent")
-      .leftJoin("users", "users", "category.userId = users.id AND category.deletedAt IS NULL")
-      .leftJoin(
-        "entry",
-        "entry",
-        "category.id = entry.categoryId AND entry.type = 'expense' AND ((DATE(entry.when) BETWEEN users.periodGe AND users.periodLe) OR (DATE(entry.when) BETWEEN DATE(:ge) AND DATE(:le)))",
-        {
-          ge: options?.filter?.when?.ge || new Date(new Date().getTime() - 100 * 365 * 24 * 60 * 60 * 1000),
-          le: options?.filter?.when?.le || new Date(new Date().getTime() + 100 * 365 * 24 * 60 * 60 * 1000),
-        }
-      )
-      .where("category.deletedAt IS NULL AND category.userId = :userId", { userId: options?.filter.userId })
-      .groupBy("category.name")
-      .addGroupBy("category.id");
-
-    if (options?.filter?.category) queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
-    if (options?.filter?.text)
-      queryBuilder.having(
-        "(category.name LIKE :text OR REPLACE(FORMAT(spent, 2), '.', ',') LIKE :text OR REPLACE(FORMAT(mark - spent, 2), '.', ',') LIKE :text OR mark LIKE :text)",
-        {
-          text: `%${options.filter!.text!}%`,
-        }
-      );
-
-    if (options?.order?.column) {
-      queryBuilder.orderBy(`${options.order.column}`, options.order.mode || "DESC");
-    } else {
-      queryBuilder.orderBy("category.name", "ASC");
-    }
-
-    const { entities, raw } = await queryBuilder.getRawAndEntities();
-
-    return {
-      data: entities.map((entity, index) => {
-        return {
-          ...entity,
-          mark: entity.mark || 0,
-          spent: raw[index].spent,
-        };
-      }),
-    };
+    return result;
   }
 
   public static async findById(id: Entry["id"]) {
