@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgresdb:
+    image: postgres
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgres
+  app:
+    depends_on:
+      - postgresdb
+    build: .
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - 3333:3333
+    stdin_open: true
+    tty: true
+
+volumes: 
+  db:
