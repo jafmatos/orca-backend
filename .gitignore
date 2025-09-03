@@ -1,7 +1,7 @@
 ssl
 dist
 logs
-.env*
+.env
 
 # Logs
 logs
