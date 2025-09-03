@@ -1,8 +1,7 @@
 import { dataSource } from "Src/database/data-source";
-import { Category } from "Src/database/entities/Category.entity";
 import { Entry } from "Src/database/entities/Entry.entity";
 import { EntryTypes } from "Src/types/EntryTypes";
-import { DeepPartial, FindOptionsWhere, SelectQueryBuilder } from "typeorm";
+import { DeepPartial, FindOptionsWhere } from "typeorm";
 
 type ListOptions = {
   order?: {
@@ -67,7 +66,7 @@ export class EntryService {
     options.filter?.category && queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
     options.filter?.text &&
       queryBuilder.andWhere(
-        "(category.name LIKE :text OR entry.description LIKE :text OR REPLACE(FORMAT(entry.amount, 2), '.', ',') LIKE :text)",
+        "(category.name ILIKE :text OR entry.description ILIKE :text OR to_char(entry.amount, 'FM999999999999999999D00') ILIKE REPLACE(:text, '.', ''))",
         { text: `%${options.filter!.text!}%` }
       );
 

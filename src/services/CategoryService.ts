@@ -1,6 +1,6 @@
 import { dataSource } from "Src/database/data-source";
 import { Category } from "Src/database/entities/Category.entity";
-import { DeepPartial, FindManyOptions, FindOptionsWhere } from "typeorm";
+import { DeepPartial, FindOptionsWhere } from "typeorm";
 
 export type ListOptions = {
   order?: {
@@ -47,13 +47,15 @@ export class CategoryService {
     queryBuilder.addGroupBy("category.id");
 
     if (options?.filter?.category) queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
-    if (options?.filter?.text)
-      queryBuilder.having(
-        "(category.name LIKE :text OR REPLACE(FORMAT(spent, 2), '.', ',') LIKE :text OR REPLACE(FORMAT(mark - spent, 2), '.', ',') LIKE :text OR mark LIKE :text)",
-        {
-          text: `%${options.filter!.text!}%`,
-        }
-      );
+
+		// This is totally broken lol
+    // if (options?.filter?.text)
+    //   queryBuilder.having(
+    //     "(category.name ILIKE :text OR to_char(COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0) as text, 'FM999999999999999999D00') ILIKE REPLACE(:text, '.', '') OR to_char(category.mark - COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0) as text, 'FM999999999999999999D00') ILIKE REPLACE(:text, '.', '') OR mark ILIKE :text)",
+    //     {
+    //       text: `%${options.filter!.text!}%`,
+    //     }
+    //   );
 
     if (options?.order?.column) {
       queryBuilder.orderBy(`${options.order.column}`, options.order.mode || "DESC");

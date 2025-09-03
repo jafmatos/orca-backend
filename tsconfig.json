@@ -28,6 +28,7 @@
 			"@types",
 			"./node_modules/@types"
 		],
+		"sourceMap": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"outDir": "./dist",
