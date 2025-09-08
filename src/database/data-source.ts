@@ -1,3 +1,5 @@
+require("dotenv-expand").expand(require("dotenv").config());
+
 import { DataSource, DataSourceOptions } from "typeorm";
 
 export const dataSource = new DataSource({
@@ -7,8 +9,8 @@ export const dataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  logging: true,
-  synchronize: true,
+  logging: !!process.env.DB_LOGGING,
+  synchronize: !!process.env.DB_SYNCHRONIZE,
   entities: [`${__dirname}/entities/*.{js,ts}`],
   migrations: [`${__dirname}/migrations/*.{js,ts}`],
   timezone: process.env.DB_TIMEZONE,

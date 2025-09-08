@@ -28,8 +28,6 @@ export class Entry {
   @ManyToOne(() => Category, (category) => category.entries, {
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
-    cascade: ["insert", "soft-remove", "recover"],
-    eager: true,
   })
   @JoinColumn({
     name: "categoryId",

@@ -3,7 +3,7 @@ import { Entry } from "Src/database/entities/Entry.entity";
 import { EntryTypes } from "Src/types/EntryTypes";
 import { DeepPartial, FindOptionsWhere } from "typeorm";
 
-type ListOptions = {
+export type ListOptions = {
   order?: {
     entity?: string;
     column: string;
@@ -25,22 +25,6 @@ type ListOptions = {
   };
 };
 
-type SumUpOptions = {
-  order?: {
-    column?: string;
-    mode?: "ASC" | "DESC";
-  };
-  filter: {
-    userId: string;
-    text?: string;
-    category?: string;
-    when?: {
-      ge?: string;
-      le?: string;
-    };
-  };
-};
-
 export class EntryService {
   private static readonly entryRepository = dataSource.getRepository(Entry);
 
@@ -48,22 +32,16 @@ export class EntryService {
     const queryBuilder = this.entryRepository
       .createQueryBuilder("entry")
       .leftJoinAndSelect("entry.category", "category")
-      .leftJoin("users", "users", "entry.userId = users.id")
-      .where(
-        "entry.id IN (SELECT entry.id FROM entry LEFT JOIN category ON entry.categoryId = category.id WHERE category.deletedAt IS NULL) AND entry.userId = :userId",
-        { userId: options.filter.userId }
-      );
+      .where("(entry.userId = :userId)", { userId: options.filter.userId })
+      .andWhere("(category.removedAt IS NULL)");
 
-    const checkGe = options.filter.when?.ge ? ":ge::date" : "DATE(users.periodGe)";
-    const checkLe = options.filter.when?.le ? ":le::date" : "DATE(users.periodLe)";
-
-    queryBuilder.andWhere(`(DATE(entry.when) BETWEEN ${checkGe} AND ${checkLe})`, {
+    queryBuilder.andWhere(`(DATE(entry.when) BETWEEN :ge::date AND :le::date)`, {
       ge: options.filter.when?.ge,
       le: options.filter.when?.le,
     });
 
-    options.filter?.type && queryBuilder.andWhere("entry.type = :type", { type: options.filter!.type! });
-    options.filter?.category && queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
+    options.filter?.type && queryBuilder.andWhere("(entry.type = :type)", { type: options.filter!.type! });
+    options.filter?.category && queryBuilder.andWhere("(category.id = :category)", { category: options.filter!.category! });
     options.filter?.text &&
       queryBuilder.andWhere(
         "(category.name ILIKE :text OR entry.description ILIKE :text OR to_char(entry.amount, 'FM999999999999999999D00') ILIKE REPLACE(:text, '.', ''))",
@@ -118,6 +96,12 @@ export class EntryService {
     const updatedEntry = await this.entryRepository.save({ ...entry, ...data });
 
     return updatedEntry;
+  }
+
+  public static async softRemove(entry: Entry) {
+    const removedEntry = await this.entryRepository.softRemove(entry);
+
+    return removedEntry;
   }
 
   public static async remove(entry: Entry) {

@@ -25,9 +25,9 @@ FROM base as deps
 # Leverage bind mounts to package.json and package-lock.json to avoid having to copy them
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
+	--mount=type=bind,source=package-lock.json,target=package-lock.json \
+	--mount=type=cache,target=/root/.npm \
+	npm ci --omit=dev
 
 ################################################################################
 # Create a stage for building the application.
@@ -36,9 +36,9 @@ FROM deps as build
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci
+	--mount=type=bind,source=package-lock.json,target=package-lock.json \
+	--mount=type=cache,target=/root/.npm \
+	npm ci
 
 # Copy the rest of the source files into the image.
 COPY . .
@@ -53,6 +53,11 @@ FROM base as final
 # Use production node environment by default.
 ENV NODE_ENV production
 
+# Create uploads folder if not exists and enable access
+RUN mkdir -p uploads && \
+    chown -R node:node uploads && \
+    chmod -R 755 uploads
+
 # Run the application as a non-root user.
 USER node
 
@@ -64,9 +69,8 @@ COPY package.json .
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
-
 # Expose the port that the application listens on.
 EXPOSE 3333
 
 # Run the application.
-CMD npm start
+CMD npx typeorm migration:run -d dist/database/data-source.js && npm run start

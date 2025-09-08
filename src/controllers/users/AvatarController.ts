@@ -17,6 +17,7 @@ export class AvatarController {
 
       if (!user) throw new UnauthorizedAccessError();
       if (!file) throw new BadRequestError("É necessário enviar uma imagem");
+			if (file.size > 5 * 1024 * 1024) throw new BadRequestError("Imagem muito grande. Limite: 5MB")
 
       const [type, extname] = file.mimetype.split("/");
 

@@ -1,10 +1,10 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgresdb:
     image: postgres
     restart: unless-stopped
-    env_file: ./.env
+    env_file: ./.env.docker
     environment:
       - POSTGRES_USER=$DB_USER
       - POSTGRES_PASSWORD=$DB_PASS
@@ -18,11 +18,14 @@ services:
       - postgresdb
     build: .
     restart: unless-stopped
-    env_file: ./.env
+    env_file: ./.env.docker
     ports:
       - 3333:3333
     stdin_open: true
     tty: true
+    volumes:
+      - uploads_volume:/usr/src/app/uploads
 
-volumes: 
+volumes:
   db:
+  uploads_volume:

@@ -1,4 +1,4 @@
-import { Column, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Entry } from "./Entry.entity";
 import { User } from "./User.entity";
 
@@ -26,8 +26,8 @@ export class Category {
   @OneToMany(() => Entry, (entry) => entry.category)
   entries?: Entry[];
 
-  @DeleteDateColumn()
-  deletedAt?: Date;
+  @Column("timestamp", { nullable: true })
+  removedAt?: Date | null;
 
   spent?: number;
 }

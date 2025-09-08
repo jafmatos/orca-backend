@@ -2,6 +2,8 @@ ssl
 dist
 logs
 .env
+.env.docker
+.env.render
 
 # Logs
 logs

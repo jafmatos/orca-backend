@@ -5,16 +5,18 @@ import { z } from "zod";
 
 export class CategoryController {
   public static async index(request: Request, response: Response) {
-    if (!(request.query.filter as any)?.userId) {
-      request.query.filter = {
-        ...((request.query.filter as unknown as object) || {}),
-        userId: request.auth!.user.id,
-      };
-    }
+    const requestFilter = (request.query.filter as ListOptions["filter"]) || {
+      when: {},
+    };
 
     const categories = await CategoryService.list({
-      filter: request.query.filter as ListOptions["filter"],
-      order: request.query.order as ListOptions["order"],
+      filter: {
+        userId: request.auth!.user.id,
+        when: {
+          ge: requestFilter.when?.ge || request.auth!.user.periodGe,
+          le: requestFilter.when?.le || request.auth!.user.periodLe,
+        },
+      } as ListOptions["filter"],
     });
 
     return response.status(200).json({

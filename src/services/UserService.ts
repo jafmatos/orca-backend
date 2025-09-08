@@ -36,7 +36,7 @@ export class UserService {
       .leftJoin(
         "entry",
         "entry",
-        "entry.userId = users.id AND (DATE(entry.when) BETWEEN DATE(users.periodGe) AND DATE(users.periodLe)) AND entry.deletedAt is null"
+        "entry.userId = users.id AND (DATE(entry.when) BETWEEN DATE(users.periodGe) AND DATE(users.periodLe))"
       )
       .where(where)
       .groupBy("users.id")
@@ -49,13 +49,13 @@ export class UserService {
 
   public static async create(user: CreateUserAttributes, options?: { transaction: TypeormTransaction }) {
     const repository = await this.getRepository(options?.transaction);
-		
+
     return await repository.save(repository.create(user));
   }
 
   public static async update(user: User, data: DeepPartial<User>, options?: { transaction: TypeormTransaction }) {
     const repository = await this.getRepository(options?.transaction);
-		
+
     return await repository.save(repository.merge(user, data));
   }
 }

@@ -3,19 +3,16 @@ import { Category } from "Src/database/entities/Category.entity";
 import { DeepPartial, FindOptionsWhere } from "typeorm";
 
 export type ListOptions = {
-  order?: {
-    entity?: string;
-    column: string;
-    mode: "ASC" | "DESC";
-  };
   filter: {
     userId: string;
-    text?: string;
-    category?: string;
     when?: {
       ge?: string;
       le?: string;
     };
+  };
+  order?: {
+    column: "name" | "mark";
+    mode: "ASC" | "DESC";
   };
 };
 
@@ -27,41 +24,27 @@ export class CategoryService {
       .createQueryBuilder(Category, "category")
       .select("category")
       .addSelect("COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0)::double precision as spent")
-      .leftJoin("users", "users", "category.userId = users.id AND category.deletedAt IS NULL");
+      .where("(category.userId = :userId)", { userId: options.filter.userId })
+      .andWhere("(category.removedAt IS NULL)");
 
-    const checkGe = options.filter.when?.ge ? ":ge::date" : "DATE(users.periodGe)";
-    const checkLe = options.filter.when?.le ? ":le::date" : "DATE(users.periodLe)";
+    if (options.order) {
+      queryBuilder.orderBy(options.order.column, options.order.mode);
+    } else {
+      queryBuilder.orderBy("category.name", "ASC");
+    }
 
     queryBuilder.leftJoin(
       "entry",
       "entry",
-      `category.id = entry.categoryId AND entry.type = 'expense' AND (DATE(entry.when) BETWEEN ${checkGe} AND ${checkLe})`,
+      `category.id = entry.categoryId AND entry.type = 'expense' AND (DATE(entry.when) BETWEEN :ge::date AND :le::date)`,
       {
         ge: options.filter.when?.ge,
         le: options.filter.when?.le,
       }
     );
 
-    queryBuilder.where("category.deletedAt IS NULL AND category.userId = :userId", { userId: options?.filter.userId });
     queryBuilder.groupBy("category.name");
     queryBuilder.addGroupBy("category.id");
-
-    if (options?.filter?.category) queryBuilder.andWhere("category.id = :category", { category: options.filter!.category! });
-
-		// This is totally broken lol
-    // if (options?.filter?.text)
-    //   queryBuilder.having(
-    //     "(category.name ILIKE :text OR to_char(COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0) as text, 'FM999999999999999999D00') ILIKE REPLACE(:text, '.', '') OR to_char(category.mark - COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0) as text, 'FM999999999999999999D00') ILIKE REPLACE(:text, '.', '') OR mark ILIKE :text)",
-    //     {
-    //       text: `%${options.filter!.text!}%`,
-    //     }
-    //   );
-
-    if (options?.order?.column) {
-      queryBuilder.orderBy(`${options.order.column}`, options.order.mode || "DESC");
-    } else {
-      queryBuilder.orderBy("category.name", "ASC");
-    }
 
     const { entities, raw } = await queryBuilder.getRawAndEntities();
 
@@ -120,13 +103,21 @@ export class CategoryService {
   }
 
   public static async softRemove(category: Category) {
-    const removedCategory = await this.categoryRepository.softRemove(category);
+    // const removedCategory = await this.categoryRepository.softRemove(category);
+
+    const removedCategory = await this.categoryRepository.update(category.id, {
+      removedAt: () => "CURRENT_TIMESTAMP",
+    });
 
     return removedCategory;
   }
 
   public static async recover(category: Category) {
-    const recoveredCategory = await this.categoryRepository.recover(category);
+    // const recoveredCategory = await this.categoryRepository.recover(category);
+
+    const recoveredCategory = await this.categoryRepository.update(category.id, {
+      removedAt: null,
+    });
 
     return recoveredCategory;
   }

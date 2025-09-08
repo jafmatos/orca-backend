@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { NotFoundError, ValidationError } from "Src/helpers/Errors";
 import { CategoryService } from "Src/services/CategoryService";
-import { EntryService } from "Src/services/EntryService";
+import { EntryService, ListOptions } from "Src/services/EntryService";
 import { EntryTypes } from "Src/types/EntryTypes";
 import { IsNull } from "typeorm";
 import { z } from "zod";
@@ -18,17 +18,21 @@ const zodOptionalCategorySchema = z
 
 export class EntryController {
   public static async index(request: Request, response: Response) {
-    if (!(request.query.filter as any)?.userId) {
-      request.query.filter = {
-        ...((request.query.filter as unknown as object) || {}),
-        userId: request.auth!.user.id,
-      };
-    }
+    const requestFilter = (request.query.filter as ListOptions["filter"]) || {
+      when: {},
+    };
 
     const [entries, count] = await EntryService.list({
       pagination: request.pagination!.toQuery(),
       order: (request.query.order as any) || { column: "when", mode: "DESC" },
-      filter: request.query.filter as any,
+      filter: {
+        ...requestFilter,
+        userId: request.auth!.user.id,
+        when: {
+          ge: requestFilter.when?.ge || request.auth!.user.periodGe,
+          le: requestFilter.when?.le || request.auth!.user.periodLe,
+        },
+      } as ListOptions["filter"],
     });
 
     return response.status(200).json({
@@ -36,7 +40,7 @@ export class EntryController {
       meta: { count, pages: Math.ceil(count / request.pagination!.toQuery().take!), ...request.pagination?.toResponse() },
     });
   }
-	
+
   public static async show(request: Request, response: Response) {
     const entry = await EntryService.findOneBy({
       id: request.params.id,
@@ -64,7 +68,7 @@ export class EntryController {
     if (body.category?.id) {
       const category = await CategoryService.findOneBy({
         id: body.category.id,
-        deletedAt: IsNull(),
+        removedAt: IsNull(),
         userId: request.auth!.user.id,
       });
 
@@ -121,7 +125,7 @@ export class EntryController {
 
     if (!entry) throw new NotFoundError("Despesa não encontrada");
 
-    const removedEntry = await EntryService.remove(entry);
+    const removedEntry = await EntryService.softRemove(entry);
 
     return response.status(200).json({ entry: removedEntry });
   }

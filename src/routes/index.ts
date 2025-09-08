@@ -10,9 +10,14 @@ import multer from "multer";
 import { AvatarController } from "Src/controllers/users/AvatarController";
 import { UploadsController } from "Src/controllers/UploadsController";
 import { ResetPasswordController } from "Src/controllers/users/ResetPasswordController";
+import { OverviewController } from "Src/controllers/users/OverviewController";
 
 export const router = Router({ strict: true });
-const upload = multer();
+const upload = multer({
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
 
 router.get("/uploads/:fileName", UploadsController.show);
 
@@ -25,6 +30,8 @@ router.get("/sign-in", auth(), SignInController.show);
 
 router.post("/reset-password", ResetPasswordController.store);
 router.put("/reset-password/:id", ResetPasswordController.update);
+
+router.get("/users/overview", auth(), OverviewController.show);
 
 router.put("/users", auth(), UserController.update);
 
