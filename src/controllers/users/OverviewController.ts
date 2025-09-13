@@ -1,19 +1,24 @@
 import { Request, Response } from "express";
 import { CategoryService, ListOptions } from "Src/services/CategoryService";
-import { FindOverviewWhere, OverviewService } from "Src/services/OverviewService";
+import { OverviewService, StatusOverviewWhere } from "Src/services/OverviewService";
 
 export class OverviewController {
   public static async show(request: Request, response: Response) {
-    const requestFilter = (request.query.filter as unknown as FindOverviewWhere) || {
+    const requestFilter = (request.query.filter as unknown as StatusOverviewWhere) || {
       when: {},
     };
 
-    const overview = await OverviewService.find({
+    const status = await OverviewService.status({
       userId: request.auth!.user.id,
       when: {
         ge: requestFilter.when?.ge || request.auth!.user.periodGe,
         le: requestFilter.when?.le || request.auth!.user.periodLe,
       },
+    });
+
+    const history = await OverviewService.history({
+      userId: request.auth!.user.id,
+      months: parseInt(request.query.months as string) || 12,
     });
 
     const categories = await CategoryService.list({
@@ -27,6 +32,12 @@ export class OverviewController {
       order: request.query.order as unknown as ListOptions["order"],
     });
 
-    return response.status(200).json({ overview, categories });
+    return response.status(200).json({
+      overview: {
+        ...status,
+        history,
+      },
+      categories,
+    });
   }
 }

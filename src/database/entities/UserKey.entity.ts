@@ -16,6 +16,9 @@ export class UserKey {
   @Column()
   userId!: string;
 
+  @Column({ type: "simple-json", nullable: true })
+  data?: Record<string, any>;
+
   @Column({ type: "timestamp", nullable: true })
   expiresAt?: Date;
 

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { UserRoles } from "Src/database/entities/User.entity";
 import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { ConflictError, NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
@@ -11,7 +10,7 @@ import { KeyTypes } from "Src/types/KeyTypes";
 import z from "zod";
 
 function confirmMail(otp: string, url: string, key: string) {
-  return `<p><b>Código de confirmação: </b>${otp}</p><a href="${url}/${key}">Confirmar cadastro</a>`;
+  return `<p><b>Código de confirmação: </b>${otp}</p><a href="${url}">Confirmar cadastro</a>`;
 }
 
 export class SignUpController {
@@ -102,11 +101,13 @@ export class SignUpController {
         }
       );
 
+      const confirmUrl = `${body.confirmUrl}?key=${userKey.id}`;
+
       await Nodemailer.send({
         from: process.env.SMTP_ORIGIN!,
         to: user.email,
         subject: "Confirmação de E-mail",
-        html: confirmMail(otp, body.confirmUrl, userKey.id),
+        html: confirmMail(otp, confirmUrl, userKey.id),
       });
 
       await transaction.commit();
@@ -114,7 +115,7 @@ export class SignUpController {
 
       return response.status(200).json({
         key: userKey,
-        confirmUrl: `${body.confirmUrl.replace(/\d/, "")}?key=${userKey.id}`,
+        confirmUrl,
       });
     } catch (error) {
       await transaction.rollback();
@@ -214,11 +215,13 @@ export class SignUpController {
         }
       );
 
+      const confirmUrl = `${body.confirmUrl}?key=${userKey.id}`;
+
       await Nodemailer.send({
         from: process.env.SMTP_ORIGIN!,
         to: key.user!.email,
         subject: "Confirmação de E-mail",
-        html: confirmMail(otp, body.confirmUrl, userKey.id),
+        html: confirmMail(otp, confirmUrl, userKey.id),
       });
 
       await transaction.commit();
@@ -226,7 +229,7 @@ export class SignUpController {
 
       return response.status(200).json({
         key: userKey,
-        confirmUrl: `${body.confirmUrl.replace(/\d/, "")}?key=${userKey.id}`,
+        confirmUrl,
       });
     } catch (error) {
       await transaction.rollback();

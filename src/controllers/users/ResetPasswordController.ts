@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import { UserRoles } from "Src/database/entities/User.entity";
 import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { Jwt } from "Src/helpers/Jwt";
 import { Nodemailer } from "Src/helpers/Nodemailer";
 import { UserKeyService } from "Src/services/UserKeyService";
-import { CreateUserAttributes, UserService } from "Src/services/UserService";
+import { UserService } from "Src/services/UserService";
 import { KeyTypes } from "Src/types/KeyTypes";
 import z from "zod";
 
@@ -53,11 +52,13 @@ export class ResetPasswordController {
         }
       );
 
+      const confirmUrl = `${body.confirmUrl}?key=${userKey.id}`;
+
       await Nodemailer.send({
         from: process.env.SMTP_ORIGIN!,
         to: user!.email,
         subject: "Recuperação de senha",
-        html: `<p><b>Código de confirmação: </b>${otp}</p><a href="${body.confirmUrl}/${userKey.id}">Continuar</a>`,
+        html: `<p><b>Código de confirmação: </b>${otp}</p><a href="${confirmUrl}">Continuar</a>`,
       });
 
       await transaction.commit();
@@ -66,7 +67,7 @@ export class ResetPasswordController {
       return response.status(200).json({
         user,
         key: userKey,
-        confirmUrl: `${body.confirmUrl.replace(/\d/, "")}/${userKey.id}`,
+        confirmUrl,
       });
     } catch (error) {
       await transaction.rollback();
