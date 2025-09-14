@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGenerated
 import { Avatar } from "./Avatar.entity";
 import { Category } from "./Category.entity";
 import { Entry } from "./Entry.entity";
+import { Subscription } from "./Subscription.entity";
 import { UserKey } from "./UserKey.entity";
 
 export enum UserRoles {
@@ -13,6 +14,9 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Column({ nullable: true })
+  stripeId?: string;
+
   @Column({ type: "enum", enum: UserRoles, default: UserRoles.User })
   role!: UserRoles;
 
@@ -23,7 +27,7 @@ export class User {
   name!: string;
 
   @Column({ type: "boolean", default: false })
-  isActive!: boolean;
+  isEmailConfirmed!: boolean;
 
   @Column()
   password!: string;
@@ -51,6 +55,9 @@ export class User {
 
   @OneToOne(() => Avatar, (avatar) => avatar.user, { eager: true })
   avatar?: Avatar;
+
+  @OneToOne(() => Subscription, (subscription) => subscription.user, { eager: true })
+  subscription?: Subscription;
 
   @OneToMany(() => UserKey, (key) => key.user)
   keys?: UserKey[];

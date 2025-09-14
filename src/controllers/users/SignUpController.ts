@@ -58,7 +58,7 @@ export class SignUpController {
         email: body.email,
       });
 
-      if (existingUser?.isActive) throw new ConflictError("Sua conta já está ativa");
+      if (existingUser?.isEmailConfirmed) throw new ConflictError("Você já confirmou seu E-mail");
 
       const user = existingUser
         ? await UserService.update(existingUser, {
@@ -75,7 +75,7 @@ export class SignUpController {
               password: body.password,
               periodGe: defaultPeriodGe,
               periodLe: defaultPeriodLe,
-              isActive: false,
+              isEmailConfirmed: false,
             } as CreateUserAttributes,
             {
               transaction,
@@ -155,7 +155,7 @@ export class SignUpController {
       const updatedUser = await UserService.update(
         user,
         {
-          isActive: true,
+          isEmailConfirmed: true,
           lastLoggedIn: new Date().toISOString(),
         },
         {

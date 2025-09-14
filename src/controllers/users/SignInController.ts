@@ -31,7 +31,12 @@ export class SignInController {
 
     if (!user || !Bcrypt.compare(body.password, user.password)) throw new TeapotError("Credenciais inválidas");
 
-    if (!user.isActive) throw new ConflictError("Você precisa confirmar o E-mail antes de acessar sua conta. Verifique sua caixa de entrada!");
+    if (!user.isEmailConfirmed)
+      throw new ConflictError("Você precisa confirmar o E-mail antes de acessar sua conta. Verifique sua caixa de entrada!");
+
+    await UserService.update(user, {
+      lastLoggedIn: new Date().toISOString(),
+    });
 
     const token = Jwt.sign({
       id: user.id,

@@ -12,7 +12,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - db:/var/lib/postgres
+      - backend_db:/var/lib/postgres
   app:
     depends_on:
       - postgresdb
@@ -20,12 +20,16 @@ services:
     restart: unless-stopped
     env_file: ./.env.docker
     ports:
+      - 80:80
+      - 443:443
       - 3333:3333
     stdin_open: true
     tty: true
     volumes:
-      - uploads_volume:/usr/src/app/uploads
+      - backend_uploads:/usr/src/app/uploads
 
 volumes:
-  db:
-  uploads_volume:
+  backend_db:
+    external: true
+  backend_uploads:
+    external: true

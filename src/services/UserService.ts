@@ -18,11 +18,25 @@ export class UserService {
     return await this.userRepository.existsBy(where);
   }
 
+  public static async findById(id: User["id"]) {
+    const user = await this.userRepository.findOneBy({ id });
+
+    return user;
+  }
+
+  public static async findOneByWithoutRelations(where: FindOptionsWhere<User>) {
+    const user = await this.userRepository.findOneBy(where);
+
+    return user;
+  }
+
   public static async findOneBy(where: FindOptionsWhere<User>) {
     const user = await this.userRepository
       .createQueryBuilder("users")
       .select("users")
       .leftJoinAndSelect("users.avatar", "avatar")
+      .leftJoinAndSelect("users.subscription", "subscription")
+      .leftJoinAndSelect("subscription.plan", "plan")
       .where(where)
       .getOne();
 
@@ -33,11 +47,7 @@ export class UserService {
       .select(
         "COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END)::numeric, 2), 0)::double precision as balance"
       )
-      .leftJoin(
-        "entry",
-        "entry",
-        "entry.userId = users.id AND (DATE(entry.when) BETWEEN DATE(users.periodGe) AND DATE(users.periodLe))"
-      )
+      .leftJoin("entry", "entry", "entry.userId = users.id AND (DATE(entry.when) BETWEEN DATE(users.periodGe) AND DATE(users.periodLe))")
       .where(where)
       .groupBy("users.id")
       .getRawOne();
