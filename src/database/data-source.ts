@@ -2,7 +2,7 @@ require("dotenv-expand").expand(require("dotenv").config());
 
 import { DataSource, DataSourceOptions } from "typeorm";
 
-console.log(process.env.NODE_ENV);
+console.log(process.env.ENV);
 
 export const dataSource = new DataSource({
   type: "postgres",
@@ -16,5 +16,5 @@ export const dataSource = new DataSource({
   entities: [`${__dirname}/entities/*.{js,ts}`],
   migrations: [`${__dirname}/migrations/*.{js,ts}`],
   timezone: process.env.DB_TIMEZONE,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : null,
+  ssl: process.env.ENV === "production" ? { rejectUnauthorized: false } : null,
 } as DataSourceOptions);
