@@ -84,6 +84,7 @@ export class SignUpController {
 
       await UserKeyService.delete({
         userId: user.id,
+        type: KeyTypes.SignUp,
       });
 
       const otp = Math.floor(Math.random() * 1_000_000)
@@ -139,21 +140,18 @@ export class SignUpController {
 
       if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-      const key = await UserKeyService.findById(request.params.id);
+      const key = await UserKeyService.findOneBy({
+        id: request.params.id,
+        type: KeyTypes.SignUp,
+      });
 
       if (!key) throw new NotFoundError("Chave de acesso não encontrada");
 
       if (!Bcrypt.compare(body.otp, key.otp) || (key.expiresAt && new Date() > new Date(key.expiresAt)))
         throw new TeapotError("Código incorreto ou expirado");
 
-      const user = await UserService.findOneBy({
-        id: key.userId,
-      });
-
-      if (!user) throw new NotFoundError("Usuário não encontrado");
-
       const updatedUser = await UserService.update(
-        user,
+        key.user!,
         {
           isEmailConfirmed: true,
           lastLoggedIn: new Date().toISOString(),
@@ -169,8 +167,8 @@ export class SignUpController {
       await transaction.release();
 
       const token = Jwt.sign({
-        id: user.id,
-        role: user.role,
+        id: key.user!.id,
+        role: key.user!.role,
       });
 
       return response.status(200).json({ user: updatedUser, token });
@@ -196,7 +194,10 @@ export class SignUpController {
 
       if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-      const key = await UserKeyService.findById(request.params.id);
+      const key = await UserKeyService.findOneBy({
+        id: request.params.id,
+        type: KeyTypes.SignUp,
+      });
 
       if (!key) throw new NotFoundError("Chave de acesso não encontrada");
 

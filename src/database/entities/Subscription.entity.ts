@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User.entity";
 import { Plan } from "./Plan.entity";
 import { SubscriptionStatuses } from "Src/types/SubscriptionStatuses";
@@ -26,11 +26,14 @@ export class Subscription {
   @Column({ type: "enum", enum: SubscriptionStatuses })
   status!: SubscriptionStatuses;
 
-  @OneToOne(() => User, (user) => user.subscription, { onDelete: "CASCADE", onUpdate: "CASCADE" })
+  @OneToOne(() => User, (user) => user.subscription, { onDelete: "CASCADE", onUpdate: "CASCADE", orphanedRowAction: "delete" })
   @JoinColumn({ name: "userId" })
   user?: User;
 
   @ManyToOne(() => Plan, { onDelete: "CASCADE", onUpdate: "CASCADE", eager: true })
   @JoinColumn({ name: "planId" })
   plan?: Plan;
+
+  @CreateDateColumn()
+  createdAt!: Date;
 }

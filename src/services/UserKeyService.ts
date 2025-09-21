@@ -25,6 +25,17 @@ export class UserKeyService {
     return category;
   }
 
+  public static async findOneBy(where: FindOptionsWhere<UserKey>) {
+    const category = await this.userKeyRepository.findOne({
+      where,
+      relations: {
+        user: true,
+      },
+    });
+
+    return category;
+  }
+
   public static async create(key: DeepPartial<UserKey>, options?: { transaction: TypeormTransaction }) {
     const repository = await this.getRepository(options?.transaction);
 

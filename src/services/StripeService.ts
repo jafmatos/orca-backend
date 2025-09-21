@@ -39,7 +39,7 @@ export class StripeService {
           userId: user.id,
           planId: plan.id,
         },
-        trial_period_days: 31,
+        trial_period_days: plan.trialPeriodDays,
         trial_settings: {
           end_behavior: {
             missing_payment_method: "pause",

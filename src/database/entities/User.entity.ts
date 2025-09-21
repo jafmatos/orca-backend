@@ -7,6 +7,8 @@ import { UserKey } from "./UserKey.entity";
 
 export enum UserRoles {
   User = "user",
+  Admin = "admin",
+  SuperUser = "super-user",
 }
 
 @Entity("users")
@@ -56,7 +58,7 @@ export class User {
   @OneToOne(() => Avatar, (avatar) => avatar.user, { eager: true })
   avatar?: Avatar;
 
-  @OneToOne(() => Subscription, (subscription) => subscription.user, { eager: true })
+  @OneToOne(() => Subscription, (subscription) => subscription.user, { eager: true, cascade: ["insert", "update"] })
   subscription?: Subscription;
 
   @OneToMany(() => UserKey, (key) => key.user)

@@ -11,6 +11,9 @@ export class Plan {
   @Column("float")
   price!: number;
 
+  @Column({ nullable: true })
+  trialPeriodDays?: number;
+
   @Column("simple-json")
   benefits!: string[];
 }

@@ -6,12 +6,11 @@ export const express_async_errors_middleware = (error: Error & ApiError, request
 
   const statusCode = error.statusCode ?? 500;
   const message = error.message ?? "Erro interno do servidor";
-  const errors = error.errors;
 
   if (response.headersSent) return next(error);
 
   return response.status(statusCode).json({
+    ...error,
     message,
-    errors,
   });
 };

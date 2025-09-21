@@ -23,6 +23,7 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024,
   },
 });
+// todo: set to true in production
 const subscribedUserMiddleware = auth([UserRoles.User], { withValidSubscription: true });
 
 router.get("/uploads/:fileName", UploadsController.show);
@@ -42,6 +43,10 @@ router.post("/reset-password", ResetPasswordController.store);
 router.put("/reset-password/:id", ResetPasswordController.update);
 
 router.get("/plans", PlanController.index);
+// todo: set super user middleware
+router.post("/plans", auth(), PlanController.store);
+router.put("/plans/:id", auth(), PlanController.update);
+router.delete("/plans/:id", auth(), PlanController.destroy);
 
 router.get("/users/overview", subscribedUserMiddleware, OverviewController.show);
 

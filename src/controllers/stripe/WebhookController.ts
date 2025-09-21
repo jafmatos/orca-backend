@@ -25,22 +25,26 @@ export class StripeWebhookHandler {
         throw new Error(`User ${stripeSubscription.metadata.userId} not found for subscription ${stripeSubscription.id}`);
       }
 
-      await UserService.update(user, { stripeId: stripeSubscription.customer as string }, { transaction });
-
-      await SubscriptionService.create(
+      await UserService.update(
+        user,
         {
-          stripeId: stripeSubscription.id,
-          status: stripeSubscription.status as SubscriptionStatuses,
-          trialStart,
-          trialEnd,
-          planId: stripeSubscription.metadata.planId,
-          userId: stripeSubscription.metadata.userId,
+          stripeId: stripeSubscription.customer as string,
+          subscription: {
+            stripeId: stripeSubscription.id,
+            status: stripeSubscription.status as SubscriptionStatuses,
+            trialStart,
+            trialEnd,
+            planId: stripeSubscription.metadata.planId,
+            userId: stripeSubscription.metadata.userId,
+          },
         },
         { transaction }
       );
 
       await transaction.commit();
     } catch (error) {
+      console.log(error);
+
       await transaction.rollback();
 
       throw error;
@@ -50,26 +54,35 @@ export class StripeWebhookHandler {
   }
 
   public static async handleCustomerSubscriptionUpdated(stripeSubscription: Stripe.Subscription) {
-    console.log("it is in update lol");
-    const trialStart = stripeSubscription.trial_start ? new Date(stripeSubscription.trial_start * 1000) : undefined;
-    const trialEnd = stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : undefined;
-    const subscription = await SubscriptionService.findOne({
-      stripeId: stripeSubscription.id,
-    });
+    try {
+      const trialStart = stripeSubscription.trial_start ? new Date(stripeSubscription.trial_start * 1000) : undefined;
+      const trialEnd = stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : undefined;
+      const subscription = await SubscriptionService.findOne({
+        stripeId: stripeSubscription.id,
+      });
 
-    if (!subscription) {
-      console.warn(`Received update for non-existent subscription: ${stripeSubscription.id}`);
+      if (!subscription) {
+        console.warn(`Received update for non-existent subscription: ${stripeSubscription.id}`);
 
-      await this.handleCustomerSubscriptionCreated(stripeSubscription);
+        await this.handleCustomerSubscriptionCreated(stripeSubscription);
 
-      return;
+        return;
+      }
+
+      await SubscriptionService.update(subscription, {
+        status: stripeSubscription.status as SubscriptionStatuses,
+        trialStart,
+        trialEnd,
+      });
+    } catch (error) {
+      console.log(error);
+
+      throw error;
     }
+  }
 
-    await SubscriptionService.update(subscription, {
-      status: stripeSubscription.status as SubscriptionStatuses,
-      trialStart,
-      trialEnd,
-    });
+  public static async handleCustomerSubscriptionDeleted(stripeSubscription: Stripe.Subscription) {
+    await this.handleCustomerSubscriptionUpdated(stripeSubscription);
   }
 }
 
@@ -97,6 +110,10 @@ export class StripeWebhookController {
         break;
       case "customer.subscription.updated":
         await StripeWebhookHandler.handleCustomerSubscriptionUpdated(event.data.object);
+
+        break;
+      case "customer.subscription.deleted":
+        await StripeWebhookHandler.handleCustomerSubscriptionDeleted(event.data.object);
 
         break;
 

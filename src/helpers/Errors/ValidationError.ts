@@ -16,6 +16,6 @@ export class ValidationError extends ApiError {
    *
    */
   constructor(message: string, errors: { message: string; path: PropertyKey; input: any }[]) {
-    super(422, message, errors);
+    super(422, message, undefined, errors);
   }
 }
