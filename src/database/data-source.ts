@@ -2,8 +2,6 @@ require("dotenv-expand").expand(require("dotenv").config());
 
 import { DataSource, DataSourceOptions } from "typeorm";
 
-console.log(process.env.ENV);
-
 export const dataSource = new DataSource({
   type: "postgres",
   host: process.env.DB_HOST,

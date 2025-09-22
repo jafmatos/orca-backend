@@ -37,7 +37,7 @@ server.listen(port, async () => {
   try {
     await dataSource.initialize();
 
-    console.log(`App running on ${process.env.APP_URL} in mode: ${process.env.NODE_ENV}`);
+    console.log(`App running on ${process.env.APP_URL} in ${process.env.NODE_ENV}`);
   } catch (error) {
     console.log(error);
 
