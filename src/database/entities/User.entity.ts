@@ -47,6 +47,9 @@ export class User {
   updatedAt!: Date;
 
   @Column({ type: "timestamp", nullable: true })
+  acceptedTermsAt?: Date | null;
+
+  @Column({ type: "timestamp", nullable: true })
   lastLoggedIn!: Date | null;
 
   @OneToMany(() => Category, (category) => category.user)

@@ -35,29 +35,33 @@ const assertSubscribed = (subscription: Subscription, allowedStatuses: Subscript
 
 export const auth = (roles?: UserRoles[], options?: { withValidSubscription: boolean }) => {
   return async (request: Request, response: Response, next: NextFunction) => {
-    const authorization = request.headers.authorization;
-    const token = authorization?.split(" ")[1];
+    try {
+      const authorization = request.headers.authorization;
+      const token = authorization?.split(" ")[1];
 
-    if (!token) throw new UnauthorizedAccessError();
+      if (!token) throw new UnauthorizedAccessError();
 
-    const jwtData = Jwt.verify(token);
+      const jwtData = Jwt.verify(token);
 
-    const user = await UserService.findOneBy({
-      id: jwtData.id,
-      role: jwtData.role,
-    });
+      const user = await UserService.findOneBy({
+        id: jwtData.id,
+        role: jwtData.role,
+      });
 
-    if (!user) throw new UnauthorizedAccessError();
+      if (!user) throw new UnauthorizedAccessError();
 
-    if (roles && !roles.includes(user.role)) new ForbiddenError().setMessage("Você não tem permissão para acessar este recurso").throw();
+      if (roles && !roles.includes(user.role)) new ForbiddenError().setMessage("Você não tem permissão para acessar este recurso").throw();
 
-    if (options?.withValidSubscription)
-      assertSubscribed(user.subscription!, [SubscriptionStatuses.Trialing, SubscriptionStatuses.Active, SubscriptionStatuses.PastDue]);
+      if (options?.withValidSubscription)
+        assertSubscribed(user.subscription!, [SubscriptionStatuses.Trialing, SubscriptionStatuses.Active, SubscriptionStatuses.PastDue]);
 
-    request.auth = {
-      user,
-    };
+      request.auth = {
+        user,
+      };
 
-    next();
+      next();
+    } catch (error) {
+      throw new UnauthorizedAccessError();
+    }
   };
 };

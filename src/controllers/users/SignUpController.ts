@@ -27,6 +27,7 @@ export class SignUpController {
           email: z.string().email("Email inválido"),
           password: z.string().min(6, "Senha curta demais"),
           passwordConfirmation: z.string().min(6, "Confirmação curta demais"),
+          acceptedTerms: z.boolean(),
         })
         .superRefine(async (body, ctx) => {
           if (body.password !== body.passwordConfirmation) {
@@ -76,6 +77,7 @@ export class SignUpController {
               periodGe: defaultPeriodGe,
               periodLe: defaultPeriodLe,
               isEmailConfirmed: false,
+              acceptedTermsAt: new Date(),
             } as CreateUserAttributes,
             {
               transaction,
