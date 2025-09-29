@@ -1,4 +1,5 @@
 export enum KeyTypes {
   SignUp = "sign-up",
   ResetPassword = "reset-password",
+  DeleteAccount = "delete-account",
 }

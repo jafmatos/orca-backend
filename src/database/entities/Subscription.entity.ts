@@ -1,4 +1,18 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  AfterInsert,
+  AfterLoad,
+  AfterRecover,
+  AfterRemove,
+  AfterSoftRemove,
+  AfterUpdate,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { User } from "./User.entity";
 import { Plan } from "./Plan.entity";
 import { SubscriptionStatuses } from "Src/types/SubscriptionStatuses";
@@ -36,4 +50,8 @@ export class Subscription {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  get isValid() {
+    return [SubscriptionStatuses.Trialing, SubscriptionStatuses.Active, SubscriptionStatuses.PastDue].includes(this.status);
+  }
 }

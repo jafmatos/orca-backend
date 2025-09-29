@@ -16,6 +16,8 @@ import { StripeWebhookController } from "Src/controllers/stripe/WebhookControlle
 import { StripeCheckoutController } from "../controllers/stripe/CheckoutController";
 import { StripeBillingPortalsController } from "Src/controllers/stripe/BillingPortalsController";
 import { UserRoles } from "Src/database/entities/User.entity";
+import { DeleteAccountController } from "Src/controllers/users/DeleteAccountController";
+import { subscribed } from "Src/middleware/subscribed";
 
 export const router = Router({ strict: true });
 const upload = multer({
@@ -32,15 +34,20 @@ router.post("/stripe/webhook", StripeWebhookController.store);
 router.post("/stripe/checkout", auth(), StripeCheckoutController.store);
 router.post("/stripe/billing-portals", auth(), StripeBillingPortalsController.store);
 
+router.post("/sign-in", SignInController.store);
+router.get("/sign-in", auth([UserRoles.User]), SignInController.show);
+
 router.post("/sign-up", SignUpController.store);
 router.put("/sign-up/:id", SignUpController.update);
 router.put("/sign-up/resend/:id", SignUpController.resend);
 
-router.post("/sign-in", SignInController.store);
-router.get("/sign-in", auth([UserRoles.User]), SignInController.show);
-
 router.post("/reset-password", ResetPasswordController.store);
 router.put("/reset-password/:id", ResetPasswordController.update);
+router.put("/reset-password/resend/:id", ResetPasswordController.resend);
+
+router.post("/delete-account", auth(), DeleteAccountController.store);
+router.put("/delete-account/:id", DeleteAccountController.update);
+router.put("/delete-account/resend/:id", DeleteAccountController.resend);
 
 router.get("/plans", PlanController.index);
 // todo: set super user middleware
@@ -48,25 +55,25 @@ router.post("/plans", auth(), PlanController.store);
 router.put("/plans/:id", auth(), PlanController.update);
 router.delete("/plans/:id", auth(), PlanController.destroy);
 
-router.get("/users/overview", subscribedUserMiddleware, OverviewController.show);
+router.get("/users/overview", auth(), subscribed, OverviewController.show);
 
-router.put("/users", subscribedUserMiddleware, UserController.update);
+router.put("/users", auth(), subscribed, UserController.update);
 
-router.put("/users/avatar", subscribedUserMiddleware, upload.single("avatar"), AvatarController.update);
-router.delete("/users/avatar", subscribedUserMiddleware, AvatarController.destroy);
+router.put("/users/avatar", auth(), subscribed, upload.single("avatar"), AvatarController.update);
+router.delete("/users/avatar", auth(), subscribed, AvatarController.destroy);
 
-router.get("/categories", subscribedUserMiddleware, CategoryController.index);
-router.get("/categories/:id", subscribedUserMiddleware, CategoryController.show);
-router.post("/categories", subscribedUserMiddleware, CategoryController.store);
-router.put("/categories/:id", subscribedUserMiddleware, CategoryController.update);
-router.delete("/categories/:id", subscribedUserMiddleware, CategoryController.destroy);
-router.put("/categories/recover/:id", subscribedUserMiddleware, CategoryController.recover);
+router.get("/categories", auth(), subscribed, CategoryController.index);
+router.get("/categories/:id", auth(), subscribed, CategoryController.show);
+router.post("/categories", auth(), subscribed, CategoryController.store);
+router.put("/categories/:id", auth(), subscribed, CategoryController.update);
+router.delete("/categories/:id", auth(), subscribed, CategoryController.destroy);
+router.put("/categories/recover/:id", auth(), subscribed, CategoryController.recover);
 
-router.get("/entries", subscribedUserMiddleware, pagination({ defaultPage: 1, defaultPerPage: 10 }), EntryController.index);
-router.get("/entries/:id", subscribedUserMiddleware, EntryController.show);
-router.post("/entries", subscribedUserMiddleware, EntryController.store);
-router.put("/entries/:id", subscribedUserMiddleware, EntryController.update);
-router.delete("/entries/:id", subscribedUserMiddleware, EntryController.destroy);
+router.get("/entries", auth(), subscribed, pagination({ defaultPage: 1, defaultPerPage: 10 }), EntryController.index);
+router.get("/entries/:id", auth(), subscribed, EntryController.show);
+router.post("/entries", auth(), subscribed, EntryController.store);
+router.put("/entries/:id", auth(), subscribed, EntryController.update);
+router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
 
 router.get("/", async (request, response) => {
   return response.send("Hello, I'm running on Docker!");

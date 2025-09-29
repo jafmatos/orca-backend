@@ -68,4 +68,10 @@ export class UserService {
 
     return await repository.save(repository.merge(user, data));
   }
+
+  public static async remove(user: User, options?: { transaction: TypeormTransaction }) {
+    const repository = await this.getRepository(options?.transaction);
+
+    return await repository.remove(user);
+  }
 }

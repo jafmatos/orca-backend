@@ -3,7 +3,7 @@ import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { Jwt } from "Src/helpers/Jwt";
-import { Nodemailer } from "Src/helpers/Nodemailer";
+import { EmailService } from "Src/services/Email/EmailService";
 import { UserKeyService } from "Src/services/UserKeyService";
 import { UserService } from "Src/services/UserService";
 import { KeyTypes } from "Src/types/KeyTypes";
@@ -45,7 +45,7 @@ export class ResetPasswordController {
           userId: user!.id,
           type: KeyTypes.ResetPassword,
           otp: Bcrypt.hash(otp),
-          expiresAt: new Date(new Date().getTime() + 5 * 60 * 1000), // 5 minutes
+          expiresAt: new Date(new Date().getTime() + 60 * 60 * 1000), // 1h
         },
         {
           transaction,
@@ -54,11 +54,11 @@ export class ResetPasswordController {
 
       const confirmUrl = `${body.confirmUrl}?key=${userKey.id}`;
 
-      await Nodemailer.send({
-        from: process.env.SMTP_ORIGIN!,
+      await EmailService.sendResetPasswordEmail({
         to: user!.email,
-        subject: "Recuperação de senha",
-        html: `<p><b>Código de confirmação: </b>${otp}</p><a href="${confirmUrl}">Continuar</a>`,
+        name: user!.name,
+        otp,
+        confirmUrl,
       });
 
       await transaction.commit();
@@ -131,6 +131,66 @@ export class ResetPasswordController {
       });
 
       return response.status(200).json({ user: updatedUser, token });
+    } catch (error) {
+      await transaction.rollback();
+      await transaction.release();
+
+      throw error;
+    }
+  }
+
+  public static async resend(request: Request, response: Response) {
+    const transaction = new TypeormTransaction();
+
+    await transaction.begin();
+
+    try {
+      const { data: body, error } = await z
+        .object({
+          confirmUrl: z.string().url(),
+        })
+        .safeParse(request.body);
+
+      if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
+
+      const key = await UserKeyService.findOneBy({
+        id: request.params.id,
+        type: KeyTypes.ResetPassword,
+      });
+
+      if (!key) throw new NotFoundError("Chave de acesso não encontrada");
+
+      const otp = Math.floor(Math.random() * 1_000_000)
+        .toString()
+        .padStart(6, "0");
+
+      const userKey = await UserKeyService.update(
+        key,
+        {
+          otp: Bcrypt.hash(otp),
+          expiresAt: new Date(new Date().getTime() + 60 * 60 * 1000), // 1h
+        },
+        {
+          transaction,
+        }
+      );
+
+      const confirmUrl = `${body.confirmUrl}?key=${userKey.id}`;
+
+      await EmailService.sendResetPasswordEmail({
+        to: userKey.user!.email,
+        name: userKey.user!.name,
+        otp,
+        confirmUrl,
+      });
+
+      await transaction.commit();
+      await transaction.release();
+
+      return response.status(200).json({
+        key: userKey,
+        confirmUrl,
+      });
     } catch (error) {
       await transaction.rollback();
       await transaction.release();

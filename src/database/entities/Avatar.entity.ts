@@ -1,6 +1,7 @@
-import { Entity, JoinColumn, OneToOne } from "typeorm";
+import { BeforeRemove, Entity, JoinColumn, OneToOne } from "typeorm";
 import { File } from "./File.entity";
 import { User } from "./User.entity";
+import { Jetpack } from "Src/helpers/Jetpack";
 
 @Entity()
 export class Avatar extends File {
@@ -10,4 +11,13 @@ export class Avatar extends File {
   })
   @JoinColumn()
   user?: User;
+
+  @BeforeRemove()
+  async removeFile() {
+    try {
+      await Jetpack.removeFile(this.fileName);
+    } catch (error) {
+      console.log(`Failed to remove file: ${this.fileName}`);
+    }
+  }
 }
