@@ -1,5 +1,5 @@
 import { renderToString } from "react-dom/server";
-import { Layout } from "../layouts/layout";
+import { Layout } from "../layouts/Layout";
 
 export type ResetPasswordEmailProps = {
   name: string;
