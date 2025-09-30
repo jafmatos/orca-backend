@@ -5,6 +5,7 @@ logs
 .env.docker
 .env.render
 uploads 
+backups
 
 # Logs
 logs
