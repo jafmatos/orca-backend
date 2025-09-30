@@ -25,8 +25,6 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024,
   },
 });
-// todo: set to true in production
-const subscribedUserMiddleware = auth([UserRoles.User], { withValidSubscription: true });
 
 router.get("/uploads/:fileName", UploadsController.show);
 
@@ -76,5 +74,5 @@ router.put("/entries/:id", auth(), subscribed, EntryController.update);
 router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
 
 router.get("/", async (request, response) => {
-  return response.send("Hello, I'm running on Docker!");
+  return response.send("Hello, World!");
 });
