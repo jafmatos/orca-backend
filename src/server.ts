@@ -11,6 +11,8 @@ import http from "http";
 import { express_async_errors_middleware } from "./middleware/express_async_errors";
 import { router } from "./routes";
 import { dataSource } from "./database/data-source";
+import { User, UserRoles } from "./database/entities/User.entity";
+import { Bcrypt } from "./helpers/Bcrypt";
 
 const app = express();
 const port = +process.env.APP_PORT!;
@@ -33,8 +35,8 @@ app.use(
 
 				const allowedDomains = [
 					'https://orca-financas.com',
-					'https://www.orca-financas.com',
 					'http://orca-financas.com',
+					'https://www.orca-financas.com',
 					'http://www.orca-financas.com'
 				];
 
@@ -58,6 +60,25 @@ const server = http.createServer(app);
 server.listen(port, async () => {
 	try {
 		await dataSource.initialize();
+
+		const userRepository = dataSource.getRepository(User)
+		const existingSuperUser = await userRepository.findOne({
+			where: {
+				email: "anselmojose397@gmail.com",
+
+			}
+		})
+
+		if (!existingSuperUser) {
+			await userRepository.save(userRepository.create({
+				role: UserRoles.SuperUser,
+				email: process.env.APP_SUPER_USER_EMAIL,
+				name: process.env.APP_SUPER_USER_NAME,
+				password: Bcrypt.hash(process.env.APP_SUPER_USER_PASSWORD!),
+				isEmailConfirmed: true,
+				acceptedTermsAt: new Date(),
+			}));
+		}
 
 		console.log(`App running on ${process.env.APP_URL} in ${process.env.NODE_ENV}`);
 	} catch (error) {

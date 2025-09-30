@@ -21,9 +21,9 @@ import { subscribed } from "Src/middleware/subscribed";
 
 export const router = Router({ strict: true });
 const upload = multer({
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
+	limits: {
+		fileSize: 5 * 1024 * 1024,
+	},
 });
 
 router.get("/uploads/:fileName", UploadsController.show);
@@ -48,10 +48,9 @@ router.put("/delete-account/:id", DeleteAccountController.update);
 router.put("/delete-account/resend/:id", DeleteAccountController.resend);
 
 router.get("/plans", PlanController.index);
-// todo: set super user middleware
-router.post("/plans", auth(), PlanController.store);
-router.put("/plans/:id", auth(), PlanController.update);
-router.delete("/plans/:id", auth(), PlanController.destroy);
+router.post("/plans", auth([UserRoles.SuperUser]), PlanController.store);
+router.put("/plans/:id", auth([UserRoles.SuperUser]), PlanController.update);
+router.delete("/plans/:id", auth([UserRoles.SuperUser]), PlanController.destroy);
 
 router.get("/users/overview", auth(), subscribed, OverviewController.show);
 
@@ -74,5 +73,5 @@ router.put("/entries/:id", auth(), subscribed, EntryController.update);
 router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
 
 router.get("/", async (request, response) => {
-  return response.send("Hello, World!");
+	return response.send("Hello, World!");
 });

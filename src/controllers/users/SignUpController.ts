@@ -9,10 +9,6 @@ import { CreateUserAttributes, UserService } from "Src/services/UserService";
 import { KeyTypes } from "Src/types/KeyTypes";
 import z from "zod";
 
-function confirmMail(otp: string, url: string, key: string) {
-  return `<p><b>Código de confirmação: </b>${otp}</p><a href="${url}">Confirmar cadastro</a>`;
-}
-
 export class SignUpController {
   public static async store(request: Request, response: Response) {
     const transaction = new TypeormTransaction();
