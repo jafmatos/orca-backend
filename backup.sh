@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 VOLUMES=("backend_db" "backend_uploads")
 
 DAILY_KEEP=14

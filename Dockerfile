@@ -9,69 +9,65 @@
 ARG NODE_VERSION=22.14.0
 
 ################################################################################
-# Use node image for base image for all stages.
+# Usa a imagem do node para todos os estágios
 FROM node:${NODE_VERSION}-alpine as base
 
-# Set working directory for all build stages.
+# Define o diretório de trabalho para todos os estágios da build.
 WORKDIR /usr/src/app
 
-
 ################################################################################
-# Create a stage for installing production dependecies.
+# Criar estágio para instalar dependências de produção.
 FROM base as deps
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage bind mounts to package.json and package-lock.json to avoid having to copy them
-# into this layer.
+# Torna os aqruivos package.json e package-lock.json do host acessíveis para o container para evitar copiá-los para dentro do container e ocupar espaço permanentemente.
+# Armazena as dependências em cache para otimizar processos futuros de build.
 RUN --mount=type=bind,source=package.json,target=package.json \
 	--mount=type=bind,source=package-lock.json,target=package-lock.json \
 	--mount=type=cache,target=/root/.npm \
 	npm ci --omit=dev
 
 ################################################################################
-# Create a stage for building the application.
+# Criar estágio para fazer build da aplicação.
 FROM deps as build
 
-# Download additional development dependencies before building, as some projects require
-# "devDependencies" to be installed to build. If you don't need this, remove this step.
+# Instalar dependências de desenvolvimento para a build (necessário pelo tsc)
+# Armazena as dependências em cache para otimizar processos fututos de build.
 RUN --mount=type=bind,source=package.json,target=package.json \
 	--mount=type=bind,source=package-lock.json,target=package-lock.json \
 	--mount=type=cache,target=/root/.npm \
 	npm ci
 
-# Copy the rest of the source files into the image.
+# Copiar o código fonte para dentro da imagem.
 COPY . .
-# Run the build script.
+
+# Rodar o comando de build.
 RUN npm run build
 
 ################################################################################
-# Create a new stage to run the application with minimal runtime dependencies
-# where the necessary files are copied from the build stage.
+# Criar um novo estágio para rodar a aplicação com as dependências mínimas.
 FROM base as final
 
-# Use production node environment by default.
+# Usar NODE_ENV de produção.
 ENV NODE_ENV production
 
-# Create uploads folder if not exists and enable access
+# Criar pasta de uploads no container e garantir permissões de acesso a ela.
 RUN mkdir -p uploads && \
     chown -R node:node uploads && \
     chmod -R 755 uploads
 
-# Run the application as a non-root user.
+# Rodar a aplicação sem acesso root.
 USER node
 
-# Copy package.json so that package manager commands can be used.
+# Copiar package.json para poder utilizar os scripts definidos no arquivo.
 COPY package.json .
 
-# Copy the production dependencies from the deps stage and also
-# the built application from the build stage into the image.
+# Copiar as dependências de produção do estágio deps para a imagem
+# Copiar a build do estágio build para a imagem.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
-# Expose the port that the application listens on.
+# Expor a porta em que a aplicação ficará disponível.
 EXPOSE 3333
 
-# Run the application.
-# CMD npx typeorm migration:run -d dist/database/data-source.js && npm run start
+# Rodar a aplicação.
 CMD npx typeorm migration:run -d dist/database/data-source.js && npm run start

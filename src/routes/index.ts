@@ -26,6 +26,11 @@ const upload = multer({
 	},
 });
 
+router.get("/plans", PlanController.index);
+router.post("/plans", auth([UserRoles.SuperUser]), PlanController.store);
+router.put("/plans/:id", auth([UserRoles.SuperUser]), PlanController.update);
+router.delete("/plans/:id", auth([UserRoles.SuperUser]), PlanController.destroy);
+
 router.get("/uploads/:fileName", UploadsController.show);
 
 router.post("/stripe/webhook", StripeWebhookController.store);
@@ -46,11 +51,6 @@ router.put("/reset-password/resend/:id", ResetPasswordController.resend);
 router.post("/delete-account", auth(), DeleteAccountController.store);
 router.put("/delete-account/:id", DeleteAccountController.update);
 router.put("/delete-account/resend/:id", DeleteAccountController.resend);
-
-router.get("/plans", PlanController.index);
-router.post("/plans", auth([UserRoles.SuperUser]), PlanController.store);
-router.put("/plans/:id", auth([UserRoles.SuperUser]), PlanController.update);
-router.delete("/plans/:id", auth([UserRoles.SuperUser]), PlanController.destroy);
 
 router.get("/users/overview", auth(), subscribed, OverviewController.show);
 
