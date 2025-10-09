@@ -20,7 +20,7 @@ export class StripeCheckoutController {
 
 		if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-		if (authUser.subscription && authUser.subscription?.status !== SubscriptionStatuses.Canceled) throw new ConflictError("Você já se inscreveu em um plano");
+		if (authUser.subscription && authUser.subscription?.status !== SubscriptionStatuses.Canceled) throw new ConflictError("Você já tem uma assinatura ativa.");
 
 		const plan = await PlanService.findById(body.planId);
 

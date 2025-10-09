@@ -46,6 +46,7 @@ export class StripeService {
           },
         },
       },
+      customer_email: user.email,
       metadata: {
         userId: user.id,
         planId: plan.id,

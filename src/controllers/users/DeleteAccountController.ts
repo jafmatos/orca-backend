@@ -3,6 +3,7 @@ import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { EmailService } from "Src/services/Email/EmailService";
+import { stripe } from "Src/services/StripeService";
 import { UserKeyService } from "Src/services/UserKeyService";
 import { UserService } from "Src/services/UserService";
 import { KeyTypes } from "Src/types/KeyTypes";
@@ -98,6 +99,8 @@ export class DeleteAccountController {
       });
 
       await UserKeyService.remove(key, { transaction });
+
+      await stripe.customers.del(removedUser.stripeId!);
 
       await transaction.commit();
       await transaction.release();

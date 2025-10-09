@@ -1,0 +1,54 @@
+# secrets.REMOTE_HOST: The VPS IP address
+# secrets.REMOTE_USER: The VPS user name
+# secrets.REMOTE_PORT: The VPS ssh connection port (default 22)
+# secrets.REMOTE_WORK_DIR: The VPS working directory for deploying
+# secrets.SERVER_SSH_KEY: Public SSH for VPS authentication
+
+name: orca-financas.com deployment
+
+on:
+  push:
+    branches: [master]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: echo Building the app
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{vars.APP_URL}}
+    steps:
+      - name: Repo Checkout
+        uses: actions/checkout@v1
+      - name: Hostinger Deployment
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
+          SOURCE: "./"
+          REMOTE_HOST: ${{secrets.REMOTE_HOST}}
+          REMOTE_USER: ${{secrets.REMOTE_USER}}
+          REMOTE_PORT: ${{secrets.REMOTE_PORT}}
+          TARGET: ${{secrets.REMOTE_WORK_DIR}}
+      - name: VPS Build
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          key: ${{secrets.SERVER_SSH_KEY}}
+          host: ${{secrets.REMOTE_HOST}}
+          username: ${{secrets.REMOTE_USER}}
+          port: ${{secrets.REMOTE_PORT}}
+          script: |
+            echo "Setting up environment"
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+            git config --global --add safe.directory ${{secrets.REMOTE_WORK_DIR}}
+            cd ${{secrets.REMOTE_WORK_DIR}}
+            git pull origin master
+            npm run docker:deploy
+          debug: true
