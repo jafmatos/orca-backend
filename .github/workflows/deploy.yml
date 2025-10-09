@@ -20,17 +20,17 @@ jobs:
       name: production
       url: ${{vars.APP_URL}}
     steps:
-      - name: Repo Checkout
-        uses: actions/checkout@v1
-      - name: Hostinger Deployment
-        uses: easingthemes/ssh-deploy@main
+      - name: Download source code
+        uses: actions/checkout@v4
+      - name: Copy source code to VPS
+        uses: appleboy/scp-action@v0.1.7
         with:
-          SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
-          SOURCE: "./"
-          REMOTE_HOST: ${{secrets.REMOTE_HOST}}
-          REMOTE_USER: ${{secrets.REMOTE_USER}}
-          REMOTE_PORT: ${{secrets.REMOTE_PORT}}
-          TARGET: ${{secrets.REMOTE_WORK_DIR}}
+          source: "."
+          host: ${{secrets.REMOTE_HOST}}
+          username: ${{secrets.REMOTE_USER}}
+          key: ${{secrets.SERVER_SSH_KEY}}
+          port: ${{secrets.REMOTE_PORT}}
+          target: ${{secrets.REMOTE_WORK_DIR}}
       - name: VPS Build
         uses: appleboy/ssh-action@v1.0.3
         with:
