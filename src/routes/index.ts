@@ -73,5 +73,5 @@ router.put("/entries/:id", auth(), subscribed, EntryController.update);
 router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
 
 router.get("/", async (request, response) => {
-	return response.send("Hello, World!");
+	return response.send("Hello, World! This was deployed by pipiline");
 });
