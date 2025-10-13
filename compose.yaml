@@ -1,16 +1,19 @@
+version: '3.8'
+
 services:
   postgresdb:
     image: postgres
     restart: unless-stopped
     env_file: ./.env.docker
     environment:
-      - POSTGRES_USER=$DB_USER
-      - POSTGRES_PASSWORD=$DB_PASS
-      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=orca
     ports:
       - 5432:5432
     volumes:
-      - backend_db:/var/lib/postgres/data
+      - backend_db:/var/lib/postgresql/18/docker
+  
   app:
     depends_on:
       - postgresdb
@@ -23,6 +26,26 @@ services:
     tty: true
     volumes:
       - backend_uploads:/usr/src/app/uploads
+  
+  backup:
+    image: offen/docker-volume-backup:latest
+    restart: unless-stopped
+    env_file: ./.env.docker
+    volumes:
+      - backend_db:/backup/db:ro
+      - backend_uploads:/backup/uploads:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backups:/archive
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=orca
+      - SCHEDULE=0 2 * * *
+      - BACKUP_SOURCES=/backup
+      - BACKUP_FILENAME=backup-%d-%m-%Y.tar.gz
+      - BACKUP_RETENTION_DAYS=7
+      - BACKUP_RETENTION_WEEKS=4
+      - BACKUP_RETENTION_MONTHS=6
 
 volumes:
   backend_db:

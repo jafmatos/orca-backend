@@ -13,6 +13,8 @@
 		"docker:start": "docker compose --env-file .env.docker start",
 		"docker:restart": "docker compose --env-file .env.docker restart",
 		"docker:logs": "docker compose --env-file .env.docker logs -f",
+		"docker:backup": "docker exec -it apiorca-financascom-backup-1 backup",
+		"docker:restore": "./restore.sh",
 		"typeorm:seed": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d ./src/data-source.ts",
 		"typeorm:generate": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/database/data-source.ts",
 		"typeorm:migrate": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/database/data-source.ts",

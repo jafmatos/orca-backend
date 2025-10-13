@@ -1,28 +1,42 @@
 #!/bin/bash
 set -euo pipefail
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <backup-file.tar.gz> <volume-name>"
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <backup-file-date>"
   exit 1
 fi
 
-BACKUP_FILE=$1
-VOLUME_NAME=$2
+BACKUP_FILE="backup-$1.tar.gz"
+BACKUP_DIR="$(pwd)/backups"
+BACKUP_PATH="$BACKUP_DIR/$BACKUP_FILE"
 
-if [ ! -f "$BACKUP_FILE/$VOLUME_NAME.tar.gz" ]; then
-  echo "Error: Backup file not found: $BACKUP_FILE/$VOLUME_NAME.tar.gz"
+if [ ! -f $BACKUP_PATH ]; then
+  echo "Error: Backup file not found: $BACKUP_PATH"
   exit 1
 fi
 
-BACKUP_DIR=$(dirname "$BACKUP_FILE/$VOLUME_NAME.tar.gz")
-BACKUP_NAME=$(basename "$BACKUP_FILE/$VOLUME_NAME.tar.gz")
+echo "Restoring from: $BACKUP_PATH"
 
-echo "Restoring $BACKUP_FILE/$VOLUME_NAME.tar.gz into volume $VOLUME_NAME..."
+docker compose stop app postgresdb
 
-MSYS_NO_PATHCONV=1  docker run --rm \
-  -v "$VOLUME_NAME:/volume" \
+echo "Restoring database..."
+
+MSYS_NO_PATHCONV=1 docker run --rm \
+  -v "backend_db:/volume" \
   -v "$BACKUP_DIR:/backup" \
   busybox \
-  sh -c "rm -rf /volume/* && tar xzvf /backup/$BACKUP_NAME -C /volume"
+  sh -c "rm -rf /volume/* && tar xzf /backup/$BACKUP_FILE -C /volume --strip-components=2 backup/db/"
+
+docker run --rm -v backend_db:/volume alpine chown -R 999:999 /volume
+
+echo "Restoring uploads..."
+
+MSYS_NO_PATHCONV=1 docker run --rm \
+  -v "backend_uploads:/volume" \
+  -v "$BACKUP_DIR:/backup" \
+  busybox \
+  sh -c "rm -rf /volume/* && tar xzf /backup/$BACKUP_FILE -C /volume --strip-components=2 backup/uploads/"
+
+docker compose up -d
 
 echo "Restore complete!"
