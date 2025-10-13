@@ -5,7 +5,7 @@
 # secrets.SERVER_SSH_KEY: Public SSH for VPS authentication
 # vars.APP_URL: Deployed app url
 
-name: orca-financas.com deployment
+name: api.orca-financas.com deployment
 
 on:
   push:
