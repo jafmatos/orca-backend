@@ -18,12 +18,13 @@ import { StripeBillingPortalsController } from "Src/controllers/stripe/BillingPo
 import { UserRoles } from "Src/database/entities/User.entity";
 import { DeleteAccountController } from "Src/controllers/users/DeleteAccountController";
 import { subscribed } from "Src/middleware/subscribed";
+import { ReminderController } from "Src/controllers/ReminderController";
 
 export const router = Router({ strict: true });
 const upload = multer({
-	limits: {
-		fileSize: 5 * 1024 * 1024,
-	},
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
 });
 
 router.get("/plans", PlanController.index);
@@ -72,6 +73,12 @@ router.post("/entries", auth(), subscribed, EntryController.store);
 router.put("/entries/:id", auth(), subscribed, EntryController.update);
 router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
 
+router.get("/reminders", auth(), subscribed, pagination({ defaultPage: 1, defaultPerPage: 10 }), ReminderController.index);
+router.get("/reminders/:id", auth(), subscribed, ReminderController.show);
+router.post("/reminders", auth(), subscribed, ReminderController.store);
+router.put("/reminders/:id", auth(), subscribed, ReminderController.update);
+router.delete("/reminders/:id", auth(), subscribed, ReminderController.destroy);
+
 router.get("/", async (request, response) => {
-	return response.send("Hello, World! This was deployed by pipiline");
+  return response.send("Hello, World! This was deployed by pipiline");
 });

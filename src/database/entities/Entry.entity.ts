@@ -46,6 +46,6 @@ export class Entry {
   })
   user?: User;
 
-  @DeleteDateColumn()
-  deletedAt?: Date;
+  @Column("timestamp", { nullable: true })
+  removedAt?: Date | null;
 }

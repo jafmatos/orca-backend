@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { ConflictError, TeapotError, UnauthorizedAccessError, ValidationError } from "Src/helpers/Errors";
 import { Jwt } from "Src/helpers/Jwt";
+import { eventBus } from "Src/services/Events";
 import { UserService } from "Src/services/UserService";
 import z from "zod";
 
@@ -10,6 +11,8 @@ export class SignInController {
     const user = request.auth?.user;
 
     if (!user) throw new UnauthorizedAccessError();
+
+    await eventBus.triggerAsync("user:token_validated", request.auth!.user);
 
     return response.status(200).json({
       user,

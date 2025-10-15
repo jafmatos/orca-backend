@@ -99,7 +99,9 @@ export class EntryService {
   }
 
   public static async softRemove(entry: Entry) {
-    const removedEntry = await this.entryRepository.softRemove(entry);
+    const removedEntry = await this.entryRepository.update(entry.id, {
+      removedAt: () => "CURRENT_TIMESTAMP",
+    });
 
     return removedEntry;
   }

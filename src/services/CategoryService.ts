@@ -103,8 +103,6 @@ export class CategoryService {
   }
 
   public static async softRemove(category: Category) {
-    // const removedCategory = await this.categoryRepository.softRemove(category);
-
     const removedCategory = await this.categoryRepository.update(category.id, {
       removedAt: () => "CURRENT_TIMESTAMP",
     });
@@ -113,8 +111,6 @@ export class CategoryService {
   }
 
   public static async recover(category: Category) {
-    // const recoveredCategory = await this.categoryRepository.recover(category);
-
     const recoveredCategory = await this.categoryRepository.update(category.id, {
       removedAt: null,
     });
