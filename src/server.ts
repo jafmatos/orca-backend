@@ -3,7 +3,7 @@ import "express-async-errors";
 
 require("dotenv-expand").expand(require("dotenv").config());
 
-import "services/Events/index";
+import "Src/services/Events/index";
 import express from "express";
 import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
