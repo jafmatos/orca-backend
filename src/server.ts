@@ -68,7 +68,7 @@ server.listen(port, async () => {
     const userRepository = dataSource.getRepository(User);
     const existingSuperUser = await userRepository.findOne({
       where: {
-        email: "anselmojose397@gmail.com",
+        email: process.env.APP_SUPER_USER_EMAIL,
       },
     });
 
