@@ -20,7 +20,7 @@ const zodOptionalCategorySchema = z
 
 export class ReminderController {
   public static async index(request: Request, response: Response) {
-    const requestFilter = request.query.filter as ListOptions["filter"];
+    const requestFilter = request.query.filter as unknown as ListOptions["filter"];
 
     const [reminders, count] = await ReminderService.list({
       filter: {

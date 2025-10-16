@@ -7,6 +7,7 @@ export type ListOptions = {
     userId: string;
     text?: string;
     category?: string;
+    dayOfMonth?: number;
   };
   pagination: {
     skip: number;
@@ -25,6 +26,8 @@ export class ReminderService {
       .andWhere("(reminder.removedAt IS NULL)");
 
     options.filter?.category && queryBuilder.andWhere("(category.id = :category)", { category: options.filter!.category! });
+
+    options.filter?.dayOfMonth && queryBuilder.andWhere("(reminder.dayOfMonth = :dayOfMonth)", { dayOfMonth: options.filter!.dayOfMonth! });
 
     options.filter?.text &&
       queryBuilder.andWhere(
