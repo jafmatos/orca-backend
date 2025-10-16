@@ -32,6 +32,9 @@ export class User {
   @Column({ type: "boolean", default: false })
   isEmailConfirmed!: boolean;
 
+  @Column({ type: "boolean", default: false })
+  acceptsNotifications!: boolean;
+
   @Column()
   password!: string;
 

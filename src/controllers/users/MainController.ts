@@ -15,6 +15,7 @@ export class UserController {
         periodGe: z.string().datetime().optional(),
         periodLe: z.string().datetime().optional(),
         periodReferenceDay: z.number().int().optional(),
+        acceptsNotifications: z.boolean().optional(),
       })
       .safeParse(request.body);
 
