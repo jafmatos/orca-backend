@@ -17,7 +17,7 @@ fi
 
 echo "Restoring from: $BACKUP_PATH"
 
-docker compose stop app postgresdb
+docker stop api postgres redis
 
 echo "Restoring database..."
 
@@ -28,6 +28,14 @@ MSYS_NO_PATHCONV=1 docker run --rm \
   sh -c "rm -rf /volume/* && tar xzf /backup/$BACKUP_FILE -C /volume --strip-components=2 backup/db/"
 
 docker run --rm -v backend_db:/volume alpine chown -R 999:999 /volume
+
+echo "Restoring redis..."
+
+MSYS_NO_PATHCONV=1 docker run --rm \
+  -v "redis_data:/volume" \
+  -v "$BACKUP_DIR:/backup" \
+  busybox \
+  sh -c "rm -rf /volume/* && tar xzf /backup/$BACKUP_FILE -C /volume --strip-components=2 backup/redis/"
 
 echo "Restoring uploads..."
 

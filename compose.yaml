@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   postgresdb:
+    container_name: postgres
     image: postgres
     restart: unless-stopped
     env_file: ./.env.docker
@@ -13,8 +14,20 @@ services:
       - 5432:5432
     volumes:
       - backend_db:/var/lib/postgresql/18/docker
-  
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data 
+    environment:
+      - REDIS_PASSWORD=$REDIS_PASSWORD 
+    restart: unless-stopped
+
   app:
+    container_name: api
     depends_on:
       - postgresdb
     build: .
@@ -28,12 +41,14 @@ services:
       - backend_uploads:/usr/src/app/uploads
   
   backup:
+    container_name: backup
     image: offen/docker-volume-backup:latest
     restart: unless-stopped
     env_file: ./.env.docker
     volumes:
       - backend_db:/backup/db:ro
       - backend_uploads:/backup/uploads:ro
+      - redis_data:/backup/redis:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./backups:/archive
     environment:
@@ -51,4 +66,6 @@ volumes:
   backend_db:
     external: true
   backend_uploads:
+    external: true
+  redis_data:
     external: true

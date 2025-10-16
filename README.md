@@ -17,6 +17,7 @@ $ git clone --depth=1 -b main https://github.com/chickelit/orca-backend .
 ```bash
 $ docker volume create backend_db
 $ docker volume create backend_uploads
+$ docker volume create redis_data
 ```
 
 ### Passo 3: Preencha um arquivo .env.docker de acordo com o .env.example
