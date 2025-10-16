@@ -16,6 +16,16 @@ export class UserController {
         periodLe: z.string().datetime().optional(),
         periodReferenceDay: z.number().int().optional(),
         acceptsNotifications: z.boolean().optional(),
+        pushSubscription: z
+          .object({
+            endpoint: z.string(),
+            keys: z.object({
+              p256dh: z.string(),
+              auth: z.string(),
+            }),
+          })
+          .optional()
+          .or(z.null()),
       })
       .safeParse(request.body);
 

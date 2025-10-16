@@ -63,6 +63,9 @@ export class ReminderService {
     const reminder = await this.reminderRepository.findOne({
       where,
       withDeleted: true,
+      relations: {
+        user: true,
+      },
     });
 
     return reminder;

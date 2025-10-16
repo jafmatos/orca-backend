@@ -6,6 +6,14 @@ import { Subscription } from "./Subscription.entity";
 import { UserKey } from "./UserKey.entity";
 import { Reminder } from "./Reminder.entity";
 
+export interface PushSubscription {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
 export enum UserRoles {
   User = "user",
   Admin = "admin",
@@ -34,6 +42,9 @@ export class User {
 
   @Column({ type: "boolean", default: false })
   acceptsNotifications!: boolean;
+
+  @Column({ type: "jsonb", nullable: true })
+  pushSubscription?: PushSubscription | null;
 
   @Column()
   password!: string;

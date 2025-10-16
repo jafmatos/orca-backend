@@ -14,6 +14,7 @@ import { router } from "./routes";
 import { dataSource } from "./database/data-source";
 import { User, UserRoles } from "./database/entities/User.entity";
 import { Bcrypt } from "./helpers/Bcrypt";
+import { NotificationManager } from "./services/Notifications/NotificationManager";
 
 const app = express();
 const port = +process.env.APP_PORT!;
@@ -61,6 +62,8 @@ const server = http.createServer(app);
 server.listen(port, async () => {
   try {
     await dataSource.initialize();
+    
+		NotificationManager.setVapidKeys();
 
     const userRepository = dataSource.getRepository(User);
     const existingSuperUser = await userRepository.findOne({

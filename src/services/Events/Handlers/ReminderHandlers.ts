@@ -1,3 +1,4 @@
+// import { NotificationManager } from "Src/services/Notifications/NotificationManager";
 import { BusEventName } from "../EventBus";
 import { Reminder } from "Src/database/entities/Reminder.entity";
 
@@ -5,6 +6,7 @@ export class ReminderHandlers {
   public static async setupSchedule(eventName: BusEventName, reminder: Reminder) {
     try {
       console.log(`Processing event: ${eventName}`);
+      // await NotificationManager.sendNotification(reminder.user!, reminder);
     } catch (error) {
       console.log(`Error while handling event: ${eventName}`);
       console.log(error);

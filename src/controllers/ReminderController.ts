@@ -73,6 +73,7 @@ export class ReminderController {
 
     const reminder = await ReminderService.create({
       ...body,
+      user: request.auth!.user,
       userId: request.auth!.user.id,
     });
 
