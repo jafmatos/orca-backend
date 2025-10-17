@@ -54,6 +54,9 @@ export class ReminderHandlers {
             body: `${reminder.category?.name || "Sem categoria"}: ${reminder.description || "Sem descrição"} - ${(
               reminder.amount || 0
             ).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
+            data: {
+              reminder,
+            },
             title: "💡 Lembrete",
             url: "https://youtube.com",
           },
