@@ -66,7 +66,7 @@ export class ReminderHandlers {
             url: "https://youtube.com",
           },
         },
-        `0 ${referenceDateTime.getMinutes()} ${referenceDateTime.getHours()} ${reminder.referenceDateTime.getDate()} * *`
+        `0 ${referenceDateTime.getMinutes()} ${referenceDateTime.getHours()} ${referenceDateTime.getDate()} * *`
       );
     } catch (error) {
       console.log(`Error while handling event: ${eventName}`);
