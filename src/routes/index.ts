@@ -10,7 +10,7 @@ import multer from "multer";
 import { AvatarController } from "Src/controllers/users/AvatarController";
 import { UploadsController } from "Src/controllers/UploadsController";
 import { ResetPasswordController } from "Src/controllers/users/ResetPasswordController";
-import { OverviewController } from "Src/controllers/users/OverviewController";
+import { OverviewController } from "Src/controllers/OverviewController";
 import { PlanController } from "Src/controllers/PlanController";
 import { StripeWebhookController } from "Src/controllers/stripe/WebhookController";
 import { StripeCheckoutController } from "../controllers/stripe/CheckoutController";
@@ -19,6 +19,7 @@ import { UserRoles } from "Src/database/entities/User.entity";
 import { DeleteAccountController } from "Src/controllers/users/DeleteAccountController";
 import { subscribed } from "Src/middleware/subscribed";
 import { ReminderController } from "Src/controllers/ReminderController";
+import { PushSubscriptionController } from "Src/controllers/PushSubscriptionController";
 
 export const router = Router({ strict: true });
 const upload = multer({
@@ -27,16 +28,16 @@ const upload = multer({
   },
 });
 
-router.get("/plans", PlanController.index);
-router.post("/plans", auth([UserRoles.SuperUser]), PlanController.store);
-router.put("/plans/:id", auth([UserRoles.SuperUser]), PlanController.update);
-router.delete("/plans/:id", auth([UserRoles.SuperUser]), PlanController.destroy);
-
 router.get("/uploads/:fileName", UploadsController.show);
 
 router.post("/stripe/webhook", StripeWebhookController.store);
 router.post("/stripe/checkout", auth(), StripeCheckoutController.store);
 router.post("/stripe/billing-portals", auth(), StripeBillingPortalsController.store);
+
+router.get("/plans", PlanController.index);
+router.post("/plans", auth([UserRoles.SuperUser]), PlanController.store);
+router.put("/plans/:id", auth([UserRoles.SuperUser]), PlanController.update);
+router.delete("/plans/:id", auth([UserRoles.SuperUser]), PlanController.destroy);
 
 router.post("/sign-in", SignInController.store);
 router.get("/sign-in", auth([UserRoles.User]), SignInController.show);
@@ -78,6 +79,8 @@ router.get("/reminders/:id", auth(), subscribed, ReminderController.show);
 router.post("/reminders", auth(), subscribed, ReminderController.store);
 router.put("/reminders/:id", auth(), subscribed, ReminderController.update);
 router.delete("/reminders/:id", auth(), subscribed, ReminderController.destroy);
+
+router.post("/webpush/subscriptions", auth(), subscribed, PushSubscriptionController.store);
 
 router.get("/", async (request, response) => {
   return response.send("Hello, World! This was deployed by pipiline");

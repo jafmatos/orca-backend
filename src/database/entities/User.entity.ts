@@ -5,14 +5,7 @@ import { Entry } from "./Entry.entity";
 import { Subscription } from "./Subscription.entity";
 import { UserKey } from "./UserKey.entity";
 import { Reminder } from "./Reminder.entity";
-
-export interface PushSubscription {
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-}
+import { PushSubscription } from "./PushSubscription.entity";
 
 export enum UserRoles {
   User = "user",
@@ -43,8 +36,8 @@ export class User {
   @Column({ type: "boolean", default: false })
   acceptsNotifications!: boolean;
 
-  @Column({ type: "jsonb", nullable: true })
-  pushSubscription?: PushSubscription | null;
+  @OneToMany(() => PushSubscription, (pushSubscription) => pushSubscription.user, { cascade: ["insert", "update"] })
+  pushSubscriptions?: PushSubscription[];
 
   @Column()
   password!: string;

@@ -24,6 +24,19 @@ export class UserService {
     return user;
   }
 
+  public static async findByIdWithPushSubscriptions(id: User["id"]) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        pushSubscriptions: true,
+      },
+    });
+
+    return user;
+  }
+
   public static async findOneByWithoutRelations(where: FindOptionsWhere<User>) {
     const user = await this.userRepository.findOneBy(where);
 
