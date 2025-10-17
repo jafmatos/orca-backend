@@ -53,9 +53,6 @@ export class ReminderHandlers {
               reminder.amount || 0
             ).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
             title: "💡 Lembrete",
-            data: {
-              reminder,
-            },
             url: "https://youtube.com",
           },
         },
