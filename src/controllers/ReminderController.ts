@@ -56,6 +56,7 @@ export class ReminderController {
         dayOfMonth: z.number("Informe um dia do mês").min(1, "O valor não pode ser negativo").max(31, "O dia não pode ser maior que 31"),
         time: z.iso.datetime("Informe um horário"),
         category: zodOptionalCategorySchema.optional().or(z.null()),
+        createEntryAutomatically: z.boolean().optional().default(false),
       })
       .safeParse(request.body);
 
@@ -95,6 +96,7 @@ export class ReminderController {
           .optional(),
         time: z.iso.datetime("Informe um horário").optional(),
         category: zodOptionalCategorySchema.optional().or(z.null()).optional(),
+        createEntryAutomatically: z.boolean().optional().default(false),
       })
       .safeParse(request.body);
 
