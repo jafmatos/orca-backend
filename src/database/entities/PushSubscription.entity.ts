@@ -1,8 +1,4 @@
-import {
-	Column, Entity,
-	JoinColumn,
-	ManyToOne, PrimaryGeneratedColumn
-} from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User.entity";
 
 export interface IPushSubscription {
@@ -18,7 +14,7 @@ export class PushSubscription {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column()
+  @Column({ unique: true })
   endpoint!: string;
 
   @Column({ type: "jsonb", nullable: false })

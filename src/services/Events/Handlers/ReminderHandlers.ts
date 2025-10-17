@@ -10,11 +10,14 @@ import { NotificationManager } from "Src/services/Notifications/NotificationMana
 
 bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => {
   try {
-    const user = await UserService.findById(payload.notification.data!.reminder!.userId!);
+    const user = await UserService.findByIdWithPushSubscriptions(payload.notification.data!.reminder!.userId!);
     const reminder = await ReminderService.findOneBy({
       id: payload.notification.data!.reminder!.id,
       removedAt: IsNull(),
     });
+
+    console.log(JSON.stringify(user, null, 2));
+    console.log(JSON.stringify(reminder, null, 2));
 
     if (!user || !reminder) {
       await bullService.removeNotificationSchedule(payload.id);
@@ -33,6 +36,8 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
         await bullService.removeNotificationSchedule(payload.id);
       }
     });
+
+		console.log("Notification sent")
   } catch (error: any) {
     console.log("Error while handling send notification queue handler: ", error);
   }
