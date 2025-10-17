@@ -19,8 +19,8 @@ export class ReminderService {
   private static readonly reminderRepository = dataSource.getRepository(Reminder);
 
   public static async list(options: ListOptions) {
-    const queryBuilder = dataSource
-      .createQueryBuilder(Reminder, "reminder")
+    const queryBuilder = this.reminderRepository
+      .createQueryBuilder("reminder")
       .leftJoinAndSelect("reminder.category", "category")
       .where("(reminder.userId = :userId)", { userId: options.filter.userId })
       .andWhere("(reminder.removedAt IS NULL)");
@@ -35,8 +35,7 @@ export class ReminderService {
         { text: `%${options.filter!.text!}%` }
       );
 
-    queryBuilder.orderBy("reminder.dayOfMonth", "ASC");
-    queryBuilder.addOrderBy("reminder.time", "ASC");
+    queryBuilder.orderBy("reminder.referenceDateTime", "ASC");
 
     if (options?.pagination) {
       queryBuilder.skip(options.pagination.skip);
