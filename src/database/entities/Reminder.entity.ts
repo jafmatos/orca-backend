@@ -11,6 +11,9 @@ export class Reminder {
   @Column({ type: "boolean", default: true })
   isActive!: boolean;
 
+  @Column({ type: "boolean", default: false })
+  createEntryAutomatically!: boolean;
+
   @Column({ type: "enum", enum: EntryTypes })
   type!: EntryTypes;
 
