@@ -37,7 +37,7 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
       }
     });
 
-		console.log("Notification sent")
+    console.log("Notification sent");
   } catch (error: any) {
     console.log("Error while handling send notification queue handler: ", error);
   }
@@ -50,7 +50,7 @@ const getNotificationJobIdForReminder = (reminder: Reminder) => {
 export class ReminderHandlers {
   public static async setupSchedule(eventName: BusEventName, reminder: Reminder) {
     try {
-      const time = new Date(reminder.time);
+      const referenceDateTime = new Date(reminder.referenceDateTime);
 
       await bullService.addNotificationSchedule(
         {
@@ -66,7 +66,7 @@ export class ReminderHandlers {
             url: "https://youtube.com",
           },
         },
-        `0 ${time.getMinutes()} ${time.getHours()} ${reminder.dayOfMonth} * *`
+        `0 ${referenceDateTime.getMinutes()} ${referenceDateTime.getHours()} ${reminder.referenceDateTime.getDate()} * *`
       );
     } catch (error) {
       console.log(`Error while handling event: ${eventName}`);

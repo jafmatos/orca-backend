@@ -42,11 +42,8 @@ export class Reminder {
   @JoinColumn({ name: "userId" })
   user?: User;
 
-  @Column("int")
-  dayOfMonth!: number;
-
   @Column()
-  time!: Date;
+  referenceDateTime!: Date;
 
   @Column("timestamp", { nullable: true })
   removedAt?: Date | null;
