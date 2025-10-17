@@ -105,7 +105,7 @@ export class ReminderController {
       userId: request.auth!.user.id,
     });
 
-    if (!reminder) throw new NotFoundError("Despesa não encontrada");
+    if (!reminder) throw new NotFoundError("Lembrete não encontrado");
 
     if (body.category?.id) {
       const category = await CategoryService.findOneBy({
