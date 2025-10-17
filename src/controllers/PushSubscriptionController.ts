@@ -22,6 +22,8 @@ export class PushSubscriptionController {
       userId: request.auth!.user.id,
     });
 
-    return response.status(200).end();
+    return response.status(200).json({
+      message: "Subscription created successfully",
+    });
   }
 }
