@@ -22,16 +22,18 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
       return;
     }
 
-    if (!user.subscription?.isValid || !user.acceptsNotifications || !user.pushSubscription || !reminder!.isActive) {
+    if (!user.subscription?.isValid || !user.acceptsNotifications || !user.pushSubscriptions?.length || !reminder!.isActive) {
       return;
     }
 
-    await NotificationManager.sendNotification(user, payload);
-  } catch (error: any) {
-    if (error.statusCode === 410) {
-      await bullService.removeNotificationSchedule(payload.id);
-    }
+    await NotificationManager.sendNotification(user, payload, async (error) => {
+      console.log("Error while trying to send a notification: ", error);
 
+      if (error.statusCode === 410) {
+        await bullService.removeNotificationSchedule(payload.id);
+      }
+    });
+  } catch (error: any) {
     console.log("Error while handling send notification queue handler: ", error);
   }
 });
