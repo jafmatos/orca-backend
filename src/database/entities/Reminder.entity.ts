@@ -8,6 +8,9 @@ export class Reminder {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Column({ type: "boolean", default: true })
+  isActive!: boolean;
+
   @Column({ type: "enum", enum: EntryTypes })
   type!: EntryTypes;
 

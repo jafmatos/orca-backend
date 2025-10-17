@@ -134,6 +134,8 @@ export class ReminderController {
 
     const removedReminder = await ReminderService.softRemove(reminder);
 
+    await eventBus.triggerAsync("reminder:removed", reminder);
+
     return response.status(200).json({ reminder: removedReminder });
   }
 }

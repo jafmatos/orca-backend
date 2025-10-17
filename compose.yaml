@@ -26,6 +26,22 @@ services:
       - REDIS_PASSWORD=$REDIS_PASSWORD 
     restart: unless-stopped
 
+  bullboard:
+    container_name: bullboard
+    image: deadly0/bull-board
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+      REDIS_USE_TLS: 'false'
+      USER_LOGIN: $BULLBOARD_USER_LOGIN
+      USER_PASSWORD: $BULLBOARD_USER_PASSWORD
+    depends_on:
+      - redis
+
   app:
     container_name: api
     depends_on:
