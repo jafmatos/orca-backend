@@ -28,7 +28,7 @@ export class ReminderService {
     options.filter?.category && queryBuilder.andWhere("(category.id = :category)", { category: options.filter!.category! });
 
     options.filter?.referenceDateTime &&
-      queryBuilder.andWhere("(EXTRACT(DAY FROM reminder.referenceDateTime) = :referenceDateTime::date)", {
+      queryBuilder.andWhere("(DATE(reminder.referenceDateTime) = :referenceDateTime::date)", {
         referenceDateTime: options.filter.referenceDateTime,
       });
 
