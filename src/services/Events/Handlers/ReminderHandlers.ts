@@ -8,13 +8,12 @@ import { ReminderService } from "Src/services/ReminderService";
 import { IsNull } from "typeorm";
 import { NotificationManager } from "Src/services/Notifications/NotificationManager";
 
-const jobIdPrefix = "notifications:reminder-";
 
 const getNotificationJobIdForReminder = (reminder: Reminder) => {
-  return `${jobIdPrefix}${reminder.id}`;
+  return `notifications:reminder-${reminder.id}`;
 };
 
-bullService.setNotificationQueueHandler(jobIdPrefix, async (payload: BullNotificationJob) => {
+bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => {
   try {
     const user = await UserService.findByIdWithPushSubscriptions(payload.notification.data!.reminder!.userId!);
     const reminder = await ReminderService.findOneBy({
