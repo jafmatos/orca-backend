@@ -6,7 +6,9 @@ export type BusEventName =
   | "user:token_validated"
   | "reminder:created"
   | "reminder:updated"
-  | "reminder:removed";
+  | "reminder:removed"
+  | "reminder:before-remove"
+  | "reminder:before-update";
 
 export type BusEventHandler = (eventName: BusEventName, args?: any) => Promise<void>;
 

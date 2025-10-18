@@ -8,6 +8,10 @@ import { ReminderService } from "Src/services/ReminderService";
 import { IsNull } from "typeorm";
 import { NotificationManager } from "Src/services/Notifications/NotificationManager";
 
+const getNotificationJobIdForReminder = (reminder: Reminder) => {
+  return `notifications:reminder-${reminder.id}`;
+};
+
 bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => {
   try {
     const user = await UserService.findByIdWithPushSubscriptions(payload.notification.data!.reminder!.userId!);
@@ -16,16 +20,19 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
       removedAt: IsNull(),
     });
 
-    console.log(JSON.stringify(user, null, 2));
-    console.log(JSON.stringify(reminder, null, 2));
-
-    if (!user || !reminder) {
-      await bullService.removeNotificationSchedule(payload.id);
-
+    if (
+      !reminder ||
+      !user?.subscription?.isValid ||
+      !user?.acceptsNotifications ||
+      !user?.pushSubscriptions?.length ||
+      !reminder!.isActive
+    ) {
       return;
     }
 
-    if (!user.subscription?.isValid || !user.acceptsNotifications || !user.pushSubscriptions?.length || !reminder!.isActive) {
+    if (!user) {
+      await bullService.removeNotificationSchedule(payload.id, reminder.monthlyCronTime);
+
       return;
     }
 
@@ -33,7 +40,7 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
       console.log("Error while trying to send a notification: ", error);
 
       if (error.statusCode === 410) {
-        await bullService.removeNotificationSchedule(payload.id);
+        await bullService.removeNotificationSchedule(payload.id, reminder.monthlyCronTime);
       }
     });
 
@@ -43,15 +50,9 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
   }
 });
 
-const getNotificationJobIdForReminder = (reminder: Reminder) => {
-  return `notifications;user-${reminder.userId};reminder-${reminder.id}`;
-};
-
 export class ReminderHandlers {
   public static async setupSchedule(eventName: BusEventName, reminder: Reminder) {
     try {
-      const referenceDateTime = new Date(reminder.referenceDateTime);
-
       await bullService.addNotificationSchedule(
         {
           id: getNotificationJobIdForReminder(reminder),
@@ -66,20 +67,8 @@ export class ReminderHandlers {
             url: "https://youtube.com",
           },
         },
-        `0 ${referenceDateTime.getMinutes()} ${referenceDateTime.getHours()} ${referenceDateTime.getDate()} * *`
+        reminder.monthlyCronTime
       );
-    } catch (error) {
-      console.log(`Error while handling event: ${eventName}`);
-      console.log(error);
-    }
-  }
-
-  public static async updateSchedule(eventName: BusEventName, reminder: Reminder) {
-    try {
-      console.log(`Processing event: ${eventName}`);
-
-      await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder));
-      await ReminderHandlers.setupSchedule(eventName, reminder);
     } catch (error) {
       console.log(`Error while handling event: ${eventName}`);
       console.log(error);
@@ -89,7 +78,7 @@ export class ReminderHandlers {
   public static async cancelSchedule(eventName: BusEventName, reminder: Reminder) {
     try {
       console.log(`Processing event: ${eventName}`);
-      await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder));
+      await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder), reminder.monthlyCronTime);
     } catch (error) {
       console.log(`Error while handling event: ${eventName}`);
       console.log(error);

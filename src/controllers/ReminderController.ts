@@ -56,6 +56,7 @@ export class ReminderController {
         referenceDateTime: z.iso.datetime("Informe um dia do mês e horário"),
         category: zodOptionalCategorySchema.optional().or(z.null()),
         createEntryAutomatically: z.boolean().optional().default(false),
+        isActive: z.boolean().optional().default(true),
       })
       .safeParse(request.body);
 
@@ -91,6 +92,7 @@ export class ReminderController {
         referenceDateTime: z.iso.datetime("Informe um dia do mês e horário"),
         category: zodOptionalCategorySchema.optional().or(z.null()).optional(),
         createEntryAutomatically: z.boolean().optional().default(false),
+        isActive: z.boolean().optional().default(true),
       })
       .safeParse(request.body);
 
@@ -113,6 +115,8 @@ export class ReminderController {
       if (!category) throw new NotFoundError("Categoria não encontrada");
     }
 
+    await eventBus.triggerAsync("reminder:before-update", reminder);
+
     const updatedReminder = await ReminderService.update(reminder, body);
 
     await eventBus.triggerAsync("reminder:updated", updatedReminder);
@@ -128,9 +132,9 @@ export class ReminderController {
 
     if (!reminder) throw new NotFoundError("Lembrete não encontrado");
 
-    const removedReminder = await ReminderService.softRemove(reminder);
+    await eventBus.triggerAsync("reminder:before-remove", reminder);
 
-    await eventBus.triggerAsync("reminder:removed", reminder);
+    const removedReminder = await ReminderService.softRemove(reminder);
 
     return response.status(200).json({ reminder: removedReminder });
   }
