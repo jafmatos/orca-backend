@@ -8,7 +8,6 @@ import { ReminderService } from "Src/services/ReminderService";
 import { IsNull } from "typeorm";
 import { NotificationManager } from "Src/services/Notifications/NotificationManager";
 
-
 const getNotificationJobIdForReminder = (reminder: Reminder) => {
   return `notifications:reminder-${reminder.id}`;
 };
@@ -32,7 +31,7 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
     }
 
     if (!user) {
-      await bullService.removeNotificationSchedule(payload.id);
+      await bullService.removeNotificationSchedule(payload.id, reminder.monthlyCronTime);
 
       return;
     }
@@ -41,7 +40,7 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
       console.log("Error while trying to send a notification: ", error);
 
       if (error.statusCode === 410) {
-        await bullService.removeNotificationSchedule(payload.id);
+        await bullService.removeNotificationSchedule(payload.id, reminder.monthlyCronTime);
       }
     });
 
@@ -79,7 +78,7 @@ export class ReminderHandlers {
   public static async cancelSchedule(eventName: BusEventName, reminder: Reminder) {
     try {
       console.log(`Processing event: ${eventName}`);
-      await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder));
+      await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder), reminder.monthlyCronTime);
     } catch (error) {
       console.log(`Error while handling event: ${eventName}`);
       console.log(error);
