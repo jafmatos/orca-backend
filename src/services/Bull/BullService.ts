@@ -50,6 +50,7 @@ export class BullService {
       await this.notificationQueue.add("notification-job", job, {
         jobId: job.id,
         repeat: {
+          key: job.id,
           cron: cronTime,
         },
         attempts: 3,
@@ -60,11 +61,8 @@ export class BullService {
     }
   }
 
-  async removeNotificationSchedule(id: BullNotificationJob["id"], cronTime: string) {
-    await this.notificationQueue.removeRepeatable({
-      jobId: id,
-      cron: cronTime,
-    });
+  async removeNotificationSchedule(id: BullNotificationJob["id"]) {
+    await this.notificationQueue.removeRepeatableByKey(id);
   }
 
   setNotificationQueueHandler(notificationQueueHandler: BullNotificationJobHandler) {
