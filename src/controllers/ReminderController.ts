@@ -62,18 +62,19 @@ export class ReminderController {
 
     if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-    if (body.category?.id) {
-      const category = await CategoryService.findOneBy({
+    const category =
+      body.category &&
+      (await CategoryService.findOneBy({
         id: body.category.id,
         removedAt: IsNull(),
         userId: request.auth!.user.id,
-      });
+      }));
 
-      if (!category) throw new NotFoundError("Categoria não encontrada");
-    }
+    if (body.category?.id || !category) throw new NotFoundError("Categoria não encontrada");
 
     const reminder = await ReminderService.create({
       ...body,
+      category,
       user: request.auth!.user,
       userId: request.auth!.user.id,
     });
@@ -105,19 +106,22 @@ export class ReminderController {
 
     if (!reminder) throw new NotFoundError("Lembrete não encontrado");
 
-    if (body.category?.id) {
-      const category = await CategoryService.findOneBy({
+    const category =
+      body.category &&
+      (await CategoryService.findOneBy({
         id: body.category.id,
         removedAt: IsNull(),
         userId: request.auth!.user.id,
-      });
+      }));
 
-      if (!category) throw new NotFoundError("Categoria não encontrada");
-    }
+    if (body.category?.id || !category) throw new NotFoundError("Categoria não encontrada");
 
     await eventBus.triggerAsync("reminder:before-update", reminder);
 
-    const updatedReminder = await ReminderService.update(reminder, body);
+    const updatedReminder = await ReminderService.update(reminder, {
+      ...body,
+      category,
+    });
 
     await eventBus.triggerAsync("reminder:updated", updatedReminder);
 
