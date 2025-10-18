@@ -67,8 +67,8 @@ export class BullService {
     });
   }
 
-  setNotificationQueueHandler(notificationQueueHandler: BullNotificationJobHandler) {
-    this.notificationQueue.process(async (payload, done) => {
+  setNotificationQueueHandler(pattern: string, notificationQueueHandler: BullNotificationJobHandler) {
+    this.notificationQueue.process(pattern, async (payload, done) => {
       try {
         await notificationQueueHandler(payload.data as BullNotificationJob);
 
