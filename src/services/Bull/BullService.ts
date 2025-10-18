@@ -47,7 +47,7 @@ export class BullService {
 
   async addNotificationSchedule(job: BullNotificationJob, cronTime: Bull.CronRepeatOptions["cron"]) {
     try {
-      await this.notificationQueue.add(job.id, job, {
+      await this.notificationQueue.add("notification-job", job, {
         jobId: job.id,
         repeat: {
           cron: cronTime,
@@ -67,8 +67,8 @@ export class BullService {
     });
   }
 
-  setNotificationQueueHandler(pattern: string, notificationQueueHandler: BullNotificationJobHandler) {
-    this.notificationQueue.process(pattern, async (payload, done) => {
+  setNotificationQueueHandler(notificationQueueHandler: BullNotificationJobHandler) {
+    this.notificationQueue.process("notification-job", async (payload, done) => {
       try {
         await notificationQueueHandler(payload.data as BullNotificationJob);
 
