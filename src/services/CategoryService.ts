@@ -36,7 +36,7 @@ export class CategoryService {
     queryBuilder.leftJoin(
       "entry",
       "entry",
-      `category.id = entry.categoryId AND entry.type = 'expense' AND (DATE(entry.when) BETWEEN :ge::date AND :le::date)`,
+      `category.id = entry.categoryId AND entry.type = 'expense' AND (DATE(entry.when) BETWEEN :ge::date AND :le::date) AND entry.removedAt IS NULL`,
       {
         ge: options.filter.when?.ge,
         le: options.filter.when?.le,
