@@ -62,8 +62,15 @@ export class BullService {
   }
 
   async removeNotificationSchedule(id: BullNotificationJob["id"], cronTime: string) {
-		console.log(`Removing by key: notification-job:${id}:::${cronTime}`)
-    await this.notificationQueue.removeRepeatableByKey(`notification-job:${id}:::${cronTime}`);
+    try {
+      await this.notificationQueue.removeRepeatable("notification-job", {
+        cron: cronTime,
+        jobId: id,
+      });
+    } catch (error) {
+      console.log("Error while removing schedule by id ", id);
+      console.log(error);
+    }
   }
 
   setNotificationQueueHandler(notificationQueueHandler: BullNotificationJobHandler) {
