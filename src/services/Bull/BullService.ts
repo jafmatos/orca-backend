@@ -62,6 +62,7 @@ export class BullService {
   }
 
   async removeNotificationSchedule(id: BullNotificationJob["id"], cronTime: string) {
+		console.log(`Removing by key: notification-job:${id}:::${cronTime}`)
     await this.notificationQueue.removeRepeatableByKey(`notification-job:${id}:::${cronTime}`);
   }
 
