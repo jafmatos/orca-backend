@@ -38,6 +38,7 @@ export class ReminderService {
         { text: `%${options.filter!.text!}%` }
       );
 
+    queryBuilder.orderBy("reminder.isActive", "DESC");
     queryBuilder.orderBy("reminder.referenceDateTime", "ASC");
 
     if (options?.pagination) {

@@ -47,4 +47,13 @@ export class Reminder {
 
   @Column("timestamp", { nullable: true })
   removedAt?: Date | null;
+
+  get monthlyCronTime() {
+    const referenceDateTime = new Date(this.referenceDateTime);
+    const date = referenceDateTime.getDate();
+    const hours = referenceDateTime.getHours();
+    const minutes = referenceDateTime.getMinutes();
+
+    return `0 ${minutes} ${hours} ${date} * *`;
+  }
 }
