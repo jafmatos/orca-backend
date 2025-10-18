@@ -33,6 +33,7 @@ export class EntryService {
       .createQueryBuilder("entry")
       .leftJoinAndSelect("entry.category", "category")
       .where("(entry.userId = :userId)", { userId: options.filter.userId })
+      .andWhere("(entry.removedAt IS NULL)")
       .andWhere("(category.removedAt IS NULL)");
 
     queryBuilder.andWhere(`(DATE(entry.when) BETWEEN :ge::date AND :le::date)`, {
