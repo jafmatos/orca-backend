@@ -70,7 +70,7 @@ export class ReminderController {
         userId: request.auth!.user.id,
       }));
 
-    if (body.category?.id || !category) throw new NotFoundError("Categoria não encontrada");
+    if (body.category?.id && !category) throw new NotFoundError("Categoria não encontrada");
 
     const reminder = await ReminderService.create({
       ...body,
@@ -90,7 +90,7 @@ export class ReminderController {
         type: z.enum(EntryTypes).optional(),
         description: z.string().max(255, "A descrição deve ter no máximo 255 caracteres").optional(),
         amount: z.number("Informe um valor").min(0, "O valor não pode ser negativo").optional(),
-        referenceDateTime: z.iso.datetime("Informe um dia do mês e horário"),
+        referenceDateTime: z.iso.datetime("Informe um dia do mês e horário").optional(),
         category: zodOptionalCategorySchema.optional().or(z.null()).optional(),
         createEntryAutomatically: z.boolean().optional().default(false),
         isActive: z.boolean().optional().default(true),
@@ -114,7 +114,7 @@ export class ReminderController {
         userId: request.auth!.user.id,
       }));
 
-    if (body.category?.id || !category) throw new NotFoundError("Categoria não encontrada");
+    if (body.category?.id && !category) throw new NotFoundError("Categoria não encontrada");
 
     await eventBus.triggerAsync("reminder:before-update", reminder);
 
