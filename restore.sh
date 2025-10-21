@@ -45,6 +45,6 @@ MSYS_NO_PATHCONV=1 docker run --rm \
   busybox \
   sh -c "rm -rf /volume/* && tar xzf /backup/$BACKUP_FILE -C /volume --strip-components=2 backup/uploads/"
 
-docker compose up -d
+docker compose --env-file .env.docker up -d
 
 echo "Restore complete!"
