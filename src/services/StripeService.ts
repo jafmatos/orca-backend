@@ -66,4 +66,28 @@ export class StripeService {
 
     return session;
   }
+
+  public static async getCustomerByEmail(email: string) {
+    const customers = await stripe.customers.search({ query: `email: '${email}'`, limit: 1 });
+
+    return customers.data[0];
+  }
+
+  public static async getCustomerSubscription(customerId: string) {
+    const subscriptions = await stripe.subscriptions.search({
+      query: `customer: '${customerId}'`,
+      limit: 1,
+    });
+
+    return subscriptions.data[0];
+  }
+
+  public static async getCustomerSubscriptionByUserId(userId: string) {
+    const subscriptions = await stripe.subscriptions.search({
+      query: `metadata["userId"]: '${userId}'`,
+      limit: 1,
+    });
+
+    return subscriptions.data[0];
+  }
 }
