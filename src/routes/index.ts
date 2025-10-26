@@ -32,6 +32,7 @@ router.get("/uploads/:fileName", UploadsController.show);
 
 router.post("/stripe/webhook", StripeWebhookController.store);
 router.post("/stripe/checkout", auth(), StripeCheckoutController.store);
+router.post("/stripe/checkout/verify", auth(), StripeCheckoutController.update);
 router.post("/stripe/billing-portals", auth(), StripeBillingPortalsController.store);
 
 router.get("/plans", PlanController.index);
