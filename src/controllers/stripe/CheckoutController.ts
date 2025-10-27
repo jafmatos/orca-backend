@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { ConflictError, NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
-import { PaymentRequiredError } from "Src/helpers/Errors/PaymentRequiredError";
 import { PlanService } from "Src/services/PlanService";
 import { StripeService } from "Src/services/StripeService";
 import { SubscriptionService } from "Src/services/SubscriptionService";
@@ -53,12 +52,6 @@ export class StripeCheckoutController {
     const existingSubscription = await SubscriptionService.findOne({
       stripeId: subscription.id,
     });
-
-    if (existingSubscription?.isValid) {
-      return response.status(200).json({
-        message: "Você já tem uma assinatura ativa",
-      });
-    }
 
     if (existingSubscription) {
       const updatedSubscription = await SubscriptionService.update(existingSubscription, {
