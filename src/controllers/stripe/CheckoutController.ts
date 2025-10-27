@@ -45,9 +45,9 @@ export class StripeCheckoutController {
   public static async update(request: Request, response: Response) {
     const transaction = new TypeormTransaction();
 
-    try {
-      await transaction.begin();
+    await transaction.begin();
 
+    try {
       const authUser = request.auth!.user!;
       const subscription = await StripeService.getCustomerSubscriptionByUserId(authUser.id);
       const customer = await StripeService.getCustomerByEmail(authUser.email);
