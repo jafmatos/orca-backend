@@ -1,4 +1,10 @@
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterRecover,
+  AfterRemove,
+  AfterSoftRemove,
+  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -44,6 +50,27 @@ export class Subscription {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  traducedStatus!: string;
+
+  @AfterInsert()
+  @AfterLoad()
+  @AfterRecover()
+  @AfterRemove()
+  @AfterSoftRemove()
+  @AfterUpdate()
+  setTraducedStatus() {
+    const map = new Map<SubscriptionStatuses, string>([
+      [SubscriptionStatuses.Active, "ativa"],
+      [SubscriptionStatuses.Canceled, "cancelada"],
+      [SubscriptionStatuses.PastDue, "com pagamento atrasado"],
+      [SubscriptionStatuses.Paused, "pausada"],
+      [SubscriptionStatuses.Trialing, "em período de teste"],
+      [SubscriptionStatuses.Unpaid, "com pagamento pendente"],
+    ]);
+
+    this.traducedStatus = map.get(this.status)!;
+  }
 
   get isValid() {
     return [SubscriptionStatuses.Trialing, SubscriptionStatuses.Active, SubscriptionStatuses.PastDue].includes(this.status);
