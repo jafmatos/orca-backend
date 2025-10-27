@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
+import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { ConflictError, NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { PlanService } from "Src/services/PlanService";
 import { StripeService } from "Src/services/StripeService";
 import { SubscriptionService } from "Src/services/SubscriptionService";
+import { UserService } from "Src/services/UserService";
 import { SubscriptionStatuses } from "Src/types/SubscriptionStatuses";
 import z from "zod";
 
@@ -41,37 +43,67 @@ export class StripeCheckoutController {
   }
 
   public static async update(request: Request, response: Response) {
-    const authUser = request.auth!.user!;
-    const subscription = await StripeService.getCustomerSubscriptionByUserId(authUser.id);
+    const transaction = new TypeormTransaction();
 
-    if (!subscription) throw new TeapotError("Pagamento não processado");
+    try {
+      await transaction.begin();
 
-    const trialStart = subscription.trial_start ? new Date(subscription.trial_start * 1000) : undefined;
-    const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : undefined;
+      const authUser = request.auth!.user!;
+      const subscription = await StripeService.getCustomerSubscriptionByUserId(authUser.id);
+      const customer = await StripeService.getCustomerByEmail(authUser.email);
 
-    const existingSubscription = await SubscriptionService.findOne({
-      stripeId: subscription.id,
-    });
+      if (!subscription || !customer) throw new TeapotError("Pagamento não processado");
 
-    if (existingSubscription) {
-      const updatedSubscription = await SubscriptionService.update(existingSubscription, {
-        status: subscription.status as SubscriptionStatuses,
-        trialStart,
-        trialEnd,
+      await UserService.update(
+        authUser,
+        {
+          stripeId: customer.id,
+        },
+        { transaction }
+      );
+
+      const trialStart = subscription.trial_start ? new Date(subscription.trial_start * 1000) : undefined;
+      const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : undefined;
+
+      const existingSubscription = await SubscriptionService.findOne({
+        stripeId: subscription.id,
       });
 
-      return response.status(200).json({ subscription: updatedSubscription });
+      if (existingSubscription) {
+        const updatedSubscription = await SubscriptionService.update(
+          existingSubscription,
+          {
+            status: subscription.status as SubscriptionStatuses,
+            trialStart,
+            trialEnd,
+          },
+          { transaction }
+        );
+
+        return response.status(200).json({ subscription: updatedSubscription });
+      }
+
+      const createdSubscription = await SubscriptionService.create(
+        {
+          stripeId: subscription.id,
+          status: subscription.status as SubscriptionStatuses,
+          trialStart,
+          trialEnd,
+          planId: subscription.metadata.planId,
+          userId: subscription.metadata.userId,
+        },
+        { transaction }
+      );
+
+      await transaction.commit();
+      await transaction.release();
+
+      return response.status(200).json({ subscription: createdSubscription });
+    } catch (error) {
+      await transaction.rollback();
+      await transaction.release();
+
+      throw error;
     }
-
-    const createdSubscription = await SubscriptionService.create({
-      stripeId: subscription.id,
-      status: subscription.status as SubscriptionStatuses,
-      trialStart,
-      trialEnd,
-      planId: subscription.metadata.planId,
-      userId: subscription.metadata.userId,
-    });
-
-    return response.status(200).json({ subscription: createdSubscription });
   }
 }
