@@ -53,12 +53,6 @@ export class StripeCheckoutController {
       stripeId: subscription.id,
     });
 
-    if (existingSubscription?.isValid) {
-      return response.status(200).json({
-        message: "Você já tem uma assinatura ativa",
-      });
-    }
-
     if (existingSubscription) {
       const updatedSubscription = await SubscriptionService.update(existingSubscription, {
         status: subscription.status as SubscriptionStatuses,
