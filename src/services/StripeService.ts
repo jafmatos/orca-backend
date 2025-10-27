@@ -1,5 +1,6 @@
 import { Plan } from "Src/database/entities/Plan.entity";
 import { User } from "Src/database/entities/User.entity";
+import { SubscriptionStatuses } from "Src/types/SubscriptionStatuses";
 import { Stripe } from "stripe";
 
 export const stripe = new Stripe(process.env.STRIPE_KEY!);
@@ -87,6 +88,10 @@ export class StripeService {
       query: `metadata["userId"]: '${userId}'`,
       limit: 1,
     });
+
+    const nonCanceledSubscription = subscriptions.data.filter((subscription) => subscription.status !== SubscriptionStatuses.Canceled)[0];
+
+    if (nonCanceledSubscription) return nonCanceledSubscription;
 
     return subscriptions.data[0];
   }

@@ -54,43 +54,21 @@ export class StripeCheckoutController {
 
       if (!subscription || !customer) throw new TeapotError("Pagamento não processado");
 
-      await UserService.update(
-        authUser,
-        {
-          stripeId: customer.id,
-        },
-        { transaction }
-      );
-
       const trialStart = subscription.trial_start ? new Date(subscription.trial_start * 1000) : undefined;
       const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : undefined;
 
-      const existingSubscription = await SubscriptionService.findOne({
-        stripeId: subscription.id,
-      });
-
-      if (existingSubscription) {
-        const updatedSubscription = await SubscriptionService.update(
-          existingSubscription,
-          {
+      const updatedUser = await UserService.update(
+        authUser,
+        {
+          stripeId: customer.id,
+          subscription: {
+            stripeId: subscription.id,
             status: subscription.status as SubscriptionStatuses,
             trialStart,
             trialEnd,
+            planId: subscription.metadata.planId,
+            userId: subscription.metadata.userId,
           },
-          { transaction }
-        );
-
-        return response.status(200).json({ subscription: updatedSubscription });
-      }
-
-      const createdSubscription = await SubscriptionService.create(
-        {
-          stripeId: subscription.id,
-          status: subscription.status as SubscriptionStatuses,
-          trialStart,
-          trialEnd,
-          planId: subscription.metadata.planId,
-          userId: subscription.metadata.userId,
         },
         { transaction }
       );
@@ -98,7 +76,7 @@ export class StripeCheckoutController {
       await transaction.commit();
       await transaction.release();
 
-      return response.status(200).json({ subscription: createdSubscription });
+      return response.status(200).json({ subscription: updatedUser.subscription });
     } catch (error) {
       await transaction.rollback();
       await transaction.release();
