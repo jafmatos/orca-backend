@@ -33,6 +33,8 @@ jobs:
         run: cat .env.docker
       - name: Running API
         run: npm run docker:deploy
+        env: 
+          DB_USER: postgres
       - name: Log the api container
         run: npm run docker:logs
       # - name: Waiting for API to be available
