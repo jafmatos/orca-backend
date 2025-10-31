@@ -1,4 +1,4 @@
-# secrets.GH_REPOSITORY: The API Repository
+# secrets.GH_REPOSITORY: The API Repository owner/repo
 # secrets.GH_TOKEN: The Github authorization token
 
 name: api.orca-financas.com integration testing
