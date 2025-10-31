@@ -29,6 +29,8 @@ jobs:
           docker volume create backend_db
           docker volume create backend_uploads
           docker volume create redis_data
+      - name: Log the .env.docker
+        run: cat .env.docker
       - name: Running API
         run: npm run docker:deploy
       - name: Log the api container
