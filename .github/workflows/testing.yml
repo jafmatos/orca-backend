@@ -41,9 +41,9 @@ jobs:
           DB_USER: postgres
       - name: Log the api container
         run: npm run docker:logs
-      # - name: Waiting for API to be available
-      #   run: |
-      #     timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
-      #     echo "API is available!"
-      # - name: Running tests
-      #   run: npm run test
+      - name: Waiting for API to be available
+        run: |
+          timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
+          echo "API is available!"
+      - name: Running tests
+        run: npm run test
