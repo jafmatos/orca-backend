@@ -73,9 +73,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./backups:/archive
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=orca
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
       - SCHEDULE=0 2 * * *
       - BACKUP_SOURCES=/backup
       - BACKUP_FILENAME=backup-%d-%m-%Y.tar.gz
