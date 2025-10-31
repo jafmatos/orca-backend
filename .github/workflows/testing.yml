@@ -22,17 +22,17 @@ jobs:
           repository: ${{ secrets.GH_REPOSITORY }}
           token: ${{ secrets.GH_TOKEN }}
           path: .
+      - name: Creating docker volumes
+        run: |
+          docker volume create backend_db
+          docker volume create backend_uploads
+          docker volume create redis_data
       - name: Create .env.docker from secrets DOCKER_ENV_FILE
         run: |
           echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker 
           set -a
           source .env.docker 
           set +a
-      - name: Creating docker volumes
-        run: |
-          docker volume create backend_db
-          docker volume create backend_uploads
-          docker volume create redis_data
       - name: Log the .env.docker
         run: cat .env.docker
       - name: Running API
