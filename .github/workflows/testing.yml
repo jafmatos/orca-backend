@@ -30,27 +30,13 @@ jobs:
       - name: Create .env.docker from secrets DOCKER_ENV_FILE
         run: |
           echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker 
-      - name: Test with simple env file
-        run: |
-          # Create a simple test file
-          cat > test.env << 'EOF'
-          DB_USER=test_user
-          DB_PASS=test_pass
-          TEST_VAR=hello_world
-          EOF
-          
-          echo "=== Test file content ==="
-          cat test.env
-          
-          echo "=== Testing docker compose with test file ==="
-          docker compose --env-file test.env config | grep -E "DB_USER|DB_PASS|TEST_VAR"
-      - name: Log the .env.docker
-        run: docker compose --env-file .env.docker config
       - name: Running API
         run: npm run docker:deploy
       - name: Waiting for API to be available
         run: |
           timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
           echo "API is available!"
+      - name: Installing dependencies to run jest
+        run: npm i
       - name: Running tests
         run: npm run test
