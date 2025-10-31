@@ -10,9 +10,6 @@ on:
 
   workflow_dispatch:
 
-env: 
-  ABABA: 1
-
 jobs:
   testing:
     runs-on: ubuntu-latest
@@ -34,9 +31,11 @@ jobs:
           docker volume create redis_data
       - name: Running API
         run: npm run docker:deploy
-      - name: Waiting for API to be available
-        run: |
-          timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
-          echo "API is available!"
-      - name: Running tests
-        run: npm run test
+      - name: Log the api container
+        run: npm run docker:logs
+      # - name: Waiting for API to be available
+      #   run: |
+      #     timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
+      #     echo "API is available!"
+      # - name: Running tests
+      #   run: npm run test

@@ -20,7 +20,7 @@ jobs:
       name: production
       url: ${{vars.APP_URL}}
     steps:
-      - name: VPS Build
+      - name: VPS Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           key: ${{secrets.SERVER_SSH_KEY}}
