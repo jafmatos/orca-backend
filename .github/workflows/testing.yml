@@ -26,7 +26,12 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: .
       - name: Create .env.docker from secrets DOCKER_ENV_FILE
-        run: echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker
+        run: echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker 
+      - name: Creating docker volumes
+        run: |
+          docker volume create backend_db
+          docker volume create backend_uploads
+          docker volume create redis_data
       - name: Running API
         run: npm run docker:deploy
       - name: Waiting for API to be available
