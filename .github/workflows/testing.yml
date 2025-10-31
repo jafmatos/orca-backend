@@ -37,6 +37,6 @@ jobs:
           timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
           echo "API is available!"
       - name: Installing dependencies to run jest
-        run: npm i
+        run: cd e2e && npm i
       - name: Running tests
         run: npm run test
