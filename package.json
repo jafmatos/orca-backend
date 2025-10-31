@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "cd e2e && jest",
+		"test": "cd e2e && npx jest",
 		"dev": "ts-node-dev -r tsconfig-paths/register ./src/server.ts --env=development",
 		"build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist",
 		"start": "node ./dist/server.js --env=production",
