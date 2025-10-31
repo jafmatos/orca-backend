@@ -1,5 +1,6 @@
 # secrets.GH_REPOSITORY: The API Repository owner/repo
 # secrets.GH_TOKEN: The Github authorization token
+# secrets.DOCKER_ENV_FILE: The whole content of .env.docker.test needed to run npm run docker:deploy
 
 name: api.orca-financas.com integration testing
 
@@ -8,6 +9,9 @@ on:
     branches: [merge]
 
   workflow_dispatch:
+
+env: 
+  ABABA: 1
 
 jobs:
   testing:
@@ -21,6 +25,8 @@ jobs:
           repository: ${{ secrets.GH_REPOSITORY }}
           token: ${{ secrets.GH_TOKEN }}
           path: .
+      - name: Create .env.docker from secrets DOCKER_ENV_FILE
+        run: echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker
       - name: Running API
         run: npm run docker:deploy
       - name: Waiting for API to be available
