@@ -3,7 +3,7 @@ dist
 logs
 .env
 .env.docker
-.env.render
+.env.docker.test
 uploads 
 backups
 

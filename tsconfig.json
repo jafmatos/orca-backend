@@ -14,15 +14,6 @@
 		"paths": {
 			"Src/*": [
 				"./*"
-			],
-			"Helpers": [
-				"./helpers"
-			],
-			"Middleware": [
-				"./middleware"
-			],
-			"Utils": [
-				"./utils"
 			]
 		},
 		"typeRoots": [
@@ -37,5 +28,8 @@
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"skipLibCheck": true
-	}
+	},
+	"exclude": [
+		"e2e"
+	]
 }
