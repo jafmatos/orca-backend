@@ -14,16 +14,6 @@ services:
       - 5432:5432
     volumes:
       - backend_db:/var/lib/postgresql/18/docker
-    command: |
-      bash -c "
-        until pg_isready; do sleep 1; done
-
-        sed -i '/host all all all scram-sha-256/d' /var/lib/postgresql/18/docker/pg_hba.conf
-
-        psql -U $DB_USER -d $DB_NAME -c 'SELECT pg_reload_conf();'
-
-        docker-entrypoint.sh postgres 
-      "
     logging:
       driver: "json-file"
       options:
