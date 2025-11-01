@@ -2,7 +2,7 @@
 # secrets.REMOTE_USER: The VPS user name
 # secrets.REMOTE_PORT: The VPS ssh connection port (default 22)
 # secrets.REMOTE_WORK_DIR: The VPS working directory for deploying
-# secrets.SERVER_SSH_KEY: Public SSH for VPS authentication
+# secrets.SERVER_SSH_KEY: PRIVATE SSH key for VPS authentication
 # vars.APP_URL: Deployed app url
 
 name: api.orca-financas.com deployment
