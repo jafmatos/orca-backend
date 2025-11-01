@@ -40,6 +40,7 @@ jobs:
         run: npm run docker:test
       - name: Push to branch review
         run: |
+          git fetch
           git checkout review
           git merge merge
           git push
