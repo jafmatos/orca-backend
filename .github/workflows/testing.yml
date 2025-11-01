@@ -38,3 +38,8 @@ jobs:
           echo "API is available!"
       - name: Running tests
         run: npm run docker:test
+      - name: Push to branch review
+        run: |
+          git checkout review
+          git merge merge
+          git push
