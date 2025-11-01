@@ -41,8 +41,8 @@ jobs:
       - name: Push to branch review
         run: |
           git fetch
-          git checkout review
+          git checkout -B review origin/review
           git config --global user.email "actions@github.com"
           git config --global user.name "Pipeline"
-          git merge merge --ff-only --allow-unrelated-histories
-          git push
+          git merge origin/merge --ff-only --allow-unrelated-histories
+          git push origin review
