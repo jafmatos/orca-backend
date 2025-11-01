@@ -1,0 +1,31 @@
+# secrets.GH_REPOSITORY: The API Repository owner/repo
+# secrets.GH_TOKEN: The Github authorization token
+
+name: api.orca-financas.com integration testing
+
+on:
+  push:
+    branches: [merge]
+
+  workflow_dispatch:
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    environment:
+      name: testing
+    steps:
+      - name: Github Checkout
+        uses: actions/checkout@v4
+        with: 
+          repository: ${{ secrets.GH_REPOSITORY }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: .
+      - name: Running API
+        run: npm run docker:deploy
+      - name: Waiting for API to be available
+        run: |
+          timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
+          echo "API is available!"
+      - name: Running tests
+        run: npm run test
