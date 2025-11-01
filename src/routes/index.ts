@@ -84,5 +84,5 @@ router.delete("/reminders/:id", auth(), subscribed, ReminderController.destroy);
 router.post("/webpush/subscriptions", auth(), subscribed, PushSubscriptionController.store);
 
 router.get("/", async (request, response) => {
-  return response.send("Hello, World! This was deployed by pipiline");
+  return response.send("Hello, World!");
 });
