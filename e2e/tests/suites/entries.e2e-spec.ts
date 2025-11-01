@@ -24,5 +24,7 @@ describeWithHooks("Entries", () => {
 
   test.todo("[List] - Deve ser capaz de filtrar os lançamentos ordenando pelo valor");
 
+  test.todo("[Show] - Deve ser capaz de encontrar um lançamento pelo id");
+
   test.todo("[Create] - Deve ser capaz de cadastrar um lançamento");
 });
