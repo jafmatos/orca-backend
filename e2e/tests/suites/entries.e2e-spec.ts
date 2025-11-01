@@ -16,9 +16,13 @@ describeWithHooks("Entries", () => {
 
   test.todo("[List] - Deve ser capaz de filtrar os lançamentos pela categoria");
 
-  test.todo("[List] - Deve ser capaz de filtrar os lançamentos por pesquisa incluindo o nome da categoria, descrição do lançamento ou valor");
+  test.todo(
+    "[List] - Deve ser capaz de filtrar os lançamentos por pesquisa incluindo o nome da categoria, descrição do lançamento ou valor"
+  );
 
   test.todo("[List] - Deve ser capaz de filtrar os lançamentos ordenando pela data");
-	
+
   test.todo("[List] - Deve ser capaz de filtrar os lançamentos ordenando pelo valor");
+
+  test.todo("[Create] - Deve ser capaz de cadastrar um lançamento");
 });
