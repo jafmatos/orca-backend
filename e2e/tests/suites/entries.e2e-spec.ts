@@ -20,5 +20,5 @@ describeWithHooks("Entries", () => {
 
   test.todo("[List] - Deve ser capaz de filtrar os lançamentos ordenando pela data");
 	
-  test.todo("[List] - Deve ser capaz de filtrar os lançamentos ordenando pela data");
+  test.todo("[List] - Deve ser capaz de filtrar os lançamentos ordenando pelo valor");
 });
