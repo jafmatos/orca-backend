@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"main": "jest.config.js",
 	"scripts": {
-		"test": "jest"
+		"test": "jest",
+		"docker:test": "docker compose up --abort-on-container-exit"
 	},
 	"keywords": [],
 	"author": "",
