@@ -10,15 +10,12 @@ export class NotificationManager {
   }
 
   public static async sendNotification(user: User, payload: object, onFailure?: (error: any) => void) {
-    console.log("Sending notification to ", user.pushSubscriptions?.length);
     if (!user.pushSubscriptions?.length) return;
 
     await Promise.all(
       user.pushSubscriptions.map(async (pushSubscription) => {
         try {
-					console.log("Sending...")
           await webpush.sendNotification(pushSubscription, JSON.stringify(payload));
-					console.log("Sent")
         } catch (error: any) {
           if (error.statusCode === 410) {
             PushSubscriptionService.remove(pushSubscription);

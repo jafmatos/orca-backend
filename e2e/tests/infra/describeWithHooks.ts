@@ -3,19 +3,19 @@ import jest, { afterAll, afterEach, beforeAll, beforeEach, describe } from "@jes
 export function describeWithHooks(blockName: string, blockFn: () => void) {
   return describe(blockName, () => {
     beforeAll(() => {
-      console.log("Default before all");
+      // console.log("Default before all");
     });
 
     afterAll(() => {
-      console.log("Default after all");
+      // console.log("Default after all");
     });
 
     beforeEach(() => {
-      console.log("Default before each");
+      // console.log("Default before each");
     });
 
     afterEach(() => {
-      console.log("Default after each");
+      // console.log("Default after each");
     });
 
     blockFn();

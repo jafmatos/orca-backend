@@ -5,7 +5,6 @@ import { UserService } from "Src/services/UserService";
 export class UserTokenValidatedHandlers {
   public static async validateAndUpdatePeriod(eventName: BusEventName, user: User) {
     try {
-      console.log(`Processing event: ${eventName}`);
       const periodGe = user.periodGe.getTime();
       const periodLe = user.periodLe.getTime();
       const now = Date.now();
@@ -25,8 +24,7 @@ export class UserTokenValidatedHandlers {
         periodLe: newPeriodLe,
       });
     } catch (error) {
-      console.log(`Error while handling event: ${eventName}`);
-      console.log(error);
+      console.log(`Error while handling event: ${eventName}`, error);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ValidationError } from "Src/helpers/Errors";
-import { stripe, StripeService } from "Src/services/StripeService";
+import { StripeService } from "Src/services/StripeService";
 import z from "zod";
 
 export class StripeBillingPortalsController {

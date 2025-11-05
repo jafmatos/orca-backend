@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgresdb:
@@ -26,10 +26,12 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data 
+      - redis_data:/data
     environment:
-      - REDIS_PASSWORD=$REDIS_PASSWORD 
+      - REDIS_PASSWORD=$REDIS_PASSWORD
     restart: unless-stopped
+    networks: 
+      - app-network
 
   bullboard:
     container_name: bullboard
@@ -41,11 +43,13 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
-      REDIS_USE_TLS: 'false'
+      REDIS_USE_TLS: "false"
       USER_LOGIN: $BULLBOARD_USER_LOGIN
       USER_PASSWORD: $BULLBOARD_USER_PASSWORD
     depends_on:
       - redis
+    networks:
+      - app-network
 
   app:
     container_name: api
@@ -60,7 +64,7 @@ services:
     tty: true
     volumes:
       - backend_uploads:/usr/src/app/uploads
-  
+
   backup:
     container_name: backup
     image: offen/docker-volume-backup:latest
@@ -90,3 +94,7 @@ volumes:
     external: true
   redis_data:
     external: true
+
+networks:
+  app-network:
+    driver: bridge

@@ -4,7 +4,7 @@
 	"main": "jest.config.js",
 	"scripts": {
 		"test": "jest",
-		"docker:test": "docker compose up --abort-on-container-exit"
+		"docker:test": "docker compose up --build --abort-on-container-exit"
 	},
 	"keywords": [],
 	"author": "",

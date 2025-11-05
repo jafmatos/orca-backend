@@ -43,8 +43,6 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
         await bullService.removeNotificationSchedule(payload.id, reminder.monthlyCronTime);
       }
     });
-
-    console.log("Notification sent");
   } catch (error: any) {
     console.log("Error while handling send notification queue handler: ", error);
   }
@@ -70,18 +68,15 @@ export class ReminderHandlers {
         reminder.monthlyCronTime
       );
     } catch (error) {
-      console.log(`Error while handling event: ${eventName}`);
-      console.log(error);
+      console.log(`Error while handling event: ${eventName}`, error);
     }
   }
 
   public static async cancelSchedule(eventName: BusEventName, reminder: Reminder) {
     try {
-      console.log(`Processing event: ${eventName}`);
       await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder), reminder.monthlyCronTime);
     } catch (error) {
-      console.log(`Error while handling event: ${eventName}`);
-      console.log(error);
+      console.log(`Error while handling event: ${eventName}`, error);
     }
   }
 }

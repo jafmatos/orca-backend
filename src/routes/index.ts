@@ -52,8 +52,8 @@ router.put("/reset-password/:id", ResetPasswordController.update);
 router.put("/reset-password/resend/:id", ResetPasswordController.resend);
 
 router.post("/delete-account", auth(), DeleteAccountController.store);
-router.put("/delete-account/:id", DeleteAccountController.update);
-router.put("/delete-account/resend/:id", DeleteAccountController.resend);
+router.put("/delete-account/:id", auth(), DeleteAccountController.update);
+router.put("/delete-account/resend/:id", auth(), DeleteAccountController.resend);
 
 router.get("/users/overview", auth(), subscribed, OverviewController.show);
 

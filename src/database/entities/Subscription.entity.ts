@@ -44,7 +44,7 @@ export class Subscription {
   @JoinColumn({ name: "userId" })
   user?: User;
 
-  @ManyToOne(() => Plan, { onDelete: "CASCADE", onUpdate: "CASCADE", eager: true })
+  @ManyToOne(() => Plan, { onDelete: "RESTRICT", onUpdate: "CASCADE", eager: true })
   @JoinColumn({ name: "planId" })
   plan?: Plan;
 

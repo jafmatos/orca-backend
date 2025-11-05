@@ -3,7 +3,6 @@ import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { ConflictError, NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { PlanService } from "Src/services/PlanService";
 import { StripeService } from "Src/services/StripeService";
-import { SubscriptionService } from "Src/services/SubscriptionService";
 import { UserService } from "Src/services/UserService";
 import { SubscriptionStatuses } from "Src/types/SubscriptionStatuses";
 import z from "zod";

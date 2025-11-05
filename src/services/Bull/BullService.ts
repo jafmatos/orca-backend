@@ -68,8 +68,7 @@ export class BullService {
         jobId: id,
       });
     } catch (error) {
-      console.log("Error while removing schedule by id ", id);
-      console.log(error);
+      console.log("Error while removing schedule by id ", id, error);
     }
   }
 
