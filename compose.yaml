@@ -1,43 +1,49 @@
-version: "3.8"
+version: "3.9"
 
 services:
   postgresdb:
     container_name: postgres
     image: postgres
     restart: unless-stopped
-    environment:
-      - POSTGRES_USER=$DB_USER
-      - POSTGRES_PASSWORD=$DB_PASS
-      - POSTGRES_DB=$DB_NAME
-    volumes:
-      - backend_db:/var/lib/postgresql/18/docker
+    ports:
+      - 5432:5432
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    volumes:
+      - backend_db:/var/lib/postgresql/18/docker
     networks:
       - app-network
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
 
   redis:
     container_name: redis
     image: redis:latest
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - app-network
     environment:
       - REDIS_PASSWORD=$REDIS_PASSWORD
-    restart: unless-stopped
-    networks: 
-      - app-network
 
   bullboard:
     container_name: bullboard
     image: deadly0/bull-board
     restart: unless-stopped
+    depends_on:
+      - redis
     ports:
       - "4000:3000"
+    networks:
+      - app-network
     environment:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
@@ -45,23 +51,119 @@ services:
       REDIS_USE_TLS: "false"
       USER_LOGIN: $BULLBOARD_USER_LOGIN
       USER_PASSWORD: $BULLBOARD_USER_PASSWORD
-    depends_on:
-      - redis
-    networks:
-      - app-network
 
   app:
     container_name: api
+    restart: unless-stopped
+    profiles: ["prod"]
+    build: .
     depends_on:
       - postgresdb
-    build: .
-    restart: unless-stopped
     ports:
       - 3333:3333
-    stdin_open: true
-    tty: true
     volumes:
       - backend_uploads:/usr/src/app/uploads
+    networks:
+      - app-network
+    stdin_open: true
+    tty: true
+    environment:
+      - NODE_ENV=$NODE_ENV
+      - APP_PORT=$APP_PORT
+      - APP_HOST=$APP_HOST
+      - APP_DIR=$APP_DIR
+      - APP_URL=$APP_URL
+      - APP_SUPER_USER_NAME=$APP_SUPER_USER_NAME
+      - APP_SUPER_USER_EMAIL=$APP_SUPER_USER_EMAIL
+      - APP_SUPER_USER_PASSWORD=$APP_SUPER_USER_PASSWORD
+      - FRONTEND_POLICY_URL=$FRONTEND_POLICY_URL
+      - FRONTEND_TERMS_URL=$FRONTEND_TERMS_URL
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_NAME=$DB_NAME
+      - DB_TIMEZONE=$DB_TIMEZONE
+      - DB_LOGGING=$DB_LOGGING
+      - DB_SYNCHRONIZE=$DB_SYNCHRONIZE
+      - SMTP_HOST=$SMTP_HOST
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_USER=$SMTP_USER
+      - SMTP_PASS=$SMTP_PASS
+      - SMTP_ORIGIN=$SMTP_ORIGIN
+      - STRIPE_KEY=$STRIPE_KEY
+      - STRIPE_ENDPOINT_SECRET=$STRIPE_ENDPOINT_SECRET
+      - JWT_TOKEN_SECRET=$JWT_TOKEN_SECRET
+      - BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS
+      - VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
+      - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
+
+  app-dev:
+    container_name: api-dev
+    restart: unless-stopped
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - postgresdb
+    ports:
+      - "3333:3333"
+    networks:
+      - app-network
+    command: npm run start:dev
+    environment:
+      - NODE_ENV=$NODE_ENV
+      - APP_PORT=$APP_PORT
+      - APP_HOST=$APP_HOST
+      - APP_DIR=$APP_DIR
+      - APP_URL=$APP_URL
+      - APP_SUPER_USER_NAME=$APP_SUPER_USER_NAME
+      - APP_SUPER_USER_EMAIL=$APP_SUPER_USER_EMAIL
+      - APP_SUPER_USER_PASSWORD=$APP_SUPER_USER_PASSWORD
+      - FRONTEND_POLICY_URL=$FRONTEND_POLICY_URL
+      - FRONTEND_TERMS_URL=$FRONTEND_TERMS_URL
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_NAME=$DB_NAME
+      - DB_TIMEZONE=$DB_TIMEZONE
+      - DB_LOGGING=$DB_LOGGING
+      - DB_SYNCHRONIZE=$DB_SYNCHRONIZE
+      - SMTP_HOST=$SMTP_HOST
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_USER=$SMTP_USER
+      - SMTP_PASS=$SMTP_PASS
+      - SMTP_ORIGIN=$SMTP_ORIGIN
+      - STRIPE_KEY=$STRIPE_KEY
+      - STRIPE_ENDPOINT_SECRET=$STRIPE_ENDPOINT_SECRET
+      - JWT_TOKEN_SECRET=$JWT_TOKEN_SECRET
+      - BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS
+      - VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
+      - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
+ 
+  app-test:
+    container_name: api-test
+    restart: no
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      - postgresdb
+    ports:
+      - "3333:3333"
     networks:
       - app-network
     environment:

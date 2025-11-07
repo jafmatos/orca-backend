@@ -9,7 +9,6 @@ import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
 import bodyParser from "body-parser";
 import http from "http";
-import { Client } from "pg";
 import { express_async_errors_middleware } from "./middleware/express_async_errors";
 import { router } from "./routes";
 import { dataSource, initializeDb } from "./database/data-source";

@@ -1,7 +1,0 @@
-services:
-  tests:
-    container_name: api-e2e
-    build:
-      context: .
-    ports:
-      - 1000:1000

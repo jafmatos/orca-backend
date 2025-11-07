@@ -14,6 +14,9 @@
 		"paths": {
 			"Src/*": [
 				"./*"
+			],
+			"Tests/*": [
+				"./tests/*"
 			]
 		},
 		"typeRoots": [
@@ -28,8 +31,5 @@
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"skipLibCheck": true
-	},
-	"exclude": [
-		"e2e"
-	]
+	}
 }

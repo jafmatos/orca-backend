@@ -27,19 +27,13 @@ jobs:
           docker volume create backend_db
           docker volume create backend_uploads
           docker volume create redis_data
-      - name: Create .env.docker from secrets DOCKER_ENV_FILE
+      - name: Create .env.docker.test from secrets DOCKER_ENV_FILE
         run: |
-          echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker
+          echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker.test
       - name: Running the migrations
         run: npm run typeorm:migrate
       - name: Running the seeders
         run: npm run typeorm:seed 
-      - name: Running API
-        run: npm run docker:deploy
-      - name: Waiting for API to be available
-        run: |
-          timeout 60s bash -c 'until curl -f http://localhost:3333/v1; do sleep 3; done'
-          echo "API is available!"
       - name: Running tests
         run: npm run docker:test
       - name: Push to branch review
