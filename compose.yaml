@@ -110,6 +110,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    develop:
+      watch:
+        - path: src
+          action: sync+exec
+          target: /usr/src/app/src
     depends_on:
       - postgresdb
     ports:
