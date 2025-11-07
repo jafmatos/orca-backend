@@ -36,5 +36,6 @@ jobs:
             cd ${{secrets.REMOTE_WORK_DIR}}
             git fetch origin
             git reset --hard origin/master
+            npm run typeorm:migrate
             npm run docker:deploy
           debug: true

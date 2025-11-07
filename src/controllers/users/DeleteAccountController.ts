@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
+import { Otp } from "Src/helpers/Otp/Otp";
 import { EmailService } from "Src/services/Email/EmailService";
 import { stripe } from "Src/services/StripeService";
 import { UserKeyService } from "Src/services/UserKeyService";
@@ -31,9 +32,7 @@ export class DeleteAccountController {
         type: KeyTypes.DeleteAccount,
       });
 
-      const otp = Math.floor(Math.random() * 1_000_000)
-        .toString()
-        .padStart(6, "0");
+      const otp = Otp.generate();
       const userKey = await UserKeyService.create(
         {
           userId: user.id,
@@ -135,9 +134,7 @@ export class DeleteAccountController {
 
       if (!key) throw new NotFoundError("Chave de acesso não encontrada");
 
-      const otp = Math.floor(Math.random() * 1_000_000)
-        .toString()
-        .padStart(6, "0");
+      const otp = Otp.generate();
 
       const userKey = await UserKeyService.update(
         key,

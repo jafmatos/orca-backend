@@ -70,4 +70,5 @@ COPY --from=build /usr/src/app/dist ./dist
 EXPOSE 3333
 
 # Rodar a aplicação.
-CMD npx typeorm migration:run -d dist/database/data-source.js && npm run start
+# CMD npx typeorm migration:run -d dist/database/data-source.js && npm run start:prod
+CMD npm run start:prod

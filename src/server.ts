@@ -9,9 +9,10 @@ import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
 import bodyParser from "body-parser";
 import http from "http";
+import { Client } from "pg";
 import { express_async_errors_middleware } from "./middleware/express_async_errors";
 import { router } from "./routes";
-import { dataSource } from "./database/data-source";
+import { dataSource, initializeDb } from "./database/data-source";
 import { User, UserRoles } from "./database/entities/User.entity";
 import { Bcrypt } from "./helpers/Bcrypt";
 import { NotificationManager } from "./services/Notifications/NotificationManager";
@@ -60,10 +61,12 @@ app.use(express_async_errors_middleware);
 const server = http.createServer(app);
 
 server.listen(port, async () => {
+ 
+
   try {
-    await dataSource.initialize();
-    
-		NotificationManager.setVapidKeys();
+    await initializeDb()
+
+    NotificationManager.setVapidKeys();
 
     const userRepository = dataSource.getRepository(User);
     const existingSuperUser = await userRepository.findOne({
@@ -90,5 +93,5 @@ server.listen(port, async () => {
     console.log(error);
 
     process.exit(1);
-  }
+  } 
 });

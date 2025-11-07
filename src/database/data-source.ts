@@ -1,5 +1,6 @@
 require("dotenv-expand").expand(require("dotenv").config());
 
+import { Client } from "pg";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 export const dataSource = new DataSource({
@@ -16,3 +17,26 @@ export const dataSource = new DataSource({
   timezone: process.env.DB_TIMEZONE,
   ssl: process.env.ENV === "production" ? { rejectUnauthorized: false } : null,
 } as DataSourceOptions);
+
+export const initializeDb = async () => {
+  const pgClient = new Client({
+    host: process.env.DB_HOST,
+    port: +process.env.DB_PORT!,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+  });
+
+  try {
+    await pgClient.connect();
+
+    const databaseExists = await pgClient.query(`SELECT 1 FROM pg_database WHERE datname = $1`, [process.env.DB_NAME]);
+
+    if (!databaseExists.rowCount) await pgClient.query(`CREATE DATABASE ${process.env.DB_NAME};`);
+
+    return await dataSource.initialize();
+  } catch (error) {
+    throw error;
+  } finally {
+    await pgClient.end();
+  }
+};

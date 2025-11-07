@@ -3,6 +3,7 @@ import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { ConflictError, NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { Jwt } from "Src/helpers/Jwt";
+import { Otp } from "Src/helpers/Otp/Otp";
 import { EmailService } from "Src/services/Email/EmailService";
 import { UserKeyService } from "Src/services/UserKeyService";
 import { CreateUserAttributes, UserService } from "Src/services/UserService";
@@ -85,9 +86,7 @@ export class SignUpController {
         type: KeyTypes.SignUp,
       });
 
-      const otp = Math.floor(Math.random() * 1_000_000)
-        .toString()
-        .padStart(6, "0");
+      const otp = Otp.generate();
       const userKey = await UserKeyService.create(
         {
           userId: user.id,
@@ -199,10 +198,7 @@ export class SignUpController {
 
       if (!key) throw new NotFoundError("Chave de acesso não encontrada");
 
-      const otp = Math.floor(Math.random() * 1_000_000)
-        .toString()
-        .padStart(6, "0");
-
+      const otp = Otp.generate();
       const userKey = await UserKeyService.update(
         key,
         {

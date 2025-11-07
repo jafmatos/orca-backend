@@ -5,7 +5,6 @@ services:
     container_name: postgres
     image: postgres
     restart: unless-stopped
-    env_file: ./.env.docker
     environment:
       - POSTGRES_USER=$DB_USER
       - POSTGRES_PASSWORD=$DB_PASS
@@ -57,7 +56,6 @@ services:
       - postgresdb
     build: .
     restart: unless-stopped
-    env_file: ./.env.docker
     ports:
       - 3333:3333
     stdin_open: true
@@ -66,12 +64,46 @@ services:
       - backend_uploads:/usr/src/app/uploads
     networks:
       - app-network
+    environment:
+      - NODE_ENV=$NODE_ENV
+      - APP_PORT=$APP_PORT
+      - APP_HOST=$APP_HOST
+      - APP_DIR=$APP_DIR
+      - APP_URL=$APP_URL
+      - APP_SUPER_USER_NAME=$APP_SUPER_USER_NAME
+      - APP_SUPER_USER_EMAIL=$APP_SUPER_USER_EMAIL
+      - APP_SUPER_USER_PASSWORD=$APP_SUPER_USER_PASSWORD
+      - FRONTEND_POLICY_URL=$FRONTEND_POLICY_URL
+      - FRONTEND_TERMS_URL=$FRONTEND_TERMS_URL
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_NAME=$DB_NAME
+      - DB_TIMEZONE=$DB_TIMEZONE
+      - DB_LOGGING=$DB_LOGGING
+      - DB_SYNCHRONIZE=$DB_SYNCHRONIZE
+      - SMTP_HOST=$SMTP_HOST
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_USER=$SMTP_USER
+      - SMTP_PASS=$SMTP_PASS
+      - SMTP_ORIGIN=$SMTP_ORIGIN
+      - STRIPE_KEY=$STRIPE_KEY
+      - STRIPE_ENDPOINT_SECRET=$STRIPE_ENDPOINT_SECRET
+      - JWT_TOKEN_SECRET=$JWT_TOKEN_SECRET
+      - BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS
+      - VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY
+      - VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
+      - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
 
   backup:
     container_name: backup
     image: offen/docker-volume-backup:latest
     restart: unless-stopped
-    env_file: ./.env.docker
     volumes:
       - backend_db:/backup/db:ro
       - backend_uploads:/backup/uploads:ro

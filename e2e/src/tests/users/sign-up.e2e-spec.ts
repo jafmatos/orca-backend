@@ -1,8 +1,25 @@
 import { test } from "@jest/globals";
+import { api } from "Tests/api/Requests";
+import { dataGenerator } from "Tests/EntityObjectModel";
 import { describeWithHooks } from "Tests/infra/describeWithHooks";
 
 describeWithHooks("Users > sign-up", () => {
-  test.todo("[Create] - Deve ser capaz de iniciar o cadastro");
+  test("[Create] - Deve ser capaz de iniciar o cadastro", async () => {
+    const password = dataGenerator.user.password();
+
+    const { body: data } = await api.users.signUp
+      .create({
+        acceptedTerms: true,
+        email: dataGenerator.user.email(),
+        name: dataGenerator.user.name(),
+        password,
+        passwordConfirmation: password,
+        confirmUrl: dataGenerator.url(),
+      })
+      .expect(200);
+
+    console.log(data);
+  });
 
   test.todo(
     "[Create] - Deve gerar uma nova chave de acesso quando o usuário tentar se cadastrar com um email que já existe e não está confirmado"

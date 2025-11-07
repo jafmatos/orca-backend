@@ -3,6 +3,7 @@ import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { Bcrypt } from "Src/helpers/Bcrypt";
 import { NotFoundError, TeapotError, ValidationError } from "Src/helpers/Errors";
 import { Jwt } from "Src/helpers/Jwt";
+import { Otp } from "Src/helpers/Otp/Otp";
 import { EmailService } from "Src/services/Email/EmailService";
 import { UserKeyService } from "Src/services/UserKeyService";
 import { UserService } from "Src/services/UserService";
@@ -37,9 +38,7 @@ export class ResetPasswordController {
         email: body.email,
       });
 
-      const otp = Math.floor(Math.random() * 1_000_000)
-        .toString()
-        .padStart(6, "0");
+      const otp = Otp.generate();
       const userKey = await UserKeyService.create(
         {
           userId: user!.id,
@@ -160,10 +159,7 @@ export class ResetPasswordController {
 
       if (!key) throw new NotFoundError("Chave de acesso não encontrada");
 
-      const otp = Math.floor(Math.random() * 1_000_000)
-        .toString()
-        .padStart(6, "0");
-
+      const otp = Otp.generate();
       const userKey = await UserKeyService.update(
         key,
         {
