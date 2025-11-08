@@ -1,0 +1,17 @@
+{
+	"name": "Orça Dev Container",
+	"dockerComposeFile": "../compose.yaml",
+	"shutdownAction": "stopCompose",
+	"runServices": [
+		"app-dev",
+		"postgresdb",
+		"redis",
+		"bullboard"
+	],
+	"forwardPorts": [
+		3333
+	],
+	"service": "app-dev",
+	"workspaceFolder": "/workspace",
+	"features": {}
+}

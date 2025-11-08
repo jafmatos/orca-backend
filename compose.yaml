@@ -104,23 +104,22 @@ services:
       - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
 
   app-dev:
-    container_name: api-dev
+    container_name: app-dev
     restart: unless-stopped
     profiles: ["dev"]
     build:
       context: .
       dockerfile: Dockerfile.dev
-    develop:
-      watch:
-        - path: src
-          action: sync
-          target: /usr/src/app/src
     depends_on:
       - postgresdb
+      - redis
+      - bullboard
     ports:
       - "3333:3333"
     networks:
       - app-network
+    volumes:
+      - ./:/workspace
     command: npm run start:dev
     environment:
       - NODE_ENV=$NODE_ENV

@@ -13,7 +13,7 @@ ARG NODE_VERSION=22.14.0
 FROM node:${NODE_VERSION}-alpine as base
 
 # Define o diretório de trabalho para todos os estágios da build.
-WORKDIR /usr/src/app
+WORKDIR /workspace
 
 ################################################################################
 # Criar estágio para instalar dependências de produção.
@@ -30,9 +30,6 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Criar um novo estágio para rodar a aplicação.
 FROM base as final
 
-# Usar NODE_ENV de desenvolvimento.
-ENV NODE_ENV development
-
 # Criar pasta de uploads no container e garantir permissões de acesso a ela.
 RUN mkdir -p uploads && \
     chown -R node:node uploads && \
@@ -41,14 +38,20 @@ RUN mkdir -p uploads && \
 # Copiar código fonte para o container.
 COPY . .
 
+# Variáveis do ambiente de desenvolvimento para hot reload
+ENV NODE_ENV=development
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+ENV CHOKIDAR_INTERVAL=1000
+
 # Copiar package.json para poder utilizar os scripts definidos no arquivo.
 COPY package.json tsconfig.json ./
 
 # Copiar a build do estágio build para a imagem.
-COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=deps /workspace/node_modules ./node_modules
 
 # Rodar a aplicação sem acesso root.
-USER node
+# USER node
 
 # Expor a porta em que a aplicação ficará disponível.
 EXPOSE 3333
