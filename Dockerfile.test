@@ -41,22 +41,11 @@ RUN mkdir -p uploads && \
 # Copiar código fonte para o container.
 COPY . .
 
-# Copiar package.json para poder utilizar os scripts definidos no arquivo.
-COPY package.json tsconfig.json ./
-
-# Copiar a build do estágio build para a imagem.
+# Copiar as dependências para o container.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 
 # Rodar a aplicação sem acesso root.
 USER node
 
-# Expor a porta em que a aplicação ficará disponível.
-EXPOSE 1000
-
-# RUN npm run typeorm:migrate
-# RUN npm run typeorm:seed
-# RUN npm run start:test &
-
-# Rodar os testes.
-# CMD sleep 15 && npm run test
+# Rodar a aplicação em modo de testes.
 CMD npm run start:test

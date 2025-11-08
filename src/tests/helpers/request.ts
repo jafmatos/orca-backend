@@ -1,3 +1,3 @@
 import supertest from "supertest";
 
-export const request = supertest("http://backend-app-test:3333/v1");
+export const request = supertest(process.env.APP_URL!);

@@ -55,10 +55,8 @@ app.use(express_async_errors_middleware);
 const server = http.createServer(app);
 
 server.listen(port, async () => {
- 
-
   try {
-    await initializeDb()
+    await initializeDb();
 
     NotificationManager.setVapidKeys();
 
@@ -87,5 +85,5 @@ server.listen(port, async () => {
     console.log(error);
 
     process.exit(1);
-  } 
+  }
 });

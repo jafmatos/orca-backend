@@ -83,6 +83,6 @@ router.delete("/reminders/:id", auth(), subscribed, ReminderController.destroy);
 
 router.post("/webpush/subscriptions", auth(), subscribed, PushSubscriptionController.store);
 
-router.get("/", async (request, response) => {
-  return response.send("Hello, World!");
+router.get("/healthcheck", async (request, response) => {
+  return response.status(200).send({ status: "OK" });
 });

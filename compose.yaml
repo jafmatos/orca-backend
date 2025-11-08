@@ -104,7 +104,7 @@ services:
       - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
 
   app-dev:
-    container_name: app-dev
+    container_name: api-dev
     restart: unless-stopped
     profiles: ["dev"]
     build:
@@ -170,6 +170,11 @@ services:
       - "3333:3333"
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "3333"]  
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       - NODE_ENV=$NODE_ENV
       - APP_PORT=$APP_PORT
@@ -205,6 +210,21 @@ services:
       - REDIS_PASSWORD=$REDIS_PASSWORD
       - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
       - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
+
+  jest: 
+    container_name: jest
+    restart: no
+    profiles: ["test"]
+    build: 
+      context: .
+      dockerfile: Dockerfile.jest
+    depends_on:
+      app-test:
+        condition: service_healthy
+    networks:
+      - app-network
+    environment:
+      - APP_URL=$APP_URL
 
   backup:
     container_name: backup
