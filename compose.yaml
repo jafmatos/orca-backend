@@ -113,7 +113,7 @@ services:
     develop:
       watch:
         - path: src
-          action: sync+exec
+          action: sync
           target: /usr/src/app/src
     depends_on:
       - postgresdb

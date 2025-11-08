@@ -5,7 +5,6 @@ require("dotenv-expand").expand(require("dotenv").config());
 
 import "Src/services/Events/index";
 import express from "express";
-import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
 import bodyParser from "body-parser";
 import http from "http";
@@ -18,10 +17,6 @@ import { NotificationManager } from "./services/Notifications/NotificationManage
 
 const app = express();
 const port = +process.env.APP_PORT!;
-
-app.set("view engine", "ejs");
-app.use(expressLayouts);
-app.set("layout", "layouts/base");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
