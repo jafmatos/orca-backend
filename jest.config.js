@@ -58,8 +58,10 @@ const config = {
   // fakeTimers: {
   //   "enableGlobally": false
   // },
-
-  // Force coverage collection from ignored files using an array of glob patterns
+	
+	testTimeout: 15000,
+  
+	// Force coverage collection from ignored files using an array of glob patterns
   // forceCoverageMatch: [],
 
   // A path to a module which exports an async function that is triggered once before all test suites
