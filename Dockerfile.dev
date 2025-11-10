@@ -1,0 +1,48 @@
+# syntax=docker/dockerfile:1
+
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Dockerfile reference guide at
+# https://docs.docker.com/go/dockerfile-reference/
+
+# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
+
+ARG NODE_VERSION=22.14.0
+
+################################################################################
+# Usa a imagem do node para todos os estágios
+FROM node:${NODE_VERSION}-alpine as base
+
+# Define o diretório de trabalho para todos os estágios da build.
+WORKDIR /workspace
+
+################################################################################
+# Criar estágio para instalar dependências de desenvolvimento.
+FROM base as deps
+
+# Torna os aqruivos package.json e package-lock.json do host acessíveis para o container para evitar copiá-los para dentro do container e ocupar espaço permanentemente.
+# Armazena as dependências em cache para otimizar processos futuros de build.
+RUN --mount=type=bind,source=package.json,target=package.json \
+	--mount=type=bind,source=package-lock.json,target=package-lock.json \
+	--mount=type=cache,target=/root/.npm \
+	npm ci
+
+################################################################################
+# Criar um novo estágio para rodar os testes.
+FROM base as final
+
+# Usar NODE_ENV de desenvolvimento.
+ENV NODE_ENV development
+
+# Criar pasta de uploads no container e garantir permissões de acesso a ela.
+RUN mkdir -p uploads && \
+	chown -R node:node uploads && \
+	chmod -R 755 uploads
+
+# Copiar código fonte para o container.
+COPY . .
+
+# Copiar as dependências para o container.
+COPY --from=deps /workspace/node_modules ./node_modules
+
+# Rodar a aplicação sem acesso root.
+USER node

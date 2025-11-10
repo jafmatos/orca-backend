@@ -1,0 +1,15 @@
+{
+	"name": "Orça Dev Container",
+	// "image": "alpine:latest",
+	"workspaceFolder": "/workspace",
+	"dockerComposeFile": "../compose.yaml",
+	"shutdownAction": "stopCompose",
+	"service": "app-dev",
+	"runServices": [
+		"app-dev",
+		"postgresdb",
+		"bullboard",
+		"redis",
+		"backup"
+	]
+}
