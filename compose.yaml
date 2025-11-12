@@ -152,6 +152,7 @@ services:
     container_name: jest
     restart: no
     profiles: ["jest"]
+    env_file: .env.docker.test
     build: 
       context: .
       dockerfile: Dockerfile.jest
