@@ -3,6 +3,9 @@ dist
 logs
 .env
 .env.docker*
+.env.jest*
+!.env.docker.example
+!.env.jest.example
 uploads 
 backups
 

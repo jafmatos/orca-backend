@@ -1,6 +1,6 @@
 import { $faker } from "../../helpers/faker";
 
-export class CategoryObjectModel {
+export class CategoryDataProvider {
   isActive() {
     return $faker.datatype.boolean();
   }

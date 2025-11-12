@@ -1,6 +1,6 @@
 import { $faker } from "../../helpers/faker";
 
-export class ReminderObjectModel {
+export class ReminderDataProvider {
   isActive() {
     return $faker.datatype.boolean();
   }

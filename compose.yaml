@@ -108,7 +108,7 @@ services:
   app-test:
     container_name: api-test
     restart: no
-    profiles: ["test"]
+    profiles: ["test", "jest"]
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -151,7 +151,7 @@ services:
   jest: 
     container_name: jest
     restart: no
-    profiles: ["test"]
+    profiles: ["jest"]
     build: 
       context: .
       dockerfile: Dockerfile.jest

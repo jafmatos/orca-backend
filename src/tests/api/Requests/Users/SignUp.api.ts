@@ -1,6 +1,6 @@
 import { request } from "../../../helpers/request";
 
-type SignUpCreateBody = {
+export type SignUpCreateBody = {
   confirmUrl: string;
   name: string;
   email: string;
@@ -9,11 +9,11 @@ type SignUpCreateBody = {
   acceptedTerms: boolean;
 };
 
-type SignUpUpdateBody = {
+export type SignUpUpdateBody = {
   otp: string;
 };
 
-type SignUpResendBody = {
+export type SignUpResendBody = {
   confirmUrl: string;
 };
 

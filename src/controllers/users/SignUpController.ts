@@ -34,6 +34,14 @@ export class SignUpController {
               code: z.ZodIssueCode.custom,
             });
           }
+
+					if (!body.acceptedTerms) {
+						ctx.addIssue({
+              path: ["acceptedTerms"],
+              message: "É necessário aceitar os termos de uso",
+              code: z.ZodIssueCode.custom,
+            });
+					}
         })
         .transform((body) => {
           if (body.password) body.password = Bcrypt.hash(body.password);

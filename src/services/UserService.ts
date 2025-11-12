@@ -1,7 +1,27 @@
 import { dataSource } from "Src/database/data-source";
-import { User } from "Src/database/entities/User.entity";
+import { User, UserRoles } from "Src/database/entities/User.entity";
 import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { DeepPartial, FindOptionsWhere } from "typeorm";
+
+export type ListOptions = {
+  order?: {
+    entity?: string;
+    column: string;
+    mode: "ASC" | "DESC";
+  };
+  filter: {
+    stripeId?: string;
+    role?: UserRoles;
+    text?: string;
+    email?: string;
+    name?: string;
+    isEmailConfirmed?: boolean;
+  };
+  pagination: {
+    skip: number;
+    take: number;
+  };
+};
 
 export type CreateUserAttributes = Omit<User, "id">;
 
@@ -12,6 +32,23 @@ export class UserService {
     if (!transaction) return this.userRepository;
 
     return transaction.manager.getRepository(User);
+  }
+
+  public static async find(options: ListOptions) {
+    const queryBuilder = this.userRepository.createQueryBuilder("user");
+
+    options.filter.stripeId && queryBuilder.andWhere(`user.stripeId = :stripeId`, { stripeId: options.filter.stripeId });
+    options.filter.role && queryBuilder.andWhere(`user.role = :role`, { role: options.filter.role });
+    options.filter.email && queryBuilder.andWhere(`user.email = :email`, { email: options.filter.email });
+    options.filter.name && queryBuilder.andWhere(`user.name = :name`, { name: options.filter.name });
+    options.filter.isEmailConfirmed &&
+      queryBuilder.andWhere(`user.isEmailConfirmed = :isEmailConfirmed`, { isEmailConfirmed: options.filter.isEmailConfirmed });
+    options.filter.text && queryBuilder.andWhere(`user.email ILIKE :text OR user.name ILIKE :text`, { text: `%${options.filter.text}%` });
+
+    queryBuilder.skip(options.pagination.skip);
+    queryBuilder.take(options.pagination.take);
+
+    return await queryBuilder.getManyAndCount();
   }
 
   public static async exists(where: FindOptionsWhere<User>) {

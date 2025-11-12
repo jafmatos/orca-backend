@@ -21,7 +21,7 @@ export class User extends UserSetters {
     public email: string,
     public name: string,
     public isEmailConfirmed: boolean,
-    public acceptsNotifications: string,
+    public acceptsNotifications: boolean,
     public pushSubscriptions: PushSubscription[] | undefined,
     public password: string,
     public periodGe: string,

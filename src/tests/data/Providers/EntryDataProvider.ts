@@ -1,6 +1,6 @@
 import { $faker } from "../../helpers/faker";
 
-export class EntryObjectModel {
+export class EntryDataProvider {
   type() {
     return ["income", "expense"][$faker.number.int({ min: 0, max: 1 })];
   }

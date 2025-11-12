@@ -7,7 +7,7 @@ export class UserSetters {
   protected email!: string;
   protected name!: string;
   protected isEmailConfirmed!: boolean;
-  protected acceptsNotifications!: string;
+  protected acceptsNotifications!: boolean;
   protected pushSubscriptions!: PushSubscription[] | undefined;
   protected password!: string;
   protected periodGe!: string;
