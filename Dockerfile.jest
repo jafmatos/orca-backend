@@ -39,5 +39,8 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 # Rodar os testes sem acesso root.
 USER node
 
+# Executar o seed do banco de dados de testes
+# RUN npm run test:seed
+
 # Rodar os testes.
-CMD npm run test
+CMD npm run test:seed && npm run test

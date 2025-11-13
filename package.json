@@ -8,6 +8,7 @@
 		"start:dev": "ts-node-dev --respawn -r tsconfig-paths/register ./src/server.ts --env=development",
 		"start:test": "ts-node-dev --respawn -r tsconfig-paths/register ./src/server.ts --env=testing",
 		"start:prod": "node ./dist/server.js --env=production",
+		"test:seed": "ts-node-dev -r tsconfig-paths/register ./src/seed.ts --env=testing",
 		"docker:prod:up": "docker compose --profile prod --env-file .env.docker up -d --build",
 		"docker:prod:stop": "docker compose --profile prod --env-file .env.docker stop",
 		"docker:prod:start": "docker compose --profile prod --env-file .env.docker start",
@@ -69,6 +70,7 @@
 		"typeorm-extension": "^3.4.0",
 		"uuid": "^11.1.0",
 		"web-push": "^3.6.7",
+		"winston": "^3.18.3",
 		"zod": "^4.0.15"
 	},
 	"devDependencies": {

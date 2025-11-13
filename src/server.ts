@@ -14,6 +14,7 @@ import { dataSource, initializeDb } from "./database/data-source";
 import { User, UserRoles } from "./database/entities/User.entity";
 import { Bcrypt } from "./helpers/Bcrypt";
 import { NotificationManager } from "./services/Notifications/NotificationManager";
+import { logger } from "./infra/Logger";
 
 const app = express();
 const port = +process.env.APP_PORT!;
@@ -80,9 +81,9 @@ server.listen(port, async () => {
       );
     }
 
-    console.log(`App running on ${process.env.APP_URL} in ${process.env.NODE_ENV}`);
-  } catch (error) {
-    console.log(error);
+    logger.info(`App running on ${process.env.APP_URL} in ${process.env.NODE_ENV} mode`);
+  } catch (error: any) {
+    logger.error(error);
 
     process.exit(1);
   }

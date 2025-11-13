@@ -152,7 +152,6 @@ services:
     container_name: jest
     restart: no
     profiles: ["jest"]
-    env_file: .env.docker.test
     build: 
       context: .
       dockerfile: Dockerfile.jest
@@ -161,8 +160,8 @@ services:
         condition: service_healthy
     networks:
       - app-network
-    environment:
-      - APP_URL=$APP_URL
+    environment: *common-env
+
 
   backup:
     container_name: backup

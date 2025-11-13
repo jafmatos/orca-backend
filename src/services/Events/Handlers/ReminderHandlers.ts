@@ -7,6 +7,7 @@ import { BullNotificationJob } from "../../Bull/BullService";
 import { ReminderService } from "Src/services/ReminderService";
 import { IsNull } from "typeorm";
 import { NotificationManager } from "Src/services/Notifications/NotificationManager";
+import { logger } from "Src/infra/Logger";
 
 const getNotificationJobIdForReminder = (reminder: Reminder) => {
   return `notifications:reminder-${reminder.id}`;
@@ -37,14 +38,14 @@ bullService.setNotificationQueueHandler(async (payload: BullNotificationJob) => 
     }
 
     await NotificationManager.sendNotification(user, payload, async (error) => {
-      console.log("Error while trying to send a notification: ", error);
+      logger.error("Error while trying to send a notification: ", error);
 
       if (error.statusCode === 410) {
         await bullService.removeNotificationSchedule(payload.id, reminder.monthlyCronTime);
       }
     });
   } catch (error: any) {
-    console.log("Error while handling send notification queue handler: ", error);
+    logger.error("Error while handling send notification queue handler: ", error);
   }
 });
 
@@ -68,7 +69,7 @@ export class ReminderHandlers {
         reminder.monthlyCronTime
       );
     } catch (error) {
-      console.log(`Error while handling event: ${eventName}`, error);
+      logger.error(`Error while handling event: ${eventName}`, error);
     }
   }
 
@@ -76,7 +77,7 @@ export class ReminderHandlers {
     try {
       await bullService.removeNotificationSchedule(getNotificationJobIdForReminder(reminder), reminder.monthlyCronTime);
     } catch (error) {
-      console.log(`Error while handling event: ${eventName}`, error);
+      logger.error(`Error while handling event: ${eventName}`, error);
     }
   }
 }

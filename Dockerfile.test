@@ -38,6 +38,10 @@ RUN mkdir -p uploads && \
 	chown -R node:node uploads && \
 	chmod -R 755 uploads
 
+USER root
+
+RUN chmod -R 777 logs  # Or chown -R node:node logs && chmod -R 775 logs
+
 # Copiar código fonte para o container.
 COPY . .
 

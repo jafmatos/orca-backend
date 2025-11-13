@@ -52,8 +52,8 @@ ENV NODE_ENV production
 
 # Criar pasta de uploads no container e garantir permissões de acesso a ela.
 RUN mkdir -p uploads && \
-    chown -R node:node uploads && \
-    chmod -R 755 uploads
+	chown -R node:node uploads && \
+	chmod -R 755 uploads
 
 # Rodar a aplicação sem acesso root.
 USER node

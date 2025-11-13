@@ -1,5 +1,6 @@
 import Bull from "bull";
 import { Reminder } from "Src/database/entities/Reminder.entity";
+import { logger } from "Src/infra/Logger";
 
 let instance: BullService;
 
@@ -57,7 +58,7 @@ export class BullService {
         timeout: 15000,
       });
     } catch (error) {
-      console.log("Failed to add schedule: ", error);
+      logger.error("Failed to add schedule: ", error);
     }
   }
 
@@ -68,7 +69,7 @@ export class BullService {
         jobId: id,
       });
     } catch (error) {
-      console.log("Error while removing schedule by id ", id, error);
+      logger.error(`Error while removing schedule by id: ${id}`, error);
     }
   }
 

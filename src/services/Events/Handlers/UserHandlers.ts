@@ -1,6 +1,7 @@
 import { User } from "Src/database/entities/User.entity";
 import { BusEventName } from "../EventBus";
 import { UserService } from "Src/services/UserService";
+import { logger } from "Src/infra/Logger";
 
 export class UserTokenValidatedHandlers {
   public static async validateAndUpdatePeriod(eventName: BusEventName, user: User) {
@@ -24,7 +25,7 @@ export class UserTokenValidatedHandlers {
         periodLe: newPeriodLe,
       });
     } catch (error) {
-      console.log(`Error while handling event: ${eventName}`, error);
+      logger.error(`Error while handling event: ${eventName}`, error);
     }
   }
 }
