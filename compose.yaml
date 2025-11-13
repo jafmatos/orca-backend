@@ -1,6 +1,7 @@
 version: "3.9"
 
 x-common-env: &common-env
+  - LOG_LEVEL=$LOG_LEVEL
   - NODE_ENV=$NODE_ENV
   - APP_PORT=$APP_PORT
   - APP_HOST=$APP_HOST
@@ -35,6 +36,8 @@ x-common-env: &common-env
   - REDIS_PASSWORD=$REDIS_PASSWORD
   - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
   - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
+  - TESTING_DEFAULT_USER_PASSWORD=$TESTING_DEFAULT_USER_PASSWORD
+  - TESTING_DEFAULT_OTP_CODE=$TESTING_DEFAULT_OTP_CODE
 
 services:
   postgresdb:
@@ -161,7 +164,6 @@ services:
     networks:
       - app-network
     environment: *common-env
-
 
   backup:
     container_name: backup

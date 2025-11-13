@@ -29,10 +29,9 @@ export class UserSeeder extends BaseSeeder<Omit<User, "id">, User> {
       periodLe = new Date();
       periodLe.setMonth(periodLe.getMonth(), periodReferenceDay);
     }
-		
-		periodGe.setHours(0, 0, 0);
-		periodLe.setHours(0, 0, 0);
 
+    periodGe.setHours(0, 0, 0);
+    periodLe.setHours(0, 0, 0);
 
     return {
       role: faker.helpers.arrayElement([UserRoles.User, UserRoles.Admin, UserRoles.SuperUser]),
@@ -40,7 +39,7 @@ export class UserSeeder extends BaseSeeder<Omit<User, "id">, User> {
       name: faker.person.fullName(),
       isEmailConfirmed: faker.datatype.boolean(0.8),
       acceptsNotifications: faker.datatype.boolean(0.7),
-      password: Bcrypt.hash(process.env.SEEDING_DEFAULT_USER_PASSWORD! || "secret"),
+      password: Bcrypt.hash(process.env.TESTING_DEFAULT_USER_PASSWORD! || "secret"),
       periodGe,
       periodLe,
       periodReferenceDay,

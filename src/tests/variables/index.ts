@@ -1,1 +1,2 @@
-export const DEFAULT_TESTING_OTP = process.env.DEFAULT_OTP_CODE!;
+export const DEFAULT_TESTING_OTP = process.env.TESTING_DEFAULT_OTP_CODE!;
+export const DEFAULT_USER_PASSWORD = process.env.TESTING_DEFAULT_USER_PASSWORD!;
