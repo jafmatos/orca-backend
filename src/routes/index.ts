@@ -41,7 +41,7 @@ router.put("/plans/:id", auth([UserRoles.SuperUser]), PlanController.update);
 router.delete("/plans/:id", auth([UserRoles.SuperUser]), PlanController.destroy);
 
 router.post("/sign-in", SignInController.store);
-router.get("/sign-in", auth([UserRoles.User]), SignInController.show);
+router.get("/sign-in", auth(), SignInController.show);
 
 router.post("/sign-up", SignUpController.store);
 router.put("/sign-up/:id", SignUpController.update);
