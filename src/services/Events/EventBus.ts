@@ -4,11 +4,11 @@ export type BusEventName =
   | "user:logged_in"
   | "user:authenticated"
   | "user:token_validated"
-  | "reminder:created"
-  | "reminder:updated"
-  | "reminder:removed"
-  | "reminder:before-remove"
-  | "reminder:before-update";
+  | "entry-recurrency:created"
+  | "entry-recurrency:updated"
+  | "entry-recurrency:removed"
+  | "entry-recurrency:before-remove"
+  | "entry-recurrency:before-update";
 
 export type BusEventHandler = (eventName: BusEventName, args?: any) => Promise<void>;
 

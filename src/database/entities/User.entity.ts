@@ -4,7 +4,6 @@ import { Category } from "./Category.entity";
 import { Entry } from "./Entry.entity";
 import { Subscription } from "./Subscription.entity";
 import { UserKey } from "./UserKey.entity";
-import { Reminder } from "./Reminder.entity";
 import { PushSubscription } from "./PushSubscription.entity";
 
 export enum UserRoles {
@@ -71,9 +70,6 @@ export class User {
 
   @OneToMany(() => Entry, (entry) => entry.user)
   entries?: Entry[];
-
-  @OneToMany(() => Reminder, (reminder) => reminder.user)
-  reminders?: Reminder[];
 
   @OneToOne(() => Avatar, (avatar) => avatar.user, { eager: true })
   avatar?: Avatar;

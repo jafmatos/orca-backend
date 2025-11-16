@@ -4,7 +4,6 @@ export * from "./Entry";
 export * from "./File";
 export * from "./Plan";
 export * from "./PushSubscription";
-export * from "./Reminder";
 export * from "./Subscription";
 export * from "./User";
 export * from "./UserKey";

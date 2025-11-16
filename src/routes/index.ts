@@ -18,7 +18,6 @@ import { StripeBillingPortalsController } from "Src/controllers/stripe/BillingPo
 import { UserRoles } from "Src/database/entities/User.entity";
 import { DeleteAccountController } from "Src/controllers/users/DeleteAccountController";
 import { subscribed } from "Src/middleware/subscribed";
-import { ReminderController } from "Src/controllers/ReminderController";
 import { PushSubscriptionController } from "Src/controllers/PushSubscriptionController";
 
 export const router = Router({ strict: true });
@@ -74,12 +73,6 @@ router.get("/entries/:id", auth(), subscribed, EntryController.show);
 router.post("/entries", auth(), subscribed, EntryController.store);
 router.put("/entries/:id", auth(), subscribed, EntryController.update);
 router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
-
-router.get("/reminders", auth(), subscribed, pagination({ defaultPage: 1, defaultPerPage: 10 }), ReminderController.index);
-router.get("/reminders/:id", auth(), subscribed, ReminderController.show);
-router.post("/reminders", auth(), subscribed, ReminderController.store);
-router.put("/reminders/:id", auth(), subscribed, ReminderController.update);
-router.delete("/reminders/:id", auth(), subscribed, ReminderController.destroy);
 
 router.post("/webpush/subscriptions", auth(), subscribed, PushSubscriptionController.store);
 

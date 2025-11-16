@@ -1,4 +1,4 @@
-import { User, UserRoles, Category, Entry, Reminder, Avatar, Subscription, UserKey, PushSubscription } from "../Models";
+import { User, UserRoles, Category, Entry, Avatar, Subscription, UserKey, PushSubscription } from "../Models";
 
 export class UserSetters {
   protected id!: string;
@@ -20,7 +20,6 @@ export class UserSetters {
   protected lastLoggedIn!: Date | null;
   protected categories!: Category[] | undefined;
   protected entries!: Entry[] | undefined;
-  protected reminders!: Reminder[] | undefined;
   protected avatar!: Avatar | undefined;
   protected subscription!: Subscription | undefined;
   protected keys!: UserKey[] | undefined;
@@ -140,12 +139,6 @@ export class UserSetters {
     return this;
   }
 
-  public setReminders(reminders: UserSetters["reminders"]) {
-    this.reminders = reminders;
-
-    return this;
-  }
-
   public setAvatar(avatar: UserSetters["avatar"]) {
     this.avatar = avatar;
 
@@ -201,7 +194,6 @@ export class UserBuilder extends UserSetters {
       this.lastLoggedIn,
       this.categories,
       this.entries,
-      this.reminders,
       this.avatar,
       this.subscription,
       this.keys,

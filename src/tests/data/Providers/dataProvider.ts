@@ -1,14 +1,12 @@
 import { $faker } from "Src/tests/helpers/faker";
 import { CategoryDataProvider } from "./CategoryDataProvider";
 import { EntryDataProvider } from "./EntryDataProvider";
-import { ReminderDataProvider } from "./ReminderDataProvider";
 import { UserDataProvider } from "./UserDataProvider";
 
 export class DataProvider {
   public readonly user = new UserDataProvider();
   public readonly category = new CategoryDataProvider();
   public readonly entry = new EntryDataProvider();
-  public readonly reminder = new ReminderDataProvider();
 
   url() {
     return $faker.internet.url();

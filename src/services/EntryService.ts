@@ -1,5 +1,7 @@
 import { dataSource } from "Src/database/data-source";
 import { Entry } from "Src/database/entities/Entry.entity";
+import { EntryRecurrency } from "Src/database/entities/EntryRecurrency.entity";
+import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { EntryTypes } from "Src/types/EntryTypes";
 import { DeepPartial, FindOptionsWhere } from "typeorm";
 
@@ -28,10 +30,17 @@ export type ListOptions = {
 export class EntryService {
   private static readonly entryRepository = dataSource.getRepository(Entry);
 
+  public static async getRepository(transaction?: TypeormTransaction) {
+    if (!transaction) return this.entryRepository;
+
+    return transaction.manager.getRepository(Entry);
+  }
+
   public static async list(options: ListOptions) {
     const queryBuilder = this.entryRepository
       .createQueryBuilder("entry")
       .leftJoinAndSelect("entry.category", "category")
+      .leftJoinAndSelect("entry.recurrency", "recurrency")
       .where("(entry.userId = :userId)", { userId: options.filter.userId })
       .andWhere("(entry.removedAt IS NULL)")
       .andWhere("(category.removedAt IS NULL)");
@@ -77,6 +86,20 @@ export class EntryService {
     return entry;
   }
 
+  public static async findLatestByRecurrency(recurrencyId: EntryRecurrency["id"]) {
+    const [entry] = await this.entryRepository.find({
+      where: {
+        recurrencyId,
+      },
+      order: {
+        when: "DESC",
+      },
+      take: 1,
+    });
+
+    return entry;
+  }
+
   public static async exists(id: Entry["id"]) {
     const exists = await this.entryRepository.existsBy({
       id,
@@ -91,10 +114,11 @@ export class EntryService {
     return entry;
   }
 
-  public static async update(entry: Entry, data: DeepPartial<Entry>) {
+  public static async update(entry: Entry, data: DeepPartial<Entry>, options?: { transaction: TypeormTransaction }) {
     if (data.category === null) data.categoryId = null;
 
-    const updatedEntry = await this.entryRepository.save({ ...entry, ...data });
+    const repository = await this.getRepository(options?.transaction);
+    const updatedEntry = await repository.save({ ...entry, ...data });
 
     return updatedEntry;
   }

@@ -1,12 +1,12 @@
 import { EventBus } from "./EventBus";
-import { ReminderHandlers } from "./Handlers/ReminderHandlers";
+import { EntryHandlers } from "./Handlers/EntryHandlers";
 import { UserTokenValidatedHandlers } from "./Handlers/UserHandlers";
 
 export const eventBus = new EventBus();
 
 eventBus.on("user:token_validated", UserTokenValidatedHandlers.validateAndUpdatePeriod);
 
-eventBus.on("reminder:before-remove", ReminderHandlers.cancelSchedule);
-eventBus.on("reminder:before-update", ReminderHandlers.cancelSchedule);
-eventBus.on("reminder:created", ReminderHandlers.setupSchedule);
-eventBus.on("reminder:updated", ReminderHandlers.setupSchedule);
+eventBus.on("entry-recurrency:before-remove", EntryHandlers.cancelSchedule);
+eventBus.on("entry-recurrency:before-update", EntryHandlers.cancelSchedule);
+eventBus.on("entry-recurrency:created", EntryHandlers.setupSchedule);
+eventBus.on("entry-recurrency:updated", EntryHandlers.setupSchedule);

@@ -1,16 +1,17 @@
 import Bull from "bull";
-import { Reminder } from "Src/database/entities/Reminder.entity";
 import { logger } from "Src/infra/Logger";
+import { BullQueue } from "./BullQueue";
+import { Entry } from "Src/database/entities/Entry.entity";
 
 let instance: BullService;
 
 export type BullNotificationJob = {
   id: string;
-  notification: {
+  notification?: {
     title: string;
     body: string;
     data?: {
-      reminder?: Reminder;
+      entry?: Entry;
     };
     url?: string;
   };
@@ -22,6 +23,7 @@ export class BullService {
   private readonly REDIS_HOST = process.env.REDIS_HOST!;
   private readonly REDIS_PORT = +process.env.REDIS_PORT!;
   private readonly REDIS_PASSWORD = process.env.REDIS_PASSWORD!;
+  public readonly entryQueue = new BullQueue<BullNotificationJob>("entries", this.redisOptions!);
   private readonly notificationQueue = new Bull("notifications", this.redisOptions!);
 
   constructor() {
@@ -46,6 +48,7 @@ export class BullService {
     };
   }
 
+  // TODO: nuke from addNotificationSchedule all the way down to setNotificationQueueHandler
   async addNotificationSchedule(job: BullNotificationJob, cronTime: Bull.CronRepeatOptions["cron"]) {
     try {
       await this.notificationQueue.add("notification-job", job, {
@@ -84,6 +87,7 @@ export class BullService {
       }
     });
   }
+  //////////////////
 }
 
 export const bullService = new BullService();

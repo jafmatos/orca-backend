@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
+import { RecurrencyActions, RecurrencyTypes } from "Src/database/entities/EntryRecurrency.entity";
+import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { NotFoundError, ValidationError } from "Src/helpers/Errors";
 import { CategoryService } from "Src/services/CategoryService";
+import { EntryRecurrencyService } from "Src/services/EntryRecurrencyServicec";
 import { EntryService, ListOptions } from "Src/services/EntryService";
+import { eventBus } from "Src/services/Events";
 import { EntryTypes } from "Src/types/EntryTypes";
 import { IsNull } from "typeorm";
 import { z } from "zod";
@@ -60,6 +64,13 @@ export class EntryController {
         description: z.string().max(255, "A descrição deve ter no máximo 255 caracteres").optional(),
         when: z.iso.datetime("Informe uma data"),
         category: zodOptionalCategorySchema.optional().or(z.null()),
+        recurrency: z
+          .object({
+            type: z.enum(RecurrencyTypes),
+            action: z.enum(RecurrencyActions),
+          })
+          .or(z.null())
+          .optional(),
       })
       .safeParse(request.body);
 
@@ -80,41 +91,80 @@ export class EntryController {
       userId: request.auth!.user.id,
     });
 
+    if (body.recurrency) {
+      await eventBus.triggerAsync("entry-recurrency:created", entry);
+    }
+
     return response.status(200).json({ entry });
   }
 
   public static async update(request: Request, response: Response) {
-    const { data: body, error } = z
-      .object({
-        type: z.enum(EntryTypes).optional(),
-        amount: z.number().min(0, "O valor não pode ser negativo").optional(),
-        description: z.string().max(255, "A descrição deve ter no máximo 255 caracteres").optional(),
-        when: z.iso.datetime().optional(),
-        category: zodOptionalCategorySchema.optional().or(z.null()),
-      })
-      .safeParse(request.body);
+    const transaction = new TypeormTransaction();
 
-    if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
+    await transaction.begin();
 
-    const entry = await EntryService.findOneBy({
-      id: request.params.id,
-      userId: request.auth!.user.id,
-    });
+    try {
+      const { data: body, error } = z
+        .object({
+          type: z.enum(EntryTypes).optional(),
+          amount: z.number().min(0, "O valor não pode ser negativo").optional(),
+          description: z.string().max(255, "A descrição deve ter no máximo 255 caracteres").optional(),
+          when: z.iso.datetime().optional(),
+          category: zodOptionalCategorySchema.optional().or(z.null()),
+          recurrency: z
+            .object({
+              type: z.enum(RecurrencyTypes),
+              action: z.enum(RecurrencyActions),
+            })
+            .or(z.null())
+            .optional(),
+        })
+        .safeParse(request.body);
 
-    if (!entry) throw new NotFoundError("Despesa não encontrada");
+      if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
-    if (body.category?.id) {
-      const category = await CategoryService.findOneBy({
-        id: body.category.id,
+      const entry = await EntryService.findOneBy({
+        id: request.params.id,
         userId: request.auth!.user.id,
       });
 
-      if (!category) throw new NotFoundError("Categoria não encontrada");
+      if (!entry) throw new NotFoundError("Despesa não encontrada");
+
+      if (body.category?.id) {
+        const category = await CategoryService.findOneBy({
+          id: body.category.id,
+          userId: request.auth!.user.id,
+        });
+
+        if (!category) throw new NotFoundError("Categoria não encontrada");
+      }
+
+      if (entry.recurrency) {
+        await eventBus.triggerAsync("entry-recurrency:before-update", entry);
+      }
+
+      if (entry.recurrency && body.recurrency) {
+        await EntryRecurrencyService.update(entry.recurrency, body.recurrency, { transaction });
+      }
+
+      delete body.recurrency;
+
+      const updatedEntry = await EntryService.update(entry, body, { transaction });
+
+      if (updatedEntry.recurrency) {
+        await eventBus.triggerAsync("entry-recurrency:updated", updatedEntry);
+      }
+
+      await transaction.commit();
+      await transaction.release();
+
+      return response.status(200).json({ entry: updatedEntry });
+    } catch (error) {
+      await transaction.rollback();
+      await transaction.release();
+
+      throw error;
     }
-
-    const updatedEntry = await EntryService.update(entry, body);
-
-    return response.status(200).json({ entry: updatedEntry });
   }
 
   public static async destroy(request: Request, response: Response) {
@@ -124,6 +174,10 @@ export class EntryController {
     });
 
     if (!entry) throw new NotFoundError("Despesa não encontrada");
+
+    if (entry.recurrency) {
+      await eventBus.triggerAsync("entry-recurrency:before-remove", entry);
+    }
 
     const removedEntry = await EntryService.softRemove(entry);
 
