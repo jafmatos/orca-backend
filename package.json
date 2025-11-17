@@ -30,7 +30,8 @@
 		"typeorm:generate": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/database/data-source.ts",
 		"typeorm:migrate": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/database/data-source.ts",
 		"typeorm:revert": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/database/data-source.ts",
-		"typeorm:drop": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d src/database/data-source.ts"
+		"typeorm:drop": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d src/database/data-source.ts",
+		"typeorm:prod:migrate": "node ./node_modules/typeorm/cli.js migration:run -d dist/database/data-source.js"
 	},
 	"keywords": [],
 	"author": "",
