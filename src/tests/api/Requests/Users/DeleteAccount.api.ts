@@ -12,7 +12,7 @@ export type DeleteAccountResendBody = {
   confirmUrl: string;
 };
 
-export class ResetPasswordApi {
+export class DeleteAccountApi {
   public create(body: DeleteAccountCreateBody) {
     return request.post("/delete-account").send(body);
   }

@@ -1,7 +1,7 @@
 import { AccountApi } from "./Users/Account.api";
 import { AvatarApi } from "./Users/Avatar.api";
 import { CategoriesApi } from "./Categories.api";
-// import { DeleteAccountApi } from "./Users/DeleteAccount.api";
+import { DeleteAccountApi } from "./Users/DeleteAccount.api";
 import { EntriesApi } from "./Entries.api";
 import { OverviewApi } from "./Overview.api";
 import { PlansApi } from "./Plans.api";
@@ -14,7 +14,7 @@ class UsersApi {
   public readonly signUp = new SignUpApi();
   public readonly signIn = new SignInApi();
   public readonly resetPassword = new ResetPasswordApi();
-  // public readonly deleteAccount = new DeleteAccountApi();
+  public readonly deleteAccount = new DeleteAccountApi();
   public readonly avatar = new AvatarApi();
   public readonly account = new AccountApi();
 }
