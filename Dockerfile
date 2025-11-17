@@ -70,4 +70,4 @@ COPY --from=build /usr/src/app/dist ./dist
 EXPOSE 3333
 
 # Rodar a aplicação.
-CMD npm run start:prod
+CMD npm run typeorm:migrate && npm run start:prod
