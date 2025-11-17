@@ -145,9 +145,9 @@ export class EntryController {
 
       if (entry.recurrency && body.recurrency) {
         await EntryRecurrencyService.update(entry.recurrency, body.recurrency, { transaction });
-      }
 
-      delete body.recurrency;
+				delete body.recurrency;
+      }
 
       const updatedEntry = await EntryService.update(entry, body, { transaction });
 
