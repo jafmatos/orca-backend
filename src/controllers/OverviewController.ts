@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CategoryService, ListOptions } from "Src/services/CategoryService";
+import { LimitService, ListOptions } from "Src/services/LimitService";
 import { OverviewService, StatusOverviewWhere } from "Src/services/OverviewService";
 
 export class OverviewController {
@@ -21,7 +21,7 @@ export class OverviewController {
       months: parseInt(request.query.months as string) || 12,
     });
 
-    const categories = await CategoryService.list({
+    const [limits] = await LimitService.list({
       filter: {
         userId: request.auth!.user.id,
         when: {
@@ -29,7 +29,6 @@ export class OverviewController {
           le: requestFilter.when?.le || request.auth!.user.periodLe,
         },
       } as unknown as ListOptions["filter"],
-      order: request.query.order as unknown as ListOptions["order"],
     });
 
     return response.status(200).json({
@@ -37,7 +36,7 @@ export class OverviewController {
         ...status,
         history,
       },
-      categories,
+      limits,
     });
   }
 }

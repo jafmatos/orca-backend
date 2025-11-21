@@ -29,7 +29,8 @@ export class OverviewService {
         userId: where.userId,
         ge: where.when?.ge,
         le: where.when?.le,
-      });
+      })
+      .andWhere("(entry.removedAt IS NULL)");
 
     const result = await queryBuilder.getRawOne();
 
@@ -51,7 +52,7 @@ export class OverviewService {
         "months"
       )
       .setParameter("months", options.months)
-      .leftJoin("entry", "entry", "TO_CHAR(months.month, 'MM/YY') = TO_CHAR(entry.when, 'MM/YY') AND entry.userId = :userId", {
+      .leftJoin("entry", "entry", "TO_CHAR(months.month, 'MM/YY') = TO_CHAR(entry.when, 'MM/YY') AND entry.userId = :userId AND entry.removedAt IS NULL", {
         userId: options.userId,
       })
       .groupBy("months.month")

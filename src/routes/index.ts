@@ -19,6 +19,7 @@ import { UserRoles } from "Src/database/entities/User.entity";
 import { DeleteAccountController } from "Src/controllers/users/DeleteAccountController";
 import { subscribed } from "Src/middleware/subscribed";
 import { PushSubscriptionController } from "Src/controllers/PushSubscriptionController";
+import { LimitController } from "Src/controllers/LimitController";
 
 export const router = Router({ strict: true });
 const upload = multer({
@@ -67,6 +68,12 @@ router.post("/categories", auth(), subscribed, CategoryController.store);
 router.put("/categories/:id", auth(), subscribed, CategoryController.update);
 router.delete("/categories/:id", auth(), subscribed, CategoryController.destroy);
 router.put("/categories/recover/:id", auth(), subscribed, CategoryController.recover);
+
+router.get("/limits", auth(), subscribed, pagination({ defaultPage: 1, defaultPerPage: 10 }), LimitController.index);
+router.get("/limits/:id", auth(), subscribed, LimitController.show);
+router.post("/limits", auth(), subscribed, LimitController.store);
+router.put("/limits/:id", auth(), subscribed, LimitController.update);
+router.delete("/limits/:id", auth(), subscribed, LimitController.destroy);
 
 router.get("/entries", auth(), subscribed, pagination({ defaultPage: 1, defaultPerPage: 10 }), EntryController.index);
 router.get("/entries/:id", auth(), subscribed, EntryController.show);

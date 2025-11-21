@@ -3,9 +3,10 @@ import { RecurrencyActions, RecurrencyTypes } from "Src/database/entities/EntryR
 import { TypeormTransaction } from "Src/database/TypeormTransaction";
 import { NotFoundError, ValidationError } from "Src/helpers/Errors";
 import { CategoryService } from "Src/services/CategoryService";
-import { EntryRecurrencyService } from "Src/services/EntryRecurrencyServicec";
+import { EntryRecurrencyService } from "Src/services/EntryRecurrencyService";
 import { EntryService, ListOptions } from "Src/services/EntryService";
 import { eventBus } from "Src/services/Events";
+import { CategoryTypes } from "Src/types/CategoryTypes";
 import { EntryTypes } from "Src/types/EntryTypes";
 import { IsNull } from "typeorm";
 import { z } from "zod";
@@ -81,6 +82,7 @@ export class EntryController {
         id: body.category.id,
         removedAt: IsNull(),
         userId: request.auth!.user.id,
+        type: body.type as unknown as CategoryTypes,
       });
 
       if (!category) throw new NotFoundError("Categoria não encontrada");
@@ -134,6 +136,7 @@ export class EntryController {
         const category = await CategoryService.findOneBy({
           id: body.category.id,
           userId: request.auth!.user.id,
+          type: (body.type || entry.type) as unknown as CategoryTypes,
         });
 
         if (!category) throw new NotFoundError("Categoria não encontrada");
@@ -146,7 +149,7 @@ export class EntryController {
       if (entry.recurrency && body.recurrency) {
         await EntryRecurrencyService.update(entry.recurrency, body.recurrency, { transaction });
 
-				delete body.recurrency;
+        delete body.recurrency;
       }
 
       const updatedEntry = await EntryService.update(entry, body, { transaction });

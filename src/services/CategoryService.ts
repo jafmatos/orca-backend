@@ -5,14 +5,6 @@ import { DeepPartial, FindOptionsWhere } from "typeorm";
 export type ListOptions = {
   filter: {
     userId: string;
-    when?: {
-      ge?: string;
-      le?: string;
-    };
-  };
-  order?: {
-    column: "name" | "mark";
-    mode: "ASC" | "DESC";
   };
 };
 
@@ -23,37 +15,11 @@ export class CategoryService {
     const queryBuilder = dataSource
       .createQueryBuilder(Category, "category")
       .select("category")
-      .addSelect("COALESCE(ROUND(SUM(entry.amount)::numeric, 2), 0)::double precision as spent")
+      .leftJoinAndSelect("category.limit", "limit")
       .where("(category.userId = :userId)", { userId: options.filter.userId })
       .andWhere("(category.removedAt IS NULL)");
 
-    if (options.order) {
-      queryBuilder.orderBy(options.order.column, options.order.mode);
-    } else {
-      queryBuilder.orderBy("category.name", "ASC");
-    }
-
-    queryBuilder.leftJoin(
-      "entry",
-      "entry",
-      `category.id = entry.categoryId AND entry.type = 'expense' AND (DATE(entry.when) BETWEEN :ge::date AND :le::date) AND entry.removedAt IS NULL`,
-      {
-        ge: options.filter.when?.ge,
-        le: options.filter.when?.le,
-      }
-    );
-
-    queryBuilder.groupBy("category.name");
-    queryBuilder.addGroupBy("category.id");
-
-    const { entities, raw } = await queryBuilder.getRawAndEntities();
-
-    return entities.map<Category>((entity, index) => {
-      return {
-        ...entity,
-        spent: raw[index].spent as number,
-      };
-    });
+    return await queryBuilder.getMany();
   }
 
   public static async findById(id: Category["id"]) {

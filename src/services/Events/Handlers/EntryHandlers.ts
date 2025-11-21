@@ -1,12 +1,12 @@
-import { bullService } from "Src/services/Bull/BullService";
-import { BusEventName } from "../EventBus";
-import { logger } from "Src/infra/Logger";
 import { Entry } from "Src/database/entities/Entry.entity";
-import { EntryRecurrencyService } from "Src/services/EntryRecurrencyServicec";
-import { EntryService } from "Src/services/EntryService";
 import { RecurrencyActions } from "Src/database/entities/EntryRecurrency.entity";
-import { UserService } from "Src/services/UserService";
+import { logger } from "Src/infra/Logger";
+import { bullService } from "Src/services/Bull/BullService";
+import { EntryRecurrencyService } from "Src/services/EntryRecurrencyService";
+import { EntryService } from "Src/services/EntryService";
 import { NotificationManager } from "Src/services/Notifications/NotificationManager";
+import { UserService } from "Src/services/UserService";
+import { BusEventName } from "../EventBus";
 
 const cronTimeFromEntry = (entry: Entry) => {
   if (!entry.when) throw new Error("Cannot set a schedule without a reference date");

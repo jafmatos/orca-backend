@@ -1,21 +1,14 @@
 import { Request, Response } from "express";
 import { NotFoundError, ValidationError } from "Src/helpers/Errors";
 import { CategoryService, ListOptions } from "Src/services/CategoryService";
+import { CategoryTypes } from "Src/types/CategoryTypes";
 import { z } from "zod";
 
 export class CategoryController {
   public static async index(request: Request, response: Response) {
-    const requestFilter = (request.query.filter as ListOptions["filter"]) || {
-      when: {},
-    };
-
     const categories = await CategoryService.list({
       filter: {
         userId: request.auth!.user.id,
-        when: {
-          ge: requestFilter.when?.ge || request.auth!.user.periodGe,
-          le: requestFilter.when?.le || request.auth!.user.periodLe,
-        },
       } as ListOptions["filter"],
     });
 
@@ -38,8 +31,25 @@ export class CategoryController {
   public static async store(request: Request, response: Response) {
     const { data: body, error } = z
       .object({
+        type: z.enum(CategoryTypes),
         name: z.string().transform((v) => v.toLowerCase().replace(/^./, v[0].toUpperCase())),
-        mark: z.number().min(0).optional(),
+        limit: z
+          .object({
+						userId: z.undefined().transform(() => request.auth!.user.id),
+            amount: z.number().min(0),
+          })
+          .optional(),
+      })
+      .superRefine((body, ctx) => {
+        if (body.type === CategoryTypes.Expense) return;
+
+        if (body.limit) {
+          ctx.addIssue({
+            path: ["limit"],
+            message: "Não é possível definir um limite para categorias de receita",
+            code: z.ZodIssueCode.custom,
+          });
+        }
       })
       .safeParse(request.body);
 
@@ -54,24 +64,38 @@ export class CategoryController {
   }
 
   public static async update(request: Request, response: Response) {
-    const { data: body, error } = z
-      .object({
-        name: z
-          .string()
-          .transform((v) => v.toLowerCase().replace(/^./, v[0].toUpperCase()))
-          .optional(),
-        mark: z.number().min(0).optional(),
-      })
-      .safeParse(request.body);
-
-    if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
-
     const category = await CategoryService.findOneBy({
       id: request.params.id,
       userId: request.auth!.user.id,
     });
 
     if (!category) throw new NotFoundError("Categoria não encontrada");
+
+    const { data: body, error } = z
+      .object({
+        name: z
+          .string()
+          .transform((v) => v.toLowerCase().replace(/^./, v[0].toUpperCase()))
+          .optional(),
+        limit: z
+          .object({
+            userId: z.undefined().transform(() => request.auth!.user.id),
+            amount: z.number().min(0),
+          })
+          .optional(),
+      })
+      .superRefine((body, ctx) => {
+        if (category.type === CategoryTypes.Income && (body.limit || category.limit)) {
+          ctx.addIssue({
+            path: ["limit"],
+            message: "Não é possível definir um limite para categorias de receita",
+            code: z.ZodIssueCode.custom,
+          });
+        }
+      })
+      .safeParse(request.body);
+
+    if (error) throw new ValidationError(error.message, ValidationError.fromZod(error));
 
     const updatedCategory = await CategoryService.update(category, body);
 

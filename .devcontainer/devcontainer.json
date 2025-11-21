@@ -11,5 +11,20 @@
 		"bullboard",
 		"redis",
 		"backup"
-	]
+	],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+				"editor.formatOnSave": true
+			},
+			"extensions": [
+				"esbenp.prettier-vscode",
+				"loiane.ts-extension-pack",
+				"ms-vscode.vscode-typescript-next",
+				"github.vscode-github-actions"
+			]
+		}
+	}
 }
