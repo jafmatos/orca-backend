@@ -4,7 +4,6 @@ export class AddLimits1763757030249 implements MigrationInterface {
   name = "AddLimits1763757030249";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`CREATE TYPE "public"."entry_recurrency_type_enum" AS ENUM('monthly', 'weekly', 'daily')`);
 		await queryRunner.query(
       `CREATE TABLE "limit" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "amount" double precision NOT NULL, "userId" character varying NOT NULL, "categoryId" uuid NOT NULL, CONSTRAINT "REL_58f7dea672fb4b785e2b930177" UNIQUE ("categoryId"), CONSTRAINT "PK_6e82b66197d877e780e19c0aadc" PRIMARY KEY ("id"))`
     );
