@@ -56,7 +56,7 @@ export class LimitService {
       };
     });
 
-		return [limits, +raw[0].count || 0] as [Limit[], number];
+		return [limits, +raw[0]?.count || 0] as [Limit[], number];
   }
 
   public static async findById(id: Limit["id"]) {
