@@ -44,6 +44,12 @@ export class EntryRecurrencyService {
       .orderBy("entry.when", "ASC")
       .getManyAndCount();
   }
+	
+  public static async findById(id: string) {
+    return await this.entryRecurrencyRepository.findOneBy({
+      id,
+    });
+  }
 
   public static async create(recurrency: DeepPartial<EntryRecurrency>) {
     return await this.entryRecurrencyRepository.save(this.entryRecurrencyRepository.create(recurrency));
