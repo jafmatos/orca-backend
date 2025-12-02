@@ -67,6 +67,7 @@ export class EntryController {
         category: zodOptionalCategorySchema.optional().or(z.null()),
         recurrency: z
           .object({
+            userId: z.undefined().transform(() => request.auth!.user.id),
             type: z.enum(RecurrencyTypes),
             action: z.enum(RecurrencyActions),
           })
@@ -115,6 +116,7 @@ export class EntryController {
           category: zodOptionalCategorySchema.optional().or(z.null()),
           recurrency: z
             .object({
+              userId: z.undefined().transform(() => request.auth!.user.id),
               type: z.enum(RecurrencyTypes),
               action: z.enum(RecurrencyActions),
             })

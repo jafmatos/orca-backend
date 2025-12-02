@@ -27,6 +27,16 @@ export type ListOptions = {
   };
 };
 
+export type ListRecurrentOptions = {
+  filter: {
+    userId: string;
+  };
+  pagination: {
+    skip: number;
+    take: number;
+  };
+};
+
 export class EntryService {
   private static readonly entryRepository = dataSource.getRepository(Entry);
 

@@ -12,7 +12,7 @@
 				"<node_internals>/**",
 				"**/node_modules/**"
 			],
-			"program": "${workspaceFolder}\\src\\server.ts",
+			"program": "${workspaceFolder}/src/server.ts",
 			"runtimeArgs": [
 				"--watch",
 				"-r",

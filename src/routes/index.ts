@@ -20,6 +20,7 @@ import { DeleteAccountController } from "Src/controllers/users/DeleteAccountCont
 import { subscribed } from "Src/middleware/subscribed";
 import { PushSubscriptionController } from "Src/controllers/PushSubscriptionController";
 import { LimitController } from "Src/controllers/LimitController";
+import { EntryRecurrencyController } from "Src/controllers/EntryRecurrencyController";
 
 export const router = Router({ strict: true });
 const upload = multer({
@@ -80,6 +81,8 @@ router.get("/entries/:id", auth(), subscribed, EntryController.show);
 router.post("/entries", auth(), subscribed, EntryController.store);
 router.put("/entries/:id", auth(), subscribed, EntryController.update);
 router.delete("/entries/:id", auth(), subscribed, EntryController.destroy);
+
+router.get("/recurrencies", auth(), subscribed, pagination({ defaultPage: 1, defaultPerPage: 10 }), EntryRecurrencyController.index);
 
 router.post("/webpush/subscriptions", auth(), subscribed, PushSubscriptionController.store);
 

@@ -5,6 +5,7 @@ import { Entry } from "./Entry.entity";
 import { Subscription } from "./Subscription.entity";
 import { UserKey } from "./UserKey.entity";
 import { PushSubscription } from "./PushSubscription.entity";
+import { EntryRecurrency } from "./EntryRecurrency.entity";
 
 export enum UserRoles {
   User = "user",
@@ -70,6 +71,9 @@ export class User {
 
   @OneToMany(() => Entry, (entry) => entry.user)
   entries?: Entry[];
+
+  @OneToMany(() => EntryRecurrency, (entryRecurrency) => entryRecurrency.user)
+  recurrencies?: EntryRecurrency[];
 
   @OneToOne(() => Avatar, (avatar) => avatar.user, { eager: true })
   avatar?: Avatar;
