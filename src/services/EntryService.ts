@@ -55,7 +55,7 @@ export class EntryService {
       .andWhere("(entry.removedAt IS NULL)")
       .andWhere("(category.removedAt IS NULL)");
 
-    queryBuilder.andWhere(`(DATE(entry.when) BETWEEN :ge::date AND :le::date)`, {
+    queryBuilder.andWhere(`(DATE(entry.when) BETWEEN DATE(:ge::date) AND DATE(:le::date))`, {
       ge: options.filter.when?.ge,
       le: options.filter.when?.le,
     });
