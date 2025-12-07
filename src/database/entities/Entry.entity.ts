@@ -34,7 +34,7 @@ export class Entry {
 
   @ManyToOne(() => EntryRecurrency, (recurrency) => recurrency.entries, {
     eager: true,
-    cascade: ["insert", "recover", "remove", "soft-remove"],
+    cascade: ["insert", "recover", "remove", "soft-remove", "update"],
   })
   @JoinColumn({
     name: "recurrencyId",

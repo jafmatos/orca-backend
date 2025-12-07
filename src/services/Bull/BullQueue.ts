@@ -51,7 +51,7 @@ export class BullQueue<T extends { id: string }> {
     }
   }
 
-  async removeSchedule(id: T["id"], cronTime: string) {
+	async removeSchedule(id: T["id"], cronTime: string) {
     try {
       if (!this.jobPrefix) {
         await this.queue.removeRepeatable({
