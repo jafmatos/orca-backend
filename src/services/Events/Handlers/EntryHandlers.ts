@@ -35,15 +35,11 @@ const onCreate = async (entry: Entry) => {
 
     if (!user?.pushSubscriptions?.length || !user.acceptsNotifications) return;
 
+    const categorySlot = newEntry.category ? `na categoria "${newEntry.category!.name}"` : "sem categoria";
+
     await NotificationManager.sendNotification(user, {
-      body: `Um lançamento automático foi criado para a categoria ${newEntry.category!.name} no valor de ${newEntry.amount.toLocaleString(
-        "pt-BR",
-        {
-          style: "currency",
-          currency: "BRL",
-        }
-      )}`,
-      title: "Lançamento cadastrado",
+      body: `Acabamos de registrar R$ ${newEntry.amount.toFixed(2)} ${categorySlot} para você.`,
+      title: "Lançamento automático registrado",
     });
   } catch (error) {
     logger.error(`Failed to create entry automatically`, error);
@@ -56,11 +52,13 @@ const onNotify = async (entry: Entry) => {
 
     if (!user?.pushSubscriptions?.length || !user.acceptsNotifications) return;
 
+    const categorySlot = entry.category ? `na categoria "${entry.category!.name}"` : "sem categoria";
+
     await NotificationManager.sendNotification(
       user,
       {
-        body: `Lembre-se de cadastrar o lançamento`,
-        title: "Lembrete",
+        body: `Registre agora: ${entry.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} ${categorySlot}.`,
+        title: "Mantenha suas finanças em dia!",
       },
       (error) => {
         logger.error(error);

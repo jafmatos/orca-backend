@@ -1,4 +1,4 @@
-import { Plan } from "Src/database/entities/Plan.entity";
+import { Plan, PlanDurationInterval } from "Src/database/entities/Plan.entity";
 import { User } from "Src/database/entities/User.entity";
 import { SubscriptionStatuses } from "Src/types/SubscriptionStatuses";
 import { Stripe } from "stripe";
@@ -17,6 +17,10 @@ export class StripeService {
     success_url: string;
     cancel_url: string;
   }) {
+    const interval = new Map<PlanDurationInterval, Stripe.Checkout.SessionCreateParams.LineItem.PriceData.Recurring.Interval>([
+      [PlanDurationInterval.Yearly, "year"],
+      [PlanDurationInterval.Monthly, "month"],
+    ]).get(plan.duration.interval)!;
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -28,8 +32,8 @@ export class StripeService {
             currency: "BRL",
             unit_amount: plan.price * 100,
             recurring: {
-              interval: "month",
-              interval_count: 1,
+              interval,
+              interval_count: plan.duration.intervalCount,
             },
           },
         },
