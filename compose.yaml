@@ -1,0 +1,100 @@
+version: "3.9"
+
+x-common-env: &common-env
+  - SILENT=$SILENT
+  - LOG_LEVEL=$LOG_LEVEL
+  - NODE_ENV=$NODE_ENV
+  - APP_PORT=$APP_PORT
+  - APP_HOST=$APP_HOST
+  - APP_DIR=$APP_DIR
+  - APP_URL=$APP_URL
+  - APP_SUPER_USER_NAME=$APP_SUPER_USER_NAME
+  - APP_SUPER_USER_EMAIL=$APP_SUPER_USER_EMAIL
+  - APP_SUPER_USER_PASSWORD=$APP_SUPER_USER_PASSWORD
+  - FRONTEND_POLICY_URL=$FRONTEND_POLICY_URL
+  - FRONTEND_TERMS_URL=$FRONTEND_TERMS_URL
+  - DB_HOST=$DB_HOST
+  - DB_PORT=$DB_PORT
+  - DB_USER=$DB_USER
+  - DB_PASS=$DB_PASS
+  - DB_NAME=$DB_NAME
+  - DB_TIMEZONE=$DB_TIMEZONE
+  - DB_LOGGING=$DB_LOGGING
+  - DB_SYNCHRONIZE=$DB_SYNCHRONIZE
+  - SMTP_HOST=$SMTP_HOST
+  - SMTP_PORT=$SMTP_PORT
+  - SMTP_USER=$SMTP_USER
+  - SMTP_PASS=$SMTP_PASS
+  - SMTP_ORIGIN=$SMTP_ORIGIN
+  - STRIPE_KEY=$STRIPE_KEY
+  - STRIPE_ENDPOINT_SECRET=$STRIPE_ENDPOINT_SECRET
+  - JWT_TOKEN_SECRET=$JWT_TOKEN_SECRET
+  - BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS
+  - VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY
+  - VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY
+  - REDIS_HOST=$REDIS_HOST
+  - REDIS_PORT=$REDIS_PORT
+  - REDIS_PASSWORD=$REDIS_PASSWORD
+  - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
+  - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
+  - TESTING_DEFAULT_USER_PASSWORD=$TESTING_DEFAULT_USER_PASSWORD
+  - TESTING_DEFAULT_OTP_CODE=$TESTING_DEFAULT_OTP_CODE
+  - OPENAI_KEY=$OPENAI_KEY
+  - OPENAI_MODEL=$OPENAI_MODEL
+
+services:
+  postgresdb:
+    container_name: postgres
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - 5432
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - database:/var/lib/postgresql/18/docker
+    networks:
+      - legacy-app-network
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+
+  app:
+    container_name: app
+    restart: unless-stopped
+    profiles: ["development"]
+    build: .
+    depends_on:
+      - postgresdb
+    ports:
+      - 3333:3333
+    volumes:
+      - uploads:/usr/src/app/uploads
+    networks:
+      - legacy-app-network
+    stdin_open: true
+    tty: true
+    environment: *common-env
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+ 
+volumes:
+  database:
+    external: true
+  uploads:
+    external: true
+
+networks:
+  legacy-app-network:
+    external: true
+    name: devcontainer_app-network
