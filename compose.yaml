@@ -56,7 +56,7 @@ services:
         max-size: '10m'
         max-file: '3'
     volumes:
-      - database:/var/lib/postgresql/18/docker
+      - orca_backend_database:/var/lib/postgresql/18/docker
     networks:
       - app-network
     environment:
@@ -79,7 +79,7 @@ services:
     ports:
       - 3333:3333
     volumes:
-      - uploads:/usr/src/app/uploads
+      - orca_backend_uploads:/usr/src/app/uploads
     networks:
       - app-network
     stdin_open: true
@@ -97,7 +97,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - orca_backend_redis:/data
     networks:
       app-network:
         aliases:
@@ -182,9 +182,9 @@ services:
     restart: unless-stopped
     profiles: ['production']
     volumes:
-      - database:/backup/db:ro
-      - uploads:/backup/uploads:ro
-      - redis_data:/backup/redis:ro
+      - orca_backend_database:/backup/db:ro
+      - orca_backend_uploads:/backup/uploads:ro
+      - orca_backend_redis:/backup/redis:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./backups:/archive
     environment:
@@ -205,11 +205,11 @@ services:
           memory: 256M
 
 volumes:
-  database:
+  orca_backend_database:
     external: true
-  uploads:
+  orca_backend_uploads:
     external: true
-  redis_data:
+  orca_backend_redis:
     external: true
 
 networks:
