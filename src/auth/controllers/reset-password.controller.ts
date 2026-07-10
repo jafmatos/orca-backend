@@ -1,4 +1,12 @@
-import { Controller, Post, Put, Body, Param, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Put,
+  Body,
+  Param,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { UserService } from '@/user/services/user.service';
@@ -10,11 +18,9 @@ import { Otp } from '@/common/helpers/otp.helper';
 import { KeyTypes } from '@/auth/entities/user-key.entity';
 import { EntityManager } from 'typeorm';
 
-// We must create a schema factory to inject userService if we want DB validations inside Zod.
-// But it's easier to do DB checks in the controller since NestJS DI doesn't easily inject into Zod schemas.
 const ResetPasswordSchema = z.object({
-  confirmUrl: z.string().url('URL inválida'),
-  email: z.string().email('Email inválido'),
+  confirmUrl: z.url('URL inválida'),
+  email: z.email('Email inválido'),
 });
 
 const ResetPasswordUpdateSchema = z
@@ -23,13 +29,13 @@ const ResetPasswordUpdateSchema = z
     password: z.string().min(6, 'Senha curta demais'),
     passwordConfirmation: z.string().min(6, 'Confirmação curta demais'),
   })
-  .refine(
-    (body) => body.password === body.passwordConfirmation,
-    { path: ['passwordConfirmation'], message: 'Confirmação incorreta' },
-  );
+  .refine((body) => body.password === body.passwordConfirmation, {
+    path: ['passwordConfirmation'],
+    message: 'Confirmação incorreta',
+  });
 
 const ResetPasswordResendSchema = z.object({
-  confirmUrl: z.string().url('URL inválida'),
+  confirmUrl: z.url('URL inválida'),
 });
 
 @Controller('reset-password')
@@ -43,10 +49,16 @@ export class ResetPasswordController {
   ) {}
 
   @Post()
-  async store(@Body(new ZodValidationPipe(ResetPasswordSchema)) body: z.infer<typeof ResetPasswordSchema>) {
+  async store(
+    @Body(new ZodValidationPipe(ResetPasswordSchema))
+    body: z.infer<typeof ResetPasswordSchema>,
+  ) {
     return this.entityManager.transaction(async (manager) => {
-      const user = await this.userService.findOneWithBalanceBy({ email: body.email });
-      if (!user) throw new NotFoundException('Não existe uma conta com este E-mail');
+      const user = await this.userService.findOneWithBalanceBy({
+        email: body.email,
+      });
+      if (!user)
+        throw new NotFoundException('Não existe uma conta com este E-mail');
 
       const otp = Otp.generate();
       const userKey = await this.userKeyService.create(
@@ -74,13 +86,20 @@ export class ResetPasswordController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(ResetPasswordUpdateSchema)) body: z.infer<typeof ResetPasswordUpdateSchema>,
+    @Body(new ZodValidationPipe(ResetPasswordUpdateSchema))
+    body: z.infer<typeof ResetPasswordUpdateSchema>,
   ) {
     return this.entityManager.transaction(async (manager) => {
-      const key = await this.userKeyService.findOneBy({ id, type: KeyTypes.ResetPassword });
+      const key = await this.userKeyService.findOneBy({
+        id,
+        type: KeyTypes.ResetPassword,
+      });
       if (!key) throw new NotFoundException('Chave de acesso não encontrada');
 
-      if (!Bcrypt.compare(body.otp, key.otp) || (key.expiresAt && new Date() > new Date(key.expiresAt))) {
+      if (
+        !Bcrypt.compare(body.otp, key.otp) ||
+        (key.expiresAt && new Date() > new Date(key.expiresAt))
+      ) {
         throw new UnauthorizedException('Código incorreto ou expirado');
       }
 
@@ -103,10 +122,14 @@ export class ResetPasswordController {
   @Put('resend/:id')
   async resend(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(ResetPasswordResendSchema)) body: z.infer<typeof ResetPasswordResendSchema>,
+    @Body(new ZodValidationPipe(ResetPasswordResendSchema))
+    body: z.infer<typeof ResetPasswordResendSchema>,
   ) {
     return this.entityManager.transaction(async (manager) => {
-      const key = await this.userKeyService.findOneBy({ id, type: KeyTypes.ResetPassword });
+      const key = await this.userKeyService.findOneBy({
+        id,
+        type: KeyTypes.ResetPassword,
+      });
       if (!key) throw new NotFoundException('Chave de acesso não encontrada');
 
       const otp = Otp.generate();

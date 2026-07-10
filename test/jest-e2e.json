@@ -5,5 +5,13 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/../src/$1",
+    "^@Test/(.*)$": "<rootDir>/$1",
+    "^expo-server-sdk$": "<rootDir>/mock-expo.js"
+  },
+  "globalSetup": "<rootDir>/global-setup.ts",
+  "globalTeardown": "<rootDir>/global-teardown.ts",
+  "testTimeout": 30000
 }

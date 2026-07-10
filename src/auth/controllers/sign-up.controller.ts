@@ -1,4 +1,13 @@
-import { Controller, Post, Put, Body, Param, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Put,
+  Body,
+  Param,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { UserService } from '@/user/services/user.service';
@@ -55,16 +64,15 @@ export class SignUpController {
   ) {}
 
   @Post()
-  async store(@Body(new ZodValidationPipe(SignUpSchema)) body: z.infer<typeof SignUpSchema>) {
+  async store(
+    @Body(new ZodValidationPipe(SignUpSchema))
+    body: z.infer<typeof SignUpSchema>,
+  ) {
     return this.entityManager.transaction(async (manager) => {
       const hashedPassword = Bcrypt.hash(body.password);
-      const defaultPeriodGe = new Date();
-      const defaultPeriodLe = new Date();
-      defaultPeriodGe.setHours(0, 0, 0, 0);
-      defaultPeriodLe.setMonth(defaultPeriodLe.getMonth() + 1);
-      defaultPeriodLe.setHours(0, 0, 0, 0);
-
-      const existingUser = await this.userService.findOneWithBalanceBy({ email: body.email });
+      const existingUser = await this.userService.findOneWithBalanceBy({
+        email: body.email,
+      });
       if (existingUser?.isEmailConfirmed) {
         throw new ConflictException('Este e-mail já está em uso');
       }
@@ -77,8 +85,6 @@ export class SignUpController {
             name: body.name,
             email: body.email,
             password: hashedPassword,
-            periodGe: defaultPeriodGe,
-            periodLe: defaultPeriodLe,
           },
           { manager },
         );
@@ -88,8 +94,6 @@ export class SignUpController {
             name: body.name,
             email: body.email,
             password: hashedPassword,
-            periodGe: defaultPeriodGe,
-            periodLe: defaultPeriodLe,
             isEmailConfirmed: false,
             acceptedTermsAt: new Date(),
           },
@@ -97,7 +101,10 @@ export class SignUpController {
         );
       }
 
-      await this.userKeyService.delete({ userId: user.id, type: KeyTypes.SignUp }, { manager });
+      await this.userKeyService.delete(
+        { userId: user.id, type: KeyTypes.SignUp },
+        { manager },
+      );
 
       const otp = Otp.generate();
       const userKey = await this.userKeyService.create(
@@ -125,13 +132,20 @@ export class SignUpController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(SignUpUpdateSchema)) body: z.infer<typeof SignUpUpdateSchema>,
+    @Body(new ZodValidationPipe(SignUpUpdateSchema))
+    body: z.infer<typeof SignUpUpdateSchema>,
   ) {
     return this.entityManager.transaction(async (manager) => {
-      const key = await this.userKeyService.findOneBy({ id, type: KeyTypes.SignUp });
+      const key = await this.userKeyService.findOneBy({
+        id,
+        type: KeyTypes.SignUp,
+      });
       if (!key) throw new NotFoundException('Chave de acesso não encontrada');
 
-      if (!Bcrypt.compare(body.otp, key.otp) || (key.expiresAt && new Date() > new Date(key.expiresAt))) {
+      if (
+        !Bcrypt.compare(body.otp, key.otp) ||
+        (key.expiresAt && new Date() > new Date(key.expiresAt))
+      ) {
         throw new UnauthorizedException('Código incorreto ou expirado');
       }
 
@@ -154,10 +168,14 @@ export class SignUpController {
   @Put('resend/:id')
   async resend(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(SignUpResendSchema)) body: z.infer<typeof SignUpResendSchema>,
+    @Body(new ZodValidationPipe(SignUpResendSchema))
+    body: z.infer<typeof SignUpResendSchema>,
   ) {
     return this.entityManager.transaction(async (manager) => {
-      const key = await this.userKeyService.findOneBy({ id, type: KeyTypes.SignUp });
+      const key = await this.userKeyService.findOneBy({
+        id,
+        type: KeyTypes.SignUp,
+      });
       if (!key) throw new NotFoundException('Chave de acesso não encontrada');
 
       const otp = Otp.generate();

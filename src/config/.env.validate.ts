@@ -1,22 +1,34 @@
 import { z } from 'zod';
 
+const assertIsTruthyInTestingEnv = (value: unknown) => {
+  if (process.env.NODE_ENV !== 'testing') return true;
+
+  return !!value;
+};
+
 export const envSchema = z.object({
   // App
+  SILENT: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((val) => val === 'true'),
   NODE_ENV: z
-    .enum(['development', 'production', 'test', 'testing'])
+    .enum(['development', 'production', 'testing', 'test'])
     .default('development'),
   LOG_LEVEL: z.string().default('info'),
+  SEED_ON_BOOTSTRAP: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((val) => val === 'true'),
   APP_PORT: z.coerce.number().default(3333),
   APP_HOST: z.string().default('127.0.0.1'),
   APP_DIR: z.string().optional(),
   APP_URL: z.string().optional(),
-  APP_SUPER_USER_NAME: z.string(),
-  APP_SUPER_USER_EMAIL: z.string().email(),
-  APP_SUPER_USER_PASSWORD: z.string(),
 
   // Frontend
-  FRONTEND_POLICY_URL: z.url(),
-  FRONTEND_TERMS_URL: z.url(),
+  FRONTEND_BASE_URL: z.string().optional(),
+  FRONTEND_POLICY_URL: z.string().optional(),
+  FRONTEND_TERMS_URL: z.string().optional(),
 
   // Database
   DB_HOST: z.string(),
@@ -67,8 +79,11 @@ export const envSchema = z.object({
   OPENAI_MODEL: z.string().optional(),
 
   // Testing
-  TESTING_DEFAULT_USER_PASSWORD: z.string(),
-  TESTING_DEFAULT_OTP_CODE: z.string(),
+  TESTING_USER_DEFAULT_PASSWORD: z.string().refine(assertIsTruthyInTestingEnv),
+  TESTING_DEFAULT_OTP_CODE: z.string().refine(assertIsTruthyInTestingEnv),
+  TESTING_SUPER_USER_NAME: z.string().refine(assertIsTruthyInTestingEnv),
+  TESTING_SUPER_USER_EMAIL: z.email().refine(assertIsTruthyInTestingEnv),
+  TESTING_SUPER_USER_PASSWORD: z.string().refine(assertIsTruthyInTestingEnv),
 });
 
 export type Env = z.infer<typeof envSchema>;

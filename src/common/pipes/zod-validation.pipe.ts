@@ -23,7 +23,7 @@ export class ZodValidationPipe implements PipeTransform {
           errors: error.issues,
         });
       }
-			
+
       throw new UnprocessableEntityException('Validation failed');
     }
   }

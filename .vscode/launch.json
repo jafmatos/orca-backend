@@ -1,0 +1,12 @@
+{
+  "configurations": [
+    {
+      "name": "Docker: Attach to Test",
+      "port": 9229,
+      "request": "attach",
+      "type": "node",
+      "remoteRoot": "/usr/src/app",
+      "localRoot": "${workspaceFolder}"
+    }
+  ]
+}

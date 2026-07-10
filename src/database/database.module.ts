@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigService } from '@nestjs/config';
 import { Env } from '@/config/.env.validate';
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SeedingModule } from './seeding/seeding.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Env } from '@/config/.env.validate';
         logging: configService.get('DB_LOGGING', { infer: true }),
       }),
     }),
+    SeedingModule,
   ],
 })
 export class DatabaseModule {}

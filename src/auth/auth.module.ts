@@ -22,7 +22,7 @@ import { DeleteAccountController } from '@/auth/controllers/delete-account.contr
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET', 'secret'),
+        secret: configService.get<string>('JWT_TOKEN_SECRET', 'secret'),
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],

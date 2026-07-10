@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, EntityManager, FindOptionsWhere, DeepPartial } from 'typeorm';
+import {
+  Repository,
+  EntityManager,
+  FindOptionsWhere,
+  DeepPartial,
+} from 'typeorm';
 import { User } from '@/user/entities/user.entity';
 
 export type CreateUserAttributes = Omit<User, 'id'>;
@@ -28,21 +33,26 @@ export class UserService {
       .createQueryBuilder('users')
       .select('users')
       .leftJoinAndSelect('users.avatar', 'avatar')
-      // Note: we can add subscriptions here later when migrated
+
       .where(where)
       .getOne();
 
     if (!user) return null;
 
-    const { balance } = await this.userRepository
+    const { balance } = (await this.userRepository
       .createQueryBuilder('users')
       .select(
         "COALESCE(ROUND(SUM(CASE WHEN entry.type = 'expense' THEN -entry.amount ELSE entry.amount END)::numeric, 2), 0)::double precision as balance",
       )
-      .leftJoin('entry', 'entry', 'entry.userId = users.id AND (entry.when BETWEEN users.periodGe AND users.periodLe)')
+      .leftJoin(
+        'entry',
+        'entry',
+        'entry.userId = users.id AND (entry.when BETWEEN :start AND :end)',
+        { start: user.currentCycle.start, end: user.currentCycle.end }
+      )
       .where(where)
       .groupBy('users.id')
-      .getRawOne() || { balance: 0 };
+      .getRawOne()) || { balance: 0 };
 
     if (user) user.balance = balance;
 
@@ -54,7 +64,11 @@ export class UserService {
     return await repository.save(repository.create(user));
   }
 
-  async update(user: User, data: DeepPartial<User>, options?: { manager: EntityManager }) {
+  async update(
+    user: User,
+    data: DeepPartial<User>,
+    options?: { manager: EntityManager },
+  ) {
     const repository = this.getRepository(options?.manager);
     return await repository.save(repository.merge(user, data));
   }

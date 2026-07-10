@@ -1,0 +1,43 @@
+# secrets.GH_REPOSITORY: The API Repository owner/repo
+# secrets.GH_TOKEN: The Github authorization token
+# secrets.DOCKER_ENV_FILE: The whole content of .env.docker.testing needed to run npm run docker:test
+
+name: api.orca-financas.com integration testing
+
+on:
+  push:
+    branches: [merge]
+
+  workflow_dispatch:
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    environment:
+      name: testing
+    steps:
+      - name: Github Checkout
+        uses: actions/checkout@v4
+        with: 
+          repository: ${{ secrets.GH_REPOSITORY }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: .
+      - name: Creating docker volumes and networks
+        run: |
+          docker volume create database
+          docker volume create uploads
+          docker volume create redis_data
+          docker network create devcontainer_app-network || true
+      - name: Create .env.docker.testing from secrets DOCKER_ENV_FILE
+        run: |
+          echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker.testing
+      - name: Running tests
+        run: npm run docker:test
+      - name: Push to branch review
+        run: |
+          git fetch
+          git checkout -B review origin/review
+          git config --global user.email "actions@github.com"
+          git config --global user.name "Pipeline"
+          git reset --hard merge
+          git push -f origin review

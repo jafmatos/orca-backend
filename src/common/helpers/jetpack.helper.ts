@@ -10,7 +10,13 @@ export class Jetpack {
     return `${process.env.APP_URL || 'http://localhost:3000'}/uploads`;
   }
 
-  public static async upload({ data, fileName }: { data: Buffer; fileName: string }) {
+  public static async upload({
+    data,
+    fileName,
+  }: {
+    data: Buffer;
+    fileName: string;
+  }) {
     await jetpack.writeAsync(this.filePath(fileName), data);
   }
 

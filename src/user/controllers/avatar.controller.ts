@@ -1,13 +1,22 @@
-import { Controller, Put, Delete, Req, UseGuards, BadRequestException, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { AvatarService } from '@/user/services/avatar.service';
+import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { Jetpack } from '@/common/helpers/jetpack.helper';
-import { EntityManager } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { User } from '@/user/entities/user.entity';
+import { AvatarService } from '@/user/services/avatar.service';
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  Put,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { randomUUID } from 'crypto';
+import { EntityManager } from 'typeorm';
 
-@Controller('users/avatar')
+@Controller('users/me/avatar')
 export class AvatarController {
   constructor(
     private readonly avatarService: AvatarService,
@@ -17,22 +26,25 @@ export class AvatarController {
   @Put()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('avatar'))
-  async update(@Req() request: any, @UploadedFile() file: Express.Multer.File) {
+  async update(
+    @AuthUser() user: User,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return this.entityManager.transaction(async (manager) => {
-      const user: User = request.user;
-
-      if (!file) throw new BadRequestException('É necessário enviar uma imagem');
-      if (file.size > 5 * 1024 * 1024) throw new BadRequestException('Imagem muito grande. Limite: 5MB');
+      if (!file)
+        throw new BadRequestException('É necessário enviar uma imagem');
+      if (file.size > 5 * 1024 * 1024)
+        throw new BadRequestException('Imagem muito grande. Limite: 5MB');
 
       const [type, extname] = file.mimetype.split('/');
-      if (type !== 'image') throw new BadRequestException('É necessário enviar uma imagem');
+      if (type !== 'image')
+        throw new BadRequestException('É necessário enviar uma imagem');
 
       if (user.avatar) {
         await this.avatarService.remove(user.avatar, { manager });
-        // The beforeRemove hook on the entity removes the file physically
       }
 
-      const fileName = `${uuidv4()}.${extname}`;
+      const fileName = `${randomUUID()}.${extname}`;
 
       const avatar = await this.avatarService.create(
         {
@@ -47,7 +59,6 @@ export class AvatarController {
         fileName,
       });
 
-      // Reload user object to send response correctly formatted if necessary
       user.avatar = avatar;
 
       return { user };
@@ -56,10 +67,8 @@ export class AvatarController {
 
   @Delete()
   @UseGuards(JwtAuthGuard)
-  async destroy(@Req() request: any) {
+  async destroy(@AuthUser() user: User) {
     return this.entityManager.transaction(async (manager) => {
-      const user: User = request.user;
-
       if (!user.avatar) return;
 
       await this.avatarService.remove(user.avatar, { manager });

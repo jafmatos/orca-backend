@@ -1,4 +1,10 @@
-import { Entity, Column, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '@/user/entities/user.entity';
 
 export enum KeyTypes {
@@ -27,7 +33,10 @@ export class UserKey {
   @Column({ type: 'timestamp', nullable: true })
   expiresAt?: Date;
 
-  @ManyToOne(() => User, (user) => user.keys, { onDelete: 'CASCADE', orphanedRowAction: 'delete' })
+  @ManyToOne(() => User, (user) => user.keys, {
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
+  })
   @JoinColumn({ name: 'userId' })
   user?: User;
 }

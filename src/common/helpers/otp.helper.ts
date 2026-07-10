@@ -1,6 +1,6 @@
 export class Otp {
   public static generate(): string {
-    if (process.env.NODE_ENV === 'testing') return '000000';
+    if (process.env.NODE_ENV === 'testing') return process.env.TESTING_DEFAULT_OTP_CODE || '000000';
 
     return Math.floor(Math.random() * 1_000_000)
       .toString()

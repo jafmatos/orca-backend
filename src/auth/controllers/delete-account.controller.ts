@@ -1,17 +1,30 @@
-import { Controller, Post, Put, Body, Param, NotFoundException, UnauthorizedException, UseGuards, Req } from '@nestjs/common';
-import { z } from 'zod';
-import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
-import { UserService } from '@/user/services/user.service';
-import { UserKeyService } from '@/auth/services/user-key.service';
+import { AuthUser } from '@/auth/decorators/auth-user.decorator';
+import { KeyTypes } from '@/auth/entities/user-key.entity';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '@/auth/guards/roles.guard';
 import { EmailService } from '@/auth/services/email.service';
+import { UserKeyService } from '@/auth/services/user-key.service';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { Bcrypt } from '@/common/helpers/bcrypt.helper';
 import { Otp } from '@/common/helpers/otp.helper';
-import { KeyTypes } from '@/auth/entities/user-key.entity';
+import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
+import { User, UserRoles } from '@/user/entities/user.entity';
+import { UserService } from '@/user/services/user.service';
+import {
+  Body,
+  Controller,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { z } from 'zod';
 
 const DeleteAccountSchema = z.object({
-  confirmUrl: z.string().url('URL inválida'),
+  confirmUrl: z.url('URL inválida'),
 });
 
 const DeleteAccountUpdateSchema = z.object({
@@ -19,7 +32,7 @@ const DeleteAccountUpdateSchema = z.object({
 });
 
 const DeleteAccountResendSchema = z.object({
-  confirmUrl: z.string().url('URL inválida'),
+  confirmUrl: z.url('URL inválida'),
 });
 
 @Controller('delete-account')
@@ -32,12 +45,18 @@ export class DeleteAccountController {
   ) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  async store(@Req() request: any, @Body(new ZodValidationPipe(DeleteAccountSchema)) body: z.infer<typeof DeleteAccountSchema>) {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoles.User)
+  async store(
+    @AuthUser() user: User,
+    @Body(new ZodValidationPipe(DeleteAccountSchema))
+    body: z.infer<typeof DeleteAccountSchema>,
+  ) {
     return this.entityManager.transaction(async (manager) => {
-      const user = request.user;
-
-      await this.userKeyService.delete({ userId: user.id, type: KeyTypes.DeleteAccount }, { manager });
+      await this.userKeyService.delete(
+        { userId: user.id, type: KeyTypes.DeleteAccount },
+        { manager },
+      );
 
       const otp = Otp.generate();
       const userKey = await this.userKeyService.create(
@@ -63,39 +82,49 @@ export class DeleteAccountController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoles.User)
   async update(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(DeleteAccountUpdateSchema)) body: z.infer<typeof DeleteAccountUpdateSchema>,
+    @Body(new ZodValidationPipe(DeleteAccountUpdateSchema))
+    body: z.infer<typeof DeleteAccountUpdateSchema>,
   ) {
     return this.entityManager.transaction(async (manager) => {
-      const key = await this.userKeyService.findOneBy({ id, type: KeyTypes.DeleteAccount });
+      const key = await this.userKeyService.findOneBy({
+        id,
+        type: KeyTypes.DeleteAccount,
+      });
 
       if (!key) throw new NotFoundException('Chave de acesso não encontrada');
 
-      if (!Bcrypt.compare(body.otp, key.otp) || (key.expiresAt && new Date() > new Date(key.expiresAt))) {
+      if (
+        !Bcrypt.compare(body.otp, key.otp) ||
+        (key.expiresAt && new Date() > new Date(key.expiresAt))
+      ) {
         throw new UnauthorizedException('Código incorreto ou expirado');
       }
 
       const removedUser = await this.userService.remove(key.user!, { manager });
-			
+
       await this.userKeyService.remove(key, { manager });
 
-      // In legacy: removedUser.stripeId && await stripe.customers.del(removedUser.stripeId!);
-      // We can implement Stripe integration later.
-
-      return { user: removedUser };
+      return { message: 'Conta excluída com sucesso' };
     });
   }
 
   @Put('resend/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoles.User)
   async resend(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(DeleteAccountResendSchema)) body: z.infer<typeof DeleteAccountResendSchema>,
+    @Body(new ZodValidationPipe(DeleteAccountResendSchema))
+    body: z.infer<typeof DeleteAccountResendSchema>,
   ) {
     return this.entityManager.transaction(async (manager) => {
-      const key = await this.userKeyService.findOneBy({ id, type: KeyTypes.DeleteAccount });
+      const key = await this.userKeyService.findOneBy({
+        id,
+        type: KeyTypes.DeleteAccount,
+      });
       if (!key) throw new NotFoundException('Chave de acesso não encontrada');
 
       const otp = Otp.generate();
