@@ -1,7 +1,11 @@
 import { z } from 'zod';
 
-const assertIsTruthyInTestingEnv = (value: unknown) => {
-  if (process.env.NODE_ENV !== 'testing') return true;
+const assertIsRequiredForSeed = (value: unknown) => {
+  if (
+    process.env.NODE_ENV !== 'testing' &&
+    process.env.SEED_ON_BOOTSTRAP !== 'true'
+  )
+    return true;
 
   return !!value;
 };
@@ -16,10 +20,6 @@ export const envSchema = z.object({
     .enum(['development', 'production', 'testing', 'test'])
     .default('development'),
   LOG_LEVEL: z.string().default('info'),
-  SEED_ON_BOOTSTRAP: z
-    .enum(['true', 'false'])
-    .default('false')
-    .transform((val) => val === 'true'),
   APP_PORT: z.coerce.number().default(3333),
   APP_HOST: z.string().default('127.0.0.1'),
   APP_DIR: z.string().optional(),
@@ -78,13 +78,35 @@ export const envSchema = z.object({
   OPENAI_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().optional(),
 
-  // Testing
-  TESTING_API_URL: z.string().optional().refine(assertIsTruthyInTestingEnv),
-  TESTING_USER_DEFAULT_PASSWORD: z.string().optional().refine(assertIsTruthyInTestingEnv),
-  TESTING_DEFAULT_OTP_CODE: z.string().optional().refine(assertIsTruthyInTestingEnv),
-  TESTING_SUPER_USER_NAME: z.string().optional().refine(assertIsTruthyInTestingEnv),
-  TESTING_SUPER_USER_EMAIL: z.email().optional().refine(assertIsTruthyInTestingEnv),
-  TESTING_SUPER_USER_PASSWORD: z.string().optional().refine(assertIsTruthyInTestingEnv),
+  // Testing & Seeding
+  TESTING_API_URL: z
+    .union([z.string(), z.literal('')])
+    .optional()
+    .refine(assertIsRequiredForSeed),
+  SEED_ON_BOOTSTRAP: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((val) => val === 'true'),
+  SEED_USER_DEFAULT_PASSWORD: z
+    .union([z.string(), z.literal('')])
+    .optional()
+    .refine(assertIsRequiredForSeed),
+  SEED_DEFAULT_OTP_CODE: z
+    .union([z.string(), z.literal('')])
+    .optional()
+    .refine(assertIsRequiredForSeed),
+  SEED_SUPER_USER_NAME: z
+    .union([z.string(), z.literal('')])
+    .optional()
+    .refine(assertIsRequiredForSeed),
+  SEED_SUPER_USER_EMAIL: z
+    .union([z.email(), z.literal('')])
+    .optional()
+    .refine(assertIsRequiredForSeed),
+  SEED_SUPER_USER_PASSWORD: z
+    .union([z.string(), z.literal('')])
+    .optional()
+    .refine(assertIsRequiredForSeed),
 });
 
 export type Env = z.infer<typeof envSchema>;

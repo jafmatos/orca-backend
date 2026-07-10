@@ -1,7 +1,6 @@
-import { api } from '../helpers/api.helper';
-import { AuthHelper } from '../helpers/auth.helper';
-import { UserHelper } from '../helpers/user.helper';
-import { $constants } from '../constants';
+import { api } from '@Test/helpers/api.helper';
+import { AuthHelper } from '@Test/helpers/auth.helper';
+import { UserHelper } from '@Test/helpers/user.helper';
 
 
 describe('Permissions (e2e)', () => {

@@ -1,8 +1,8 @@
-import { AuthHelper } from '../helpers/auth.helper';
-import { api } from '../helpers/api.helper';
-import { faker } from '@faker-js/faker';
-import { UserHelper } from '../helpers/user.helper';
-import { $constants } from '../constants';
+import { AuthHelper } from '@Test/helpers/auth.helper';
+import { UserHelper } from '@Test/helpers/user.helper';
+import { $constants } from '@Test/constants';
+import { $faker } from '@Test/helpers/$faker';
+import { api } from '@Test/helpers/api.helper';
 
 describe('Auth > reset-password (e2e)', () => {
   it('[Create] - Deve ser capaz de iniciar a recuperação de senha', async () => {
@@ -11,7 +11,7 @@ describe('Auth > reset-password (e2e)', () => {
       .post('/reset-password')
       .send({
         email: user.email,
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(201);
 
@@ -28,7 +28,7 @@ describe('Auth > reset-password (e2e)', () => {
       .post('/reset-password')
       .send({
         email: 'invalidemail',
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(422);
 
@@ -41,8 +41,8 @@ describe('Auth > reset-password (e2e)', () => {
     const response = await api()
       .post('/reset-password')
       .send({
-        email: faker.internet.email(),
-        confirmUrl: faker.internet.url(),
+        email: $faker.internet.email(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(404);
 
@@ -56,7 +56,7 @@ describe('Auth > reset-password (e2e)', () => {
     const resendResponse = await api()
       .put(`/reset-password/resend/${initialKey.id}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(200);
 
@@ -74,9 +74,9 @@ describe('Auth > reset-password (e2e)', () => {
 
   it('[Resend] - Deve falhar ao tentar reenviar o email utilizando uma chave inexistente', async () => {
     const response = await api()
-      .put(`/reset-password/resend/${faker.string.uuid()}`)
+      .put(`/reset-password/resend/${$faker.string.uuid()}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(404);
 
@@ -86,7 +86,7 @@ describe('Auth > reset-password (e2e)', () => {
   it('[Update] - Deve ser capaz de finalizar a recuperação de senha', async () => {
     const user = await UserHelper.getOneByRole('user');
     const key = await AuthHelper.initiateResetPassword(user);
-    const newPassword = faker.internet.password({ length: 12 });
+    const newPassword = $faker.internet.password({ length: 12 });
 
     const response = await api()
       .put(`/reset-password/${key.id}`)
@@ -109,7 +109,7 @@ describe('Auth > reset-password (e2e)', () => {
 
   it('[Update] - Deve ser capaz de acessar a conta utilizando a nova senha', async () => {
     const user = await UserHelper.getOneByRole('user');
-    const newPassword = faker.internet.password({ length: 12 });
+    const newPassword = $faker.internet.password({ length: 12 });
 
     await AuthHelper.resetPassword(user, newPassword);
 
@@ -129,7 +129,7 @@ describe('Auth > reset-password (e2e)', () => {
   it('[Update] - Deve falhar ao tentar finalizar a recuperação de senha utilizando um código incorreto', async () => {
     const user = await UserHelper.getOneByRole('user');
     const key = await AuthHelper.initiateResetPassword(user);
-    const newPassword = faker.internet.password({ length: 12 });
+    const newPassword = $faker.internet.password({ length: 12 });
 
     const response = await api()
       .put(`/reset-password/${key.id}`)
@@ -144,10 +144,10 @@ describe('Auth > reset-password (e2e)', () => {
   });
 
   it('[Update] - Deve falhar ao tentar finalizar a recuperação de senha utilizando uma chave inexistente', async () => {
-    const newPassword = faker.internet.password({ length: 12 });
+    const newPassword = $faker.internet.password({ length: 12 });
 
     const response = await api()
-      .put(`/reset-password/${faker.string.uuid()}`)
+      .put(`/reset-password/${$faker.string.uuid()}`)
       .send({
         otp: $constants.defaultOtpCode,
         password: newPassword,
@@ -161,7 +161,7 @@ describe('Auth > reset-password (e2e)', () => {
   it('[Update] - Deve falhar ao tentar finalizar a recuperação de senha caso a confirmação da nova senha esteja incorreta', async () => {
     const user = await UserHelper.getOneByRole('user');
     const key = await AuthHelper.initiateResetPassword(user);
-    const newPassword = faker.internet.password({ length: 12 });
+    const newPassword = $faker.internet.password({ length: 12 });
 
     const response = await api()
       .put(`/reset-password/${key.id}`)

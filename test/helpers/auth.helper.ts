@@ -1,6 +1,6 @@
 import { User } from '@/user/entities/user.entity';
+import { $constants } from '@Test/constants';
 import { api } from './api.helper';
-import { $constants } from '../constants';
 import { $faker } from './$faker';
 
 export class AuthHelper {

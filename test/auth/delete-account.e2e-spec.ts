@@ -1,9 +1,8 @@
-import { faker } from '@faker-js/faker';
-import { api } from '../helpers/api.helper';
+import { api } from '@Test/helpers/api.helper';
 import { UserHelper } from '@Test/helpers/user.helper';
 import { AuthHelper } from '@Test/helpers/auth.helper';
-import { $constants } from '../constants';
-
+import { $constants } from '@Test/constants';
+import { $faker } from '@Test/helpers/$faker';
 
 describe('Auth > delete-account (e2e)', () => {
   it('[Create] - Deve ser capaz de iniciar a exclusão da conta', async () => {
@@ -14,7 +13,7 @@ describe('Auth > delete-account (e2e)', () => {
       .post('/delete-account')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(201);
 
@@ -30,7 +29,7 @@ describe('Auth > delete-account (e2e)', () => {
     await api()
       .post('/delete-account')
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(401);
   });
@@ -42,7 +41,7 @@ describe('Auth > delete-account (e2e)', () => {
       .post('/delete-account')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(403);
 
@@ -58,7 +57,7 @@ describe('Auth > delete-account (e2e)', () => {
       .post('/delete-account')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(403);
 
@@ -92,7 +91,7 @@ describe('Auth > delete-account (e2e)', () => {
       .put(`/delete-account/resend/${initialKey.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(200);
 
@@ -112,10 +111,10 @@ describe('Auth > delete-account (e2e)', () => {
     const user = await UserHelper.getOneByRole('user');
     const token = await AuthHelper.signIn(user);
     const response = await api()
-      .put(`/delete-account/resend/${faker.string.uuid()}`)
+      .put(`/delete-account/resend/${$faker.string.uuid()}`)
       .set('Authorization', `Bearer ${token}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(404);
 
@@ -130,7 +129,7 @@ describe('Auth > delete-account (e2e)', () => {
     await api()
       .put(`/delete-account/resend/${initialKey.id}`)
       .send({
-        confirmUrl: faker.internet.url(),
+        confirmUrl: $faker.internet.url(),
       })
       .expect(401);
   });
@@ -172,7 +171,7 @@ describe('Auth > delete-account (e2e)', () => {
     const token = await AuthHelper.signIn(user);
 
     const response = await api()
-      .put(`/delete-account/${faker.string.uuid()}`)
+      .put(`/delete-account/${$faker.string.uuid()}`)
       .set('Authorization', `Bearer ${token}`)
       .send({
         otp: $constants.defaultOtpCode,

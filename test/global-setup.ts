@@ -1,10 +1,10 @@
 import 'dotenv/config';
+import 'tsconfig-paths/register';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import 'tsconfig-paths/register';
-import { AppModule } from '../src/app.module';
+import { AppModule } from '@/app.module';
 
 export default async () => {
   console.log('\n[Global Setup] Bootstrapping NestJS Application...');

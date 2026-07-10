@@ -1,5 +1,5 @@
-import { api } from '../helpers/api.helper';
-import { AuthHelper } from '../helpers/auth.helper';
+import { api } from '@Test/helpers/api.helper';
+import { AuthHelper } from '@Test/helpers/auth.helper';
 
 describe('Admin (e2e)', () => {
   describe('Admin Users', () => {

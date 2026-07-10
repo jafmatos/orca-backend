@@ -4,6 +4,7 @@ x-common-env: &common-env
   - SILENT=$SILENT
   - LOG_LEVEL=$LOG_LEVEL
   - NODE_ENV=$NODE_ENV
+  - SEED_ON_BOOTSTRAP=$SEED_ON_BOOTSTRAP
   - APP_PORT=$APP_PORT
   - APP_HOST=$APP_HOST
   - APP_DIR=$APP_DIR
@@ -37,11 +38,11 @@ x-common-env: &common-env
   - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
   - OPENAI_KEY=$OPENAI_KEY
   - OPENAI_MODEL=$OPENAI_MODEL
-  - TESTING_USER_DEFAULT_PASSWORD=$TESTING_USER_DEFAULT_PASSWORD
-  - TESTING_DEFAULT_OTP_CODE=$TESTING_DEFAULT_OTP_CODE
-  - TESTING_SUPER_USER_NAME=$TESTING_SUPER_USER_NAME
-  - TESTING_SUPER_USER_EMAIL=$TESTING_SUPER_USER_EMAIL
-  - TESTING_SUPER_USER_PASSWORD=$TESTING_SUPER_USER_PASSWORD
+  - SEED_USER_DEFAULT_PASSWORD=$SEED_USER_DEFAULT_PASSWORD
+  - SEED_DEFAULT_OTP_CODE=$SEED_DEFAULT_OTP_CODE
+  - SEED_SUPER_USER_NAME=$SEED_SUPER_USER_NAME
+  - SEED_SUPER_USER_EMAIL=$SEED_SUPER_USER_EMAIL
+  - SEED_SUPER_USER_PASSWORD=$SEED_SUPER_USER_PASSWORD
 
 services:
   postgresdb:
@@ -56,6 +57,11 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - orca_backend_database:/var/lib/postgresql/18/docker
     networks:
@@ -79,6 +85,11 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - orca_backend_database_test:/var/lib/postgresql/18/docker
     networks:
@@ -98,8 +109,10 @@ services:
     profiles: ['development', 'production']
     build: .
     depends_on:
-      - postgresdb
-      - redis
+      postgresdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - 3333:3333
     volumes:
@@ -121,9 +134,12 @@ services:
       context: .
       dockerfile: Dockerfile.test
     depends_on:
-      - postgresdb-test
-      - redis-test
-      - mailpit
+      postgresdb-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
     volumes:
       - orca_backend_uploads_test:/usr/src/app/uploads
     networks:
@@ -134,14 +150,13 @@ services:
         limits:
           memory: 1024M
 
-
   redis:
     container_name: redis
     image: redis:7-alpine
     restart: unless-stopped
     profiles: ['development', 'production']
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - orca_backend_redis:/data
     networks:
@@ -150,6 +165,11 @@ services:
           - redis
     environment:
       - REDIS_PASSWORD=$REDIS_PASSWORD
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
     labels:
       - docker-volume-backup.stop-during-backup=true
     deploy:
@@ -181,6 +201,11 @@ services:
           - redis-test
     environment:
       - REDIS_PASSWORD=$REDIS_PASSWORD
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
     deploy:
       resources:
         limits:
@@ -203,9 +228,10 @@ services:
     restart: unless-stopped
     profiles: ['development', 'production']
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     ports:
-      - "4000:3000"
+      - '4000:3000'
     networks:
       - app-network
     environment:
@@ -225,8 +251,8 @@ services:
     image: axllent/mailpit
     restart: unless-stopped
     ports:
-      - "8025:8025"
-      - "1025:1025"
+      - '8025:8025'
+      - '1025:1025'
     networks:
       - app-network
     deploy:
@@ -234,7 +260,6 @@ services:
         limits:
           memory: 256M
 
- 
   backup:
     container_name: backup
     image: offen/docker-volume-backup:latest
