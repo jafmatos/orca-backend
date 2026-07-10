@@ -8,6 +8,35 @@ import { $faker } from './$faker';
 import { api } from './api.helper';
 
 export class ScheduleHelper {
+  public static async getMany(
+    token: string,
+    filter?: any,
+    pagination?: { page: number; perPage: number },
+  ): Promise<Schedule[]> {
+    let url = '/schedules?paginated=false';
+
+    if (pagination) {
+      url = `/schedules?paginated=true&page=${pagination.page}&perPage=${pagination.perPage}`;
+    }
+
+    if (filter) {
+      url += `&filter=${encodeURIComponent(JSON.stringify(filter))}`;
+    }
+
+    const { body } = await api()
+      .get(url)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    return body.data;
+  }
+
+  public static async getOne(token: string): Promise<Schedule> {
+    const schedules = await this.getMany(token);
+
+    return $faker.helpers.arrayElement(schedules);
+  }
+
   public static async create(
     token: string,
     data?: {
@@ -59,34 +88,6 @@ export class ScheduleHelper {
       .expect(201);
 
     return body.schedule;
-  }
-
-  public static async getMany(
-    token: string,
-    filter?: any,
-    pagination?: { page: number; perPage: number },
-  ): Promise<Schedule[]> {
-    let url = '/schedules?paginated=false';
-
-    if (pagination) {
-      url = `/schedules?paginated=true&page=${pagination.page}&perPage=${pagination.perPage}`;
-    }
-
-    if (filter) {
-      url += `&filter=${encodeURIComponent(JSON.stringify(filter))}`;
-    }
-
-    const { body } = await api()
-      .get(url)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-
-    return body.data;
-  }
-
-  public static async getOne(token: string): Promise<Schedule> {
-    const schedules = await this.getMany(token);
-    return $faker.helpers.arrayElement(schedules);
   }
 
   public static async createOccurrence(

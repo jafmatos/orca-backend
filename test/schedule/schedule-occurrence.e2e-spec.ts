@@ -7,7 +7,6 @@ describe('Schedule Occurrences (e2e)', () => {
   it('[Create] - Deve ser capaz de registrar uma ocorrência (concluir um agendamento) em uma data específica', async () => {
     const user = await UserHelper.getOneSubscribed('user');
     const token = await AuthHelper.signIn(user);
-
     const schedule = await ScheduleHelper.getOne(token);
     const targetDate = new Date(user.currentCycle.start);
 
@@ -38,8 +37,7 @@ describe('Schedule Occurrences (e2e)', () => {
   it('[Delete] - Deve ser capaz de desconcluir um agendamento excluindo a entry associada à ocorrência', async () => {
     const user = await UserHelper.getOneSubscribed('user');
     const token = await AuthHelper.signIn(user);
-
-    const schedule = await ScheduleHelper.getOne(token);
+    const schedule = await ScheduleHelper.create(token);
     const targetDate = new Date(user.currentCycle.start);
 
     const { body: createResponse } = await api()
