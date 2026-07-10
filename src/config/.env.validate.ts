@@ -79,11 +79,11 @@ export const envSchema = z.object({
   OPENAI_MODEL: z.string().optional(),
 
   // Testing
-  TESTING_USER_DEFAULT_PASSWORD: z.string().refine(assertIsTruthyInTestingEnv),
-  TESTING_DEFAULT_OTP_CODE: z.string().refine(assertIsTruthyInTestingEnv),
-  TESTING_SUPER_USER_NAME: z.string().refine(assertIsTruthyInTestingEnv),
-  TESTING_SUPER_USER_EMAIL: z.email().refine(assertIsTruthyInTestingEnv),
-  TESTING_SUPER_USER_PASSWORD: z.string().refine(assertIsTruthyInTestingEnv),
+  TESTING_USER_DEFAULT_PASSWORD: z.string().optional().refine(assertIsTruthyInTestingEnv),
+  TESTING_DEFAULT_OTP_CODE: z.string().optional().refine(assertIsTruthyInTestingEnv),
+  TESTING_SUPER_USER_NAME: z.string().optional().refine(assertIsTruthyInTestingEnv),
+  TESTING_SUPER_USER_EMAIL: z.email().optional().refine(assertIsTruthyInTestingEnv),
+  TESTING_SUPER_USER_PASSWORD: z.string().optional().refine(assertIsTruthyInTestingEnv),
 });
 
 export type Env = z.infer<typeof envSchema>;
