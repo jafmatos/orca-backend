@@ -24,10 +24,10 @@ jobs:
           path: .
       - name: Creating docker volumes and networks
         run: |
-          docker volume create orca_backend_database
-          docker volume create orca_backend_uploads
-          docker volume create orca_backend_redis
-          docker network create devcontainer_app-network || true
+          docker volume create orca_backend_database_test
+          docker volume create orca_backend_uploads_test
+          docker volume create orca_backend_redis_test
+          docker network create app-network
       - name: Create .env.docker.testing from secrets DOCKER_ENV_FILE
         run: |
           echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker.testing

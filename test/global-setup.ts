@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ClassSerializerInterceptor } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import 'tsconfig-paths/register';
 import { AppModule } from '../src/app.module';
 
@@ -12,6 +14,8 @@ export default async () => {
 
   const app = moduleFixture.createNestApplication<NestExpressApplication>();
   app.set('query parser', 'extended');
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.setGlobalPrefix('v1');
 
   await app.init();
   await app.listen(3333);

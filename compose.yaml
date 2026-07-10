@@ -48,6 +48,7 @@ services:
     container_name: postgres
     image: postgres
     restart: unless-stopped
+    profiles: ['development', 'production']
     ports:
       - 5432
     logging:
@@ -57,6 +58,29 @@ services:
         max-file: '3'
     volumes:
       - orca_backend_database:/var/lib/postgresql/18/docker
+    networks:
+      - app-network
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+
+  postgresdb-test:
+    container_name: postgres-test
+    image: postgres
+    restart: unless-stopped
+    profiles: ['test']
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+    volumes:
+      - orca_backend_database_test:/var/lib/postgresql/18/docker
     networks:
       - app-network
     environment:
@@ -90,10 +114,32 @@ services:
         limits:
           memory: 1024M
 
+  app-test:
+    container_name: app-test
+    profiles: ['test']
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      - postgresdb-test
+      - redis-test
+      - mailpit
+    volumes:
+      - orca_backend_uploads_test:/usr/src/app/uploads
+    networks:
+      - app-network
+    environment: *common-env
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+
+
   redis:
     container_name: redis
     image: redis:7-alpine
     restart: unless-stopped
+    profiles: ['development', 'production']
     ports:
       - "6379:6379"
     volumes:
@@ -122,10 +168,40 @@ services:
       --maxmemory 256mb
       --maxmemory-policy noeviction
 
+  redis-test:
+    container_name: redis-test
+    image: redis:7-alpine
+    restart: unless-stopped
+    profiles: ['test']
+    volumes:
+      - orca_backend_redis_test:/data
+    networks:
+      app-network:
+        aliases:
+          - redis-test
+    environment:
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+    command: >
+      redis-server 
+      --requirepass $REDIS_PASSWORD
+      --appendonly yes 
+      --appendfsync always
+      --aof-use-rdb-preamble yes
+      --save 1800 1
+      --save 600 100
+      --save 120 10000
+      --maxmemory 256mb
+      --maxmemory-policy noeviction
+
   bullboard:
     container_name: bullboard
     image: deadly0/bull-board
     restart: unless-stopped
+    profiles: ['development', 'production']
     depends_on:
       - redis
     ports:
@@ -158,24 +234,7 @@ services:
         limits:
           memory: 256M
 
-  app-test:
-    container_name: app-test
-    profiles: ['test']
-    build:
-      context: .
-      dockerfile: Dockerfile.test
-    depends_on:
-      - postgresdb
-      - redis
-      - mailpit
-    networks:
-      - app-network
-    environment: *common-env
-    deploy:
-      resources:
-        limits:
-          memory: 1024M
-
+ 
   backup:
     container_name: backup
     image: offen/docker-volume-backup:latest
@@ -207,9 +266,15 @@ services:
 volumes:
   orca_backend_database:
     external: true
+  orca_backend_database_test:
+    external: true
   orca_backend_uploads:
     external: true
+  orca_backend_uploads_test:
+    external: true
   orca_backend_redis:
+    external: true
+  orca_backend_redis_test:
     external: true
 
 networks:
