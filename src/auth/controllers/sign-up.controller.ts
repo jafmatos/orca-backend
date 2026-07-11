@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import {
   Controller,
   Post,
@@ -53,6 +54,7 @@ const SignUpResendSchema = z.object({
   confirmUrl: z.string().url('URL inválida'),
 });
 
+@ApiTags('SignUp')
 @Controller('sign-up')
 export class SignUpController {
   constructor(

@@ -59,7 +59,10 @@ export class ScheduleService {
     return [entities, count];
   }
 
-  async findOneBy(where: FindOptionsWhere<Schedule>, cycle?: { start: Date; end: Date }): Promise<Schedule | null> {
+  async findOneBy(
+    where: FindOptionsWhere<Schedule>,
+    cycle?: { start: Date; end: Date },
+  ): Promise<Schedule | null> {
     const queryBuilder = this.scheduleRepository
       .createQueryBuilder('schedule')
       .select('schedule')
@@ -79,9 +82,7 @@ export class ScheduleService {
       queryBuilder.leftJoinAndSelect('schedule.occurrences', 'occurrences');
     }
 
-    queryBuilder
-      .leftJoinAndSelect('occurrences.entry', 'entry')
-      .where(where);
+    queryBuilder.leftJoinAndSelect('occurrences.entry', 'entry').where(where);
 
     return await queryBuilder.getOne();
   }
@@ -152,13 +153,19 @@ export class ScheduleService {
         { id: schedule.id, scheduleId: schedule.id, beforeExpire: true },
         {
           jobId: `before-${schedule.id}`,
-          repeat: { cron: schedule.getCronMinusOneDay(), tz: schedule.timezone },
+          repeat: {
+            cron: schedule.getCronMinusOneDay(),
+            tz: schedule.timezone,
+          },
         },
       );
 
       await this.schedulesQueue.add(
         { id: schedule.id, scheduleId: schedule.id, beforeExpire: false },
-        { jobId: `exact-${schedule.id}`, repeat: { cron: schedule.getCron(), tz: schedule.timezone } },
+        {
+          jobId: `exact-${schedule.id}`,
+          repeat: { cron: schedule.getCron(), tz: schedule.timezone },
+        },
       );
     } catch (e) {
       console.error('Error adding bull jobs', e);

@@ -7,7 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Entry } from '@/entry/entities/entry.entity';
+
 import { Category } from '@/category/entities/category.entity';
 import { User } from '@/user/entities/user.entity';
 import { EntryTypes } from '@/common/enums/entry-types.enum';
@@ -93,7 +93,10 @@ export class Schedule {
   getCycles(): ScheduleCycle[] {
     if (!this.user) return [];
 
-    if (!this.user.currentCycle && typeof this.user.setCurrentCycle === 'function') {
+    if (
+      !this.user.currentCycle &&
+      typeof this.user.setCurrentCycle === 'function'
+    ) {
       this.user.setCurrentCycle();
     }
 
@@ -206,7 +209,7 @@ export class Schedule {
       this.dayOfWeek !== undefined && this.dayOfWeek > 0
         ? this.dayOfWeek - 1
         : 6;
-    
+
     return `${minutes} ${hours} * * ${previousDayOfWeek}`;
   }
 

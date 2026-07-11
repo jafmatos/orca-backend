@@ -11,9 +11,9 @@ export interface KPIsOptions {
 export class AdminOverviewService {
   constructor(private readonly dataSource: DataSource) {}
 
-  public async getKPIs(options?: KPIsOptions) {
+  public async getKPIs(_options?: KPIsOptions) {
     const totalUsers = await this.dataSource.getRepository('User').count();
-    
+
     const activeSubscriptions = await this.dataSource
       .getRepository('Subscription')
       .countBy({ status: 'active' });

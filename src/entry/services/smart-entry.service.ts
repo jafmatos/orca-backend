@@ -4,7 +4,6 @@ import OpenAI from 'openai';
 import { EntryTypes } from '@/common/enums/entry-types.enum';
 import { systemPrompt, userPrompt } from '../prompts/smart-entries';
 import { Category } from '@/category/entities/category.entity';
-import * as fs from 'fs';
 
 export interface SmartEntryGenerateArguments {
   text: string;
@@ -31,7 +30,9 @@ export class SmartEntryService {
   constructor(private readonly configService: ConfigService) {
     this.isTesting = this.configService.get<string>('NODE_ENV') === 'testing';
     this.openAIClient = new OpenAI({
-      apiKey: this.configService.get<string>('OPENAI_KEY') || (this.isTesting ? 'dummy' : undefined),
+      apiKey:
+        this.configService.get<string>('OPENAI_KEY') ||
+        (this.isTesting ? 'dummy' : undefined),
     });
   }
 

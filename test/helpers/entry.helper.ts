@@ -39,12 +39,16 @@ export class EntryHelper {
       .post('/entries')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
-      .expect(201); 
+      .expect(201);
 
     return body.entry;
   }
 
-  public static async getMany(token: string, filter?: any, order?: any): Promise<Entry[]> {
+  public static async getMany(
+    token: string,
+    filter?: any,
+    order?: any,
+  ): Promise<Entry[]> {
     let url = '/entries?paginated=false';
 
     if (filter) {

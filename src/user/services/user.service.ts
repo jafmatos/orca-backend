@@ -48,7 +48,7 @@ export class UserService {
         'entry',
         'entry',
         'entry.userId = users.id AND (entry.when BETWEEN :start AND :end)',
-        { start: user.currentCycle.start, end: user.currentCycle.end }
+        { start: user.currentCycle.start, end: user.currentCycle.end },
       )
       .where(where)
       .groupBy('users.id')

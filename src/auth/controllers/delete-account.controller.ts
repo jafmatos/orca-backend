@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { KeyTypes } from '@/auth/entities/user-key.entity';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
@@ -35,6 +36,7 @@ const DeleteAccountResendSchema = z.object({
   confirmUrl: z.url('URL inválida'),
 });
 
+@ApiTags('DeleteAccount')
 @Controller('delete-account')
 export class DeleteAccountController {
   constructor(
@@ -104,7 +106,7 @@ export class DeleteAccountController {
         throw new UnauthorizedException('Código incorreto ou expirado');
       }
 
-      const removedUser = await this.userService.remove(key.user!, { manager });
+      await this.userService.remove(key.user!, { manager });
 
       await this.userKeyService.remove(key, { manager });
 

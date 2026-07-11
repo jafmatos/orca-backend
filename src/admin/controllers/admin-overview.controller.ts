@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AdminOverviewService } from '../services/admin-overview.service';
 import { Roles } from '@/common/decorators/roles.decorator';
@@ -17,8 +18,9 @@ const kpisQuerySchema = z
   })
   .optional();
 
-type KPIsQuery = z.infer<typeof kpisQuerySchema>;
+export type KPIsQuery = z.infer<typeof kpisQuerySchema>;
 
+@ApiTags('AdminOverview')
 @Controller('admin/overview')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.Admin, UserRoles.SuperUser)

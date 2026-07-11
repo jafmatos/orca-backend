@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
@@ -15,6 +16,7 @@ const UserUpdateSchema = z
   })
   .strict();
 
+@ApiTags('User')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

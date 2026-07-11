@@ -17,7 +17,7 @@ export class Avatar extends File {
   async removeFile() {
     try {
       await Jetpack.removeFile(this.fileName);
-    } catch (error) {
+    } catch {
       Logger.warn(`Failed to remove file: ${this.fileName}`, 'AvatarEntity');
     }
   }

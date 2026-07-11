@@ -23,11 +23,11 @@ describe('Analysis (e2e)', () => {
       expect(analysis.userId).toBe(user.id);
       expect(analysis.inputTokens).toBeTruthy();
       expect(analysis.outputTokens).toBeTruthy();
-      
+
       expect(analysis.output).toBeTruthy();
       expect(analysis.output.diagnostic).toBeTruthy();
       expect(typeof analysis.output.diagnostic).toBe('string');
-      
+
       expect(Array.isArray(analysis.output.issues)).toBe(true);
 
       for (const issue of analysis.output.issues) {
@@ -70,10 +70,14 @@ describe('Analysis (e2e)', () => {
 
     expect(data.data).toBeTruthy();
     expect(data.meta).toBeTruthy();
-    expect(data.meta.count).toBeGreaterThanOrEqual(dataWithoutPagination.data.length);
+    expect(data.meta.count).toBeGreaterThanOrEqual(
+      dataWithoutPagination.data.length,
+    );
     expect(data.meta.page).toBe(page);
     expect(data.meta.perPage).toBe(perPage);
-    expect(data.meta.pages).toBe(Math.ceil(dataWithoutPagination.meta.count / perPage));
+    expect(data.meta.pages).toBe(
+      Math.ceil(dataWithoutPagination.meta.count / perPage),
+    );
 
     for (const analysis of data.data) {
       expect(analysis.id).toBeTruthy();
@@ -102,11 +106,11 @@ describe('Analysis (e2e)', () => {
     expect(data.analysis.id).toBe(analysis.id);
     expect(data.analysis.userId).toBe(user.id);
     expect(data.analysis.openaiId).toBe(analysis.openaiId);
-    
+
     expect(data.analysis.output).toBeTruthy();
     expect(data.analysis.output.diagnostic).toBeTruthy();
     expect(typeof data.analysis.output.diagnostic).toBe('string');
-    
+
     expect(Array.isArray(data.analysis.output.issues)).toBe(true);
 
     for (const issue of data.analysis.output.issues) {
@@ -124,7 +128,7 @@ describe('Analysis (e2e)', () => {
       expect(action.effect).toBeTruthy();
       expect(typeof action.effect).toBe('string');
     }
-		
+
     expect(typeof data.analysis.output.expectation).toBe('string');
   });
 
@@ -144,7 +148,7 @@ describe('Analysis (e2e)', () => {
     const [userOne, userTwo] = await UserHelper.getManySubscribed();
     const userOneToken = await AuthHelper.signIn(userOne);
     const userTwoToken = await AuthHelper.signIn(userTwo);
-    
+
     const userOneAnalysis = await AnalysisHelper.getOne(userOneToken);
 
     const { body: data } = await api()

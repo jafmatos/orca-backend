@@ -6,7 +6,7 @@ import {
   FindOptionsWhere,
   DeepPartial,
 } from 'typeorm';
-import { UserKey, KeyTypes } from '@/auth/entities/user-key.entity';
+import { UserKey } from '@/auth/entities/user-key.entity';
 
 @Injectable()
 export class UserKeyService {

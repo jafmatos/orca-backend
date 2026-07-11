@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { CSVGenerator } from '@/common/csv/csv-generator';
@@ -29,12 +30,13 @@ const csvExportQuerySchema = z
   })
   .optional();
 
-type CSVExportQuery = z.infer<typeof csvExportQuerySchema>;
+export type CSVExportQuery = z.infer<typeof csvExportQuerySchema>;
 
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRoles } from '@/user/entities/user.entity';
 
+@ApiTags('EntryCSV')
 @Controller('entries/export/csv')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.User)

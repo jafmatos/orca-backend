@@ -19,7 +19,15 @@ import { TestingScheduleSeedService } from './services/testing-schedule-seed.ser
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Plan, Subscription, Category, Entry, Analysis, Schedule]),
+    TypeOrmModule.forFeature([
+      User,
+      Plan,
+      Subscription,
+      Category,
+      Entry,
+      Analysis,
+      Schedule,
+    ]),
   ],
   providers: [
     ProductionUserSeedService,

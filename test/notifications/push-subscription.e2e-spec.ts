@@ -64,7 +64,7 @@ describe('Push Subscriptions (e2e)', () => {
       .post('/push-subscriptions')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
-      .expect(400); 
+      .expect(400);
 
     expect(body.message).toBe('Assinatura já cadastrada');
   });

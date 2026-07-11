@@ -1,13 +1,21 @@
+import { ApiTags } from '@nestjs/swagger';
 import { SubscriptionStatuses } from '@/subscription/enums/subscription-status.enum';
 import { SubscriptionService } from '@/subscription/services/subscription.service';
 import { UserService } from '@/user/services/user.service';
 import type { RawBodyRequest } from '@nestjs/common';
-import { Controller, Logger, Post, Req, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Logger,
+  Post,
+  Req,
+  BadRequestException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
 import Stripe from 'stripe';
 import { StripeService } from '../services/stripe.service';
 
+@ApiTags('StripeWebhook')
 @Controller('stripe/webhook')
 export class StripeWebhookController {
   private readonly logger = new Logger(StripeWebhookController.name);
@@ -20,9 +28,7 @@ export class StripeWebhookController {
   ) {}
 
   @Post()
-  async handleWebhook(
-    @Req() request: RawBodyRequest<Request>,
-  ) {
+  async handleWebhook(@Req() request: RawBodyRequest<Request>) {
     const endpointSecret = this.configService.get<string>(
       'STRIPE_ENDPOINT_SECRET',
     );

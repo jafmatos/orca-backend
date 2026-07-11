@@ -3,7 +3,6 @@ import { EntryTypes } from '@/common/enums/entry-types.enum';
 import { $faker } from '@Test/helpers/$faker';
 import { api } from '@Test/helpers/api.helper';
 import { AuthHelper } from '@Test/helpers/auth.helper';
-import { CategoryHelper } from '@Test/helpers/category.helper';
 import { EntryHelper } from '@Test/helpers/entry.helper';
 import { UserHelper } from '@Test/helpers/user.helper';
 
@@ -71,9 +70,7 @@ describe('Overview (e2e)', () => {
     expect(response.status.totalExpense).toBeCloseTo(expectedTotalExpense);
 
     if (response.categories.length > 0) {
-      const category = $faker.helpers.arrayElement(
-        response.categories,
-      ) as Category;
+      const category = $faker.helpers.arrayElement<Category>(response.categories);
       const expectedSpent = entries
         .filter(
           (e) =>

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -39,7 +39,6 @@ const analysisSchema = z.object({
 @Injectable()
 export class AnalysisService {
   private openai: OpenAI;
-  private readonly logger = new Logger(AnalysisService.name);
 
   constructor(
     @InjectRepository(Analysis)

@@ -2,21 +2,20 @@ import { api } from '@Test/helpers/api.helper';
 import { AuthHelper } from '@Test/helpers/auth.helper';
 import { UserHelper } from '@Test/helpers/user.helper';
 
-
 describe('Permissions (e2e)', () => {
   let superUserToken: string;
   let adminToken: string;
   let userToken: string;
 
   beforeAll(async () => {
-		const superUser = await UserHelper.getOneByRole('super-user');
-		const admin = await UserHelper.getOneByRole('admin');
-		const user = await UserHelper.getOneByRole('user');
+    const superUser = await UserHelper.getOneByRole('super-user');
+    const admin = await UserHelper.getOneByRole('admin');
+    const user = await UserHelper.getOneByRole('user');
 
-		superUserToken = await AuthHelper.signIn({ email: superUser.email });
-		adminToken = await AuthHelper.signIn({ email: admin.email });
-		userToken = await AuthHelper.signIn({ email: user.email });
-  })
+    superUserToken = await AuthHelper.signIn({ email: superUser.email });
+    adminToken = await AuthHelper.signIn({ email: admin.email });
+    userToken = await AuthHelper.signIn({ email: user.email });
+  });
 
   const endpoints = [
     // Admin & SuperUser Only

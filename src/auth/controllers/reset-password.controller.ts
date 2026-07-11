@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import {
   Controller,
   Post,
@@ -38,6 +39,7 @@ const ResetPasswordResendSchema = z.object({
   confirmUrl: z.url('URL inválida'),
 });
 
+@ApiTags('ResetPassword')
 @Controller('reset-password')
 export class ResetPasswordController {
   constructor(

@@ -10,7 +10,7 @@ export class CategoryHelper {
   ): Promise<Category> {
     const type = data?.type ?? EntryTypes.Expense;
 
-    let payload: any = {
+    const payload: any = {
       name: $faker.commerce.department(),
       type,
     };
@@ -50,6 +50,6 @@ export class CategoryHelper {
       filtered = categories.filter((c: any) => c.type === type);
     }
 
-    return $faker.helpers.arrayElement(filtered) as Category;
+    return $faker.helpers.arrayElement(filtered);
   }
 }

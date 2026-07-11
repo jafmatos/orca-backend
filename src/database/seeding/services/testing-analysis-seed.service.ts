@@ -1,11 +1,10 @@
 import { User, UserRoles } from '@/user/entities/user.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, In, IsNull, Not, Repository } from 'typeorm';
+import { DeepPartial, IsNull, Not, Repository } from 'typeorm';
 import { $faker } from '../utils/$faker';
 import { Seeder } from '../Seeder';
 import { Analysis } from '@/analysis/entities/analysis.entity';
-import { SubscriptionStatuses } from '@/subscription/enums/subscription-status.enum';
 
 @Injectable()
 export class TestingAnalysisSeedService implements Seeder<Analysis[]> {

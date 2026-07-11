@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -75,6 +76,7 @@ const SmartExtractSchema = z.object({
   now: z.iso.datetime(),
 });
 
+@ApiTags('Entry')
 @Controller('entries')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.User)
@@ -93,7 +95,7 @@ export class EntryController {
     @Query('order') queryOrder: any,
     @CursorPagination() pagination: CursorPaginationOptions,
   ) {
-		if (!pagination.take)
+    if (!pagination.take)
       throw new BadRequestException('No "take" query param provided');
 
     const requestFilter =
@@ -106,7 +108,9 @@ export class EntryController {
         : queryOrder || { column: 'when', mode: 'DESC' };
 
     const entries = await this.entryService.list({
-      pagination: pagination.paginated ? { cursor: pagination.cursor as any, take: pagination.take } : undefined,
+      pagination: pagination.paginated
+        ? { cursor: pagination.cursor as any, take: pagination.take }
+        : undefined,
       order,
       filter: {
         ...requestFilter,
@@ -251,7 +255,7 @@ export class EntryController {
         );
 
         reqBody.text = transcribedText;
-      } catch (error) {
+      } catch {
         throw new InternalServerErrorException(
           'Opa, me perdi aqui! Pode enviar de novo?',
         );
@@ -333,7 +337,7 @@ export class EntryController {
         category = await this.categoryService.findOneBy({
           id: body.category.id,
           userId: user.id,
-          type: (body.type || entry.type),
+          type: body.type || entry.type,
         });
 
         if (!category) throw new NotFoundException('Categoria não encontrada');

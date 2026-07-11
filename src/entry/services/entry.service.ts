@@ -7,7 +7,6 @@ import {
   QueryRunner,
 } from 'typeorm';
 import { Entry } from '../entities/entry.entity';
-import { EntryTypes } from '@/common/enums/entry-types.enum';
 
 export type EntryListOptions = {
   pagination?: {

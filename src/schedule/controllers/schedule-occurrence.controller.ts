@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -19,6 +20,7 @@ const createOccurrenceSchema = z.object({
   when: z.string().datetime('Data inválida'),
 });
 
+@ApiTags('ScheduleOccurrence')
 @Controller('schedules/:id/occurrence')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.User)

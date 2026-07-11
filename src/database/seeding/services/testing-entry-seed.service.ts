@@ -69,7 +69,7 @@ export class TestingEntrySeedService implements Seeder<Entry[]> {
       }
 
       const savedUserEntries = await this.entryRepository.save(userEntriesData);
-			
+
       allEntries.push(...savedUserEntries);
     }
 

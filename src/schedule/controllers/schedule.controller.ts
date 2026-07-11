@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -11,7 +12,6 @@ import { EntryTypes } from '@/common/enums/entry-types.enum';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
 import { User, UserRoles } from '@/user/entities/user.entity';
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -56,7 +56,12 @@ const createScheduleSchema = z
   ])
   .and(
     z.object({
-      time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Horário inválido (esperado HH:mm)'),
+      time: z
+        .string()
+        .regex(
+          /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+          'Horário inválido (esperado HH:mm)',
+        ),
       timezone: z.string().min(1, 'Fuso horário é obrigatório'),
       type: z.enum([EntryTypes.Income, EntryTypes.Expense]),
       amount: z.number().min(0.01, 'Valor mínimo: R$ 0,01'),
@@ -89,7 +94,13 @@ const updateScheduleSchema = z
   ])
   .and(
     z.object({
-      time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Horário inválido (esperado HH:mm)').optional(),
+      time: z
+        .string()
+        .regex(
+          /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+          'Horário inválido (esperado HH:mm)',
+        )
+        .optional(),
       timezone: z.string().min(1, 'Fuso horário é obrigatório').optional(),
       type: z.enum([EntryTypes.Income, EntryTypes.Expense]).optional(),
       amount: z.number().min(0.01, 'Valor mínimo: R$ 0,01').optional(),
@@ -101,6 +112,7 @@ const updateScheduleSchema = z
     }),
   );
 
+@ApiTags('Schedule')
 @Controller('schedules')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.User)
@@ -168,7 +180,7 @@ export class ScheduleController {
     });
 
     schedule.user = user;
-		
+
     return { schedule: schedule.toJSON() };
   }
 

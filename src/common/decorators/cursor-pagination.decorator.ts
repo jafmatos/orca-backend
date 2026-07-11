@@ -36,7 +36,7 @@ export const CursorPagination = createParamDecorator(
         if (Object.keys(parsed).every((key) => !!parsed[key])) {
           result.cursor = parsed;
         }
-      } catch (e) {}
+      } catch {}
     }
 
     return result;

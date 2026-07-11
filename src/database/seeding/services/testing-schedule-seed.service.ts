@@ -4,7 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
 import { $faker } from '../utils/$faker';
 import { Seeder } from '../Seeder';
-import { Schedule, ScheduleFrequency } from '@/schedule/entities/schedule.entity';
+import {
+  Schedule,
+  ScheduleFrequency,
+} from '@/schedule/entities/schedule.entity';
 import { EntryTypes } from '@/common/enums/entry-types.enum';
 
 @Injectable()
@@ -35,9 +38,13 @@ export class TestingScheduleSeedService implements Seeder<Schedule[]> {
       const categories = user.categories || [];
 
       for (let i = 0; i < numSchedules; i++) {
-        const type = Math.random() < 0.9 ? EntryTypes.Expense : EntryTypes.Income;
+        const type =
+          Math.random() < 0.9 ? EntryTypes.Expense : EntryTypes.Income;
         const matchingCategories = categories.filter((c) => c.type === type);
-        const frequency = Math.random() < 0.8 ? ScheduleFrequency.Monthly : ScheduleFrequency.Weekly;
+        const frequency =
+          Math.random() < 0.8
+            ? ScheduleFrequency.Monthly
+            : ScheduleFrequency.Weekly;
 
         const time = `${String($faker.number.int({ min: 0, max: 23 })).padStart(2, '0')}:${String($faker.number.int({ min: 0, max: 59 })).padStart(2, '0')}`;
         const timezone = 'America/Sao_Paulo';
@@ -46,10 +53,17 @@ export class TestingScheduleSeedService implements Seeder<Schedule[]> {
           this.scheduleRepository.create({
             userId: user.id,
             type,
-            amount: type === EntryTypes.Expense
+            amount:
+              type === EntryTypes.Expense
                 ? $faker.number.float({ fractionDigits: 2, min: 10, max: 1000 })
-                : $faker.number.float({ fractionDigits: 2, min: 100, max: 5000 }),
-            description: $faker.finance.transactionDescription().substring(0, 60),
+                : $faker.number.float({
+                    fractionDigits: 2,
+                    min: 100,
+                    max: 5000,
+                  }),
+            description: $faker.finance
+              .transactionDescription()
+              .substring(0, 60),
             categoryId:
               Math.random() < 0.8 && matchingCategories.length > 0
                 ? $faker.helpers.arrayElement(matchingCategories).id
@@ -57,13 +71,20 @@ export class TestingScheduleSeedService implements Seeder<Schedule[]> {
             frequency,
             time,
             timezone,
-            dayOfMonth: frequency === ScheduleFrequency.Monthly ? $faker.number.int({ min: 1, max: 28 }) : undefined,
-            dayOfWeek: frequency === ScheduleFrequency.Weekly ? $faker.number.int({ min: 0, max: 6 }) : undefined,
+            dayOfMonth:
+              frequency === ScheduleFrequency.Monthly
+                ? $faker.number.int({ min: 1, max: 28 })
+                : undefined,
+            dayOfWeek:
+              frequency === ScheduleFrequency.Weekly
+                ? $faker.number.int({ min: 0, max: 6 })
+                : undefined,
           }),
         );
       }
 
-      const savedUserSchedules = await this.scheduleRepository.save(userSchedulesData);
+      const savedUserSchedules =
+        await this.scheduleRepository.save(userSchedulesData);
 
       allSchedules.push(...savedUserSchedules);
     }

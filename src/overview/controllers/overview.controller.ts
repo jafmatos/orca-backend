@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -8,6 +9,7 @@ import { User, UserRoles } from '@/user/entities/user.entity';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { OverviewService } from '../services/overview.service';
 
+@ApiTags('Overview')
 @Controller('users/overview')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.User)

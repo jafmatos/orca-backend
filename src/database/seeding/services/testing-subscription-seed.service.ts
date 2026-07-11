@@ -42,9 +42,7 @@ export class TestingSubscriptionSeedService implements Seeder<Subscription[]> {
         subscriptionData.status =
           index < array.length / 5
             ? SubscriptionStatuses.Active
-            : ($faker.helpers.arrayElement(
-                Object.values(SubscriptionStatuses),
-              ) as SubscriptionStatuses);
+            : $faker.helpers.arrayElement(Object.values(SubscriptionStatuses));
 
         if (subscriptionData.status === SubscriptionStatuses.Trialing) {
           const trialStart = $faker.date.recent({ days: 30 });

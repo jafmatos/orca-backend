@@ -29,9 +29,7 @@ describe('User > account (e2e)', () => {
     expect(response.body.user.currentCycle.start).toBeTruthy();
     expect(response.body.user.currentCycle.end).toBeTruthy();
     expect(response.body.user.name).toBe(payload.name);
-    expect(response.body.user.salaryDay).toBe(
-      payload.salaryDay,
-    );
+    expect(response.body.user.salaryDay).toBe(payload.salaryDay);
     expect(response.body.user.acceptsNotifications).toBe(
       payload.acceptsNotifications,
     );

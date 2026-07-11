@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import {
   Controller,
   Get,
@@ -31,6 +32,7 @@ const createPlanSchema = z.object({
 
 const updatePlanSchema = createPlanSchema.partial();
 
+@ApiTags('Plan')
 @Controller('plans')
 export class PlanController {
   constructor(private readonly planService: PlanService) {}

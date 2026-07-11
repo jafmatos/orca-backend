@@ -34,7 +34,11 @@ export class AuthHelper {
     return response.body.token;
   }
 
-  public static async initiateSignUp(): Promise<{ id: string; otp: string; expiresAt: string }> {
+  public static async initiateSignUp(): Promise<{
+    id: string;
+    otp: string;
+    expiresAt: string;
+  }> {
     const email = $faker.internet.email();
     const password = $constants.defaultUserPassword;
     const name = $faker.person.fullName();
@@ -71,7 +75,11 @@ export class AuthHelper {
     return user;
   }
 
-  public static async initiateResetPassword({ email }: { email: string }): Promise<{ id: string; otp: string; expiresAt: string }> {
+  public static async initiateResetPassword({
+    email,
+  }: {
+    email: string;
+  }): Promise<{ id: string; otp: string; expiresAt: string }> {
     const response = await api()
       .post('/reset-password')
       .send({

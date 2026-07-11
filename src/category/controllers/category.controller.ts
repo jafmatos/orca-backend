@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -65,6 +66,7 @@ const UpdateCategorySchema = z.object({
     .optional(),
 });
 
+@ApiTags('Category')
 @Controller('categories')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.User)
@@ -163,7 +165,8 @@ export class CategoryController {
         errors: [
           {
             path: ['limit'],
-            message: 'Não é possível definir um limite para categorias de receita',
+            message:
+              'Não é possível definir um limite para categorias de receita',
           },
         ],
       });

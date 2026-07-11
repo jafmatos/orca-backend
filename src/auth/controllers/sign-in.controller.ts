@@ -1,3 +1,5 @@
+import { createZodDto } from 'nestjs-zod/dto';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { AuthService } from '@/auth/services/auth.service';
@@ -22,8 +24,9 @@ const SignInSchema = z.object({
   password: z.string(),
 });
 
-type SignInDto = z.infer<typeof SignInSchema>;
+export class SignInDto extends createZodDto(SignInSchema) {}
 
+@ApiTags('SignIn')
 @Controller('sign-in')
 export class SignInController {
   constructor(

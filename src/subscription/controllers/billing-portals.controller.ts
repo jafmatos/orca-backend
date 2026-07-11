@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
@@ -10,6 +11,7 @@ const createBillingPortalSchema = z.object({
   returnUrl: z.string(),
 });
 
+@ApiTags('BillingPortals')
 @Controller('stripe/billing-portals')
 @UseGuards(JwtAuthGuard)
 export class BillingPortalsController {

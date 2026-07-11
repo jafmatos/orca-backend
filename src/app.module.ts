@@ -24,10 +24,12 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: process.env.NODE_ENV === 'testing' ? 9999 : 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: process.env.NODE_ENV === 'testing' ? 9999 : 100,
+      },
+    ]),
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
@@ -77,7 +79,7 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    }
+    },
   ],
 })
 export class AppModule {}

@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { SubscribedGuard } from '@/auth/guards/subscribed.guard';
@@ -37,8 +38,9 @@ const queryOptimizedSchema = z
   })
   .optional();
 
-type QueryOptimized = z.infer<typeof queryOptimizedSchema>;
+export type QueryOptimized = z.infer<typeof queryOptimizedSchema>;
 
+@ApiTags('Analysis')
 @Controller('analyses')
 @UseGuards(JwtAuthGuard, SubscribedGuard)
 @Roles(UserRoles.User)
@@ -73,10 +75,7 @@ export class AnalysisController {
   }
 
   @Get(':id')
-  async show(
-    @AuthUser() user: User,
-    @Param('id') id: string,
-  ) {
+  async show(@AuthUser() user: User, @Param('id') id: string) {
     const analysis = await this.analysisService.findOneBy({
       id,
       userId: user.id,
@@ -277,10 +276,7 @@ export class AnalysisController {
   }
 
   @Delete(':id')
-  async destroy(
-    @AuthUser() user: User,
-    @Param('id') id: string,
-  ) {
+  async destroy(@AuthUser() user: User, @Param('id') id: string) {
     const analysis = await this.analysisService.findOneBy({
       id,
       userId: user.id,

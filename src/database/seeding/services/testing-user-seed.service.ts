@@ -51,7 +51,7 @@ export class TestingUserSeedService implements Seeder<User[]> {
       ].map(async (user) => {
         return {
           ...user,
-          password: await this.hashPassword(user.password!),
+          password: await this.hashPassword(user.password),
         };
       }),
     );

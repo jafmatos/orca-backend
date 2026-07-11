@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AdminUserService } from '../services/admin-user.service';
 import { Roles } from '@/common/decorators/roles.decorator';
@@ -41,12 +42,13 @@ const userListQuerySchema = z
   })
   .optional();
 
-type UserListQuery = z.infer<typeof userListQuerySchema>;
+export type UserListQuery = z.infer<typeof userListQuerySchema>;
 
 const updateUserRoleSchema = z.object({
   role: z.enum(UserRoles),
 });
 
+@ApiTags('AdminUser')
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.Admin, UserRoles.SuperUser)

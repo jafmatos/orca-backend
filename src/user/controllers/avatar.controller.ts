@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { Jetpack } from '@/common/helpers/jetpack.helper';
@@ -16,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { randomUUID } from 'crypto';
 import { EntityManager } from 'typeorm';
 
+@ApiTags('Avatar')
 @Controller('users/me/avatar')
 export class AvatarController {
   constructor(

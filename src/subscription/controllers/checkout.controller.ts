@@ -1,3 +1,4 @@
+import { ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '@/auth/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { ZodValidationPipe } from '@/common/pipes/zod-validation.pipe';
@@ -46,6 +47,7 @@ const createCheckoutSchema = z.discriminatedUnion('ui_mode', [
   ]),
 ]);
 
+@ApiTags('Checkout')
 @Controller('stripe/checkout')
 @UseGuards(JwtAuthGuard)
 export class CheckoutController {

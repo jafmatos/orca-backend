@@ -152,8 +152,8 @@ describe('Auth > delete-account (e2e)', () => {
 
   it('[Update] - Deve falhar ao tentar fazer login depois de finalizar a exclusão da conta', async () => {
     const user = await UserHelper.getOneByRole('user');
-    
-		await AuthHelper.deleteAccount(user);
+
+    await AuthHelper.deleteAccount(user);
 
     const response = await api()
       .post('/sign-in')
