@@ -51,4 +51,6 @@ COPY --from=build /usr/src/app/dist ./dist
 
 EXPOSE 3333
 
-CMD ["sh", "-c", "npm run migration:run && npm run start:prod"]
+ENV DOTENV_PATH=.env.docker.production
+
+CMD ["sh", "-c", "npm run migration:prod:run && npm run start:prod"]
