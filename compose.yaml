@@ -49,7 +49,7 @@ services:
     container_name: postgres
     image: postgres
     restart: unless-stopped
-    profiles: ['development', 'production']
+    profiles: ['production']
     ports:
       - 5432
     logging:
@@ -106,7 +106,7 @@ services:
   app:
     container_name: app
     restart: unless-stopped
-    profiles: ['development', 'production']
+    profiles: ['production']
     build: .
     depends_on:
       postgresdb:
@@ -154,7 +154,7 @@ services:
     container_name: redis
     image: redis:7-alpine
     restart: unless-stopped
-    profiles: ['development', 'production']
+    profiles: ['production']
     ports:
       - '6379:6379'
     volumes:

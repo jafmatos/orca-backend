@@ -1,0 +1,130 @@
+version: "3.9"
+
+x-common-env: &common-env
+  - SILENT=$SILENT
+  - LOG_LEVEL=$LOG_LEVEL
+  - NODE_ENV=$NODE_ENV
+  - SEED_ON_BOOTSTRAP=$SEED_ON_BOOTSTRAP
+  - APP_PORT=$APP_PORT
+  - APP_HOST=$APP_HOST
+  - APP_DIR=$APP_DIR
+  - APP_URL=$APP_URL
+  - FRONTEND_BASE_URL=$FRONTEND_BASE_URL
+  - FRONTEND_POLICY_URL=$FRONTEND_POLICY_URL
+  - FRONTEND_TERMS_URL=$FRONTEND_TERMS_URL
+  - DB_HOST=$DB_HOST
+  - DB_PORT=$DB_PORT
+  - DB_USER=$DB_USER
+  - DB_PASS=$DB_PASS
+  - DB_NAME=$DB_NAME
+  - DB_TIMEZONE=$DB_TIMEZONE
+  - DB_LOGGING=$DB_LOGGING
+  - DB_SYNCHRONIZE=$DB_SYNCHRONIZE
+  - SMTP_HOST=$SMTP_HOST
+  - SMTP_PORT=$SMTP_PORT
+  - SMTP_USER=$SMTP_USER
+  - SMTP_PASS=$SMTP_PASS
+  - SMTP_ORIGIN=$SMTP_ORIGIN
+  - STRIPE_KEY=$STRIPE_KEY
+  - STRIPE_ENDPOINT_SECRET=$STRIPE_ENDPOINT_SECRET
+  - JWT_TOKEN_SECRET=$JWT_TOKEN_SECRET
+  - BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS
+  - VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY
+  - VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY
+  - REDIS_HOST=$REDIS_HOST
+  - REDIS_PORT=$REDIS_PORT
+  - REDIS_PASSWORD=$REDIS_PASSWORD
+  - BULLBOARD_USER_LOGIN=$BULLBOARD_USER_LOGIN
+  - BULLBOARD_USER_PASSWORD=$BULLBOARD_USER_PASSWORD
+  - OPENAI_KEY=$OPENAI_KEY
+  - OPENAI_MODEL=$OPENAI_MODEL
+  - SEED_USER_DEFAULT_PASSWORD=$SEED_USER_DEFAULT_PASSWORD
+  - SEED_DEFAULT_OTP_CODE=$SEED_DEFAULT_OTP_CODE
+  - SEED_SUPER_USER_NAME=$SEED_SUPER_USER_NAME
+  - SEED_SUPER_USER_EMAIL=$SEED_SUPER_USER_EMAIL
+  - SEED_SUPER_USER_PASSWORD=$SEED_SUPER_USER_PASSWORD
+
+services:
+  app-dev:
+    container_name: api-dev
+    restart: no
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    depends_on:
+      - postgresdb
+      - redis
+      - bullboard
+    ports:
+      - "3333:3333"
+    networks:
+      - app-network
+    volumes:
+      - ..:/workspace
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    environment: *common-env
+
+  postgresdb:
+    container_name: postgres-dev
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - dev_backend_db:/var/lib/postgresql/18/docker
+    networks:
+      - app-network
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+
+  redis:
+    container_name: redis-dev
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - dev_redis_data:/data
+    networks:
+      - app-network
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  bullboard:
+    container_name: bullboard-dev
+    image: deadly0/bull-board
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "4000:3000"
+    networks:
+      - app-network
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USE_TLS: "false"
+      USER_LOGIN: ${BULLBOARD_USER_LOGIN}
+      USER_PASSWORD: ${BULLBOARD_USER_PASSWORD}
+
+volumes:
+  dev_backend_db:
+    external: true
+  dev_backend_uploads:
+    external: true
+  dev_redis_data:
+    external: true
+
+networks:
+  app-network:
+    driver: bridge
