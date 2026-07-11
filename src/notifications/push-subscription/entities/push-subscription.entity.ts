@@ -20,7 +20,7 @@ export enum PushSubscriptionProvider {
   Expo = 'expo',
 }
 
-@Entity('push_subscriptions')
+@Entity('push_subscription')
 export class PushSubscription {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

@@ -4,7 +4,7 @@ import { User } from '@/user/entities/user.entity';
 import { Jetpack } from '@/common/helpers/jetpack.helper';
 import { Logger } from '@nestjs/common';
 
-@Entity('avatars')
+@Entity('avatar')
 export class Avatar extends File {
   @OneToOne(() => User, (user) => user.avatar, {
     onDelete: 'CASCADE',
