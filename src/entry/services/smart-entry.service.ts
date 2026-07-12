@@ -133,14 +133,19 @@ export class SmartEntryService {
                       anyOf: [{ type: 'string' }, { type: 'null' }],
                     },
                     category: {
-                      type: 'object',
-                      properties: {
-                        id: {
-                          anyOf: [{ type: 'string' }, { type: 'null' }],
+                      anyOf: [
+                        {
+                          type: 'object',
+                          properties: {
+                            id: {
+                              anyOf: [{ type: 'string' }, { type: 'null' }],
+                            },
+                          },
+                          additionalProperties: false,
+                          required: ['id'],
                         },
-                      },
-                      additionalProperties: false,
-                      required: ['id'],
+                        { type: 'null' },
+                      ],
                     },
                   },
                   required: [
