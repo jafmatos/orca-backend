@@ -21,6 +21,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { APP_GUARD } from '@nestjs/core';
       route: '/admin/queues',
       adapter: ExpressAdapter,
     }),
+    SupportModule,
   ],
   providers: [
     AppService,

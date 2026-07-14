@@ -19,7 +19,7 @@ export type EntryListOptions = {
       ge?: Date;
       le?: Date;
     };
-    categoryId?: string | null;
+    category?: string | null;
     type?: string;
     text?: string;
   };
@@ -42,12 +42,12 @@ export class EntryService {
       .leftJoinAndSelect('entry.category', 'category')
       .where('entry."userId" = :userId', { userId: options.filter.userId });
 
-    if (options.filter.categoryId !== undefined) {
-      if (options.filter.categoryId === null) {
+    if (options.filter.category !== undefined) {
+      if (options.filter.category === null) {
         queryBuilder.andWhere('entry."categoryId" IS NULL');
       } else {
         queryBuilder.andWhere('entry."categoryId" = :categoryId', {
-          categoryId: options.filter.categoryId,
+          categoryId: options.filter.category,
         });
       }
     }
