@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
-const assertIsRequiredForSeed = (value: unknown) => {
-  if (
-    process.env.NODE_ENV !== 'testing' &&
-    process.env.SEED_ON_BOOTSTRAP !== 'true'
-  )
-    return true;
+const requiredForTesting = (value: unknown) => {
+  if (process.env.NODE_ENV !== 'testing') return true;
+
+  return !!value;
+};
+
+const requiredForSeeding = (value: unknown) => {
+  if (process.env.SEED_ON_BOOTSTRAP !== 'true') return true;
 
   return !!value;
 };
@@ -82,7 +84,7 @@ export const envSchema = z.object({
   TESTING_API_URL: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(assertIsRequiredForSeed),
+    .refine(requiredForTesting),
   SEED_ON_BOOTSTRAP: z
     .enum(['true', 'false'])
     .default('false')
@@ -90,23 +92,28 @@ export const envSchema = z.object({
   SEED_USER_DEFAULT_PASSWORD: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(assertIsRequiredForSeed),
+    .refine(requiredForTesting)
+    .refine(requiredForSeeding),
   SEED_DEFAULT_OTP_CODE: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(assertIsRequiredForSeed),
+    .refine(requiredForTesting)
+    .refine(requiredForSeeding),
   SEED_SUPER_USER_NAME: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(assertIsRequiredForSeed),
+    .refine(requiredForTesting)
+    .refine(requiredForSeeding),
   SEED_SUPER_USER_EMAIL: z
     .union([z.email(), z.literal('')])
     .optional()
-    .refine(assertIsRequiredForSeed),
+    .refine(requiredForTesting)
+    .refine(requiredForSeeding),
   SEED_SUPER_USER_PASSWORD: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(assertIsRequiredForSeed),
+    .refine(requiredForTesting)
+    .refine(requiredForSeeding),
 });
 
 export type Env = z.infer<typeof envSchema>;

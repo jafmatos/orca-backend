@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker.testing
       - name: Running tests
-        run: npm run docker:test
+        run: npm run docker:test:up
       - name: Push to branch review
         run: |
           git fetch

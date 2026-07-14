@@ -3,7 +3,7 @@ import { Env } from '@/config/.env.validate';
 import { ConfigService } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
-config({ path: process.env.DOTENV_PATH || '.env.docker.development', override: false });
+config({ path: process.env.DOTENV_PATH || '.devcontainer/.env', override: false });
 
 const configService = new ConfigService<Env, true>();
 

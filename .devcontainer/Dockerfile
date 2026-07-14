@@ -31,8 +31,10 @@ ENV NODE_ENV development
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	bash \
 	curl \
+	wget \
 	git \
 	procps \
+	ca-certificates \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Criar pasta de uploads no container e garantir permissões de acesso a ela.
@@ -48,6 +50,3 @@ COPY --from=deps /workspace/node_modules ./node_modules
 
 # Expor a porta da API.
 EXPOSE 3333
-
-# Rodar a aplicação sem acesso root.
-USER node

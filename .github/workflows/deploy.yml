@@ -35,6 +35,7 @@ jobs:
             git config --global --add safe.directory ${{secrets.REMOTE_WORK_DIR}}
             cd ${{secrets.REMOTE_WORK_DIR}}
             git fetch origin
+            echo "${{ secrets.DOCKER_ENV_FILE }}" > .env.docker.production
             git reset --hard origin/master
             npm run docker:prod:up
           debug: true

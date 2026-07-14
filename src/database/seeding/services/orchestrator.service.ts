@@ -29,12 +29,12 @@ export class OrchestratorService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     const NODE_ENV = this.configService.get('NODE_ENV');
 
+    if (NODE_ENV !== 'testing' && !this.configService.get('SEED_ON_BOOTSTRAP'))
+      return;
+
     if (NODE_ENV === 'production') {
       return await this.userProductionSeedService.seed();
     }
-
-    if (NODE_ENV !== 'testing' && !this.configService.get('SEED_ON_BOOTSTRAP'))
-      return;
 
     await this.clearDatabase();
 

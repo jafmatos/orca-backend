@@ -38,7 +38,7 @@ import { APP_GUARD } from '@nestjs/core';
           ? '.env.docker.testing'
           : process.env.NODE_ENV === 'production'
             ? '.env.docker.production'
-            : '.env.docker.development',
+            : '.devcontainer/.env',
     }),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),

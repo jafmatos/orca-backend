@@ -4,7 +4,6 @@
 	"dockerComposeFile": "./compose.yaml",
 	"shutdownAction": "stopCompose",
 	"service": "app-dev",
-	"remoteUser": "node",
 	"runServices": [
 		"app-dev",
 		"postgresdb",
@@ -25,13 +24,7 @@
 				"github.vscode-github-actions"
 			]
 		}
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/common-utils": "latest",
-		"ghcr.io/devcontainers/features/git:1": {}
-	},
-	"mounts": [
-		"source=${localEnv:HOME}/.gitconfig,target=/home/node/.gitconfig,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.ssh/id_rsa,target=/home/node/.ssh/id_rsa,type=bind,consistency=cached"
-	]
+	}
+
+
 }
