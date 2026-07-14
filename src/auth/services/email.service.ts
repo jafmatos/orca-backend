@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import nodemailer, { Transporter } from 'nodemailer';
 import { renderToString } from 'react-dom/server';
 import { Env } from '@/config/.env.validate';
-import { SignUpEmail } from './emails/templates/SignUpEmail';
-import { ResetPasswordEmail } from './emails/templates/ResetPasswordEmail';
-import { DeleteAccountEmail } from './emails/templates/DeleteAccountEmail';
+import { SignUpEmail } from '@/auth/services/emails/templates/SignUpEmail';
+import { ResetPasswordEmail } from '@/auth/services/emails/templates/ResetPasswordEmail';
+import { DeleteAccountEmail } from '@/auth/services/emails/templates/DeleteAccountEmail';
 
 type SendEmailArgs = {
   to: string;
@@ -16,7 +16,6 @@ type SendEmailArgs = {
 
 @Injectable()
 export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
   private readonly transporter: Transporter;
 
   constructor(private readonly configService: ConfigService<Env, true>) {
