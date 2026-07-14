@@ -114,6 +114,7 @@ export class EntryController {
       order,
       filter: {
         ...requestFilter,
+        category: requestFilter.category,
         userId: user.id,
         when: {
           ge: requestFilter.when?.ge,

@@ -7,5 +7,3 @@ export const UpdateTicketSchema = z.object({
 });
 
 export class UpdateTicketDto extends createZodDto(UpdateTicketSchema) {}
-
-export type UpdateTicketBody = z.infer<typeof UpdateTicketSchema>;

@@ -78,7 +78,7 @@ describe('Categories (e2e)', () => {
       if (category.type !== EntryTypes.Expense) continue;
 
       const entries = await EntryHelper.getMany(token, {
-        categoryId: category.id,
+        category: category.id,
         when: {
           ge: user.currentCycle.start,
           le: user.currentCycle.end,

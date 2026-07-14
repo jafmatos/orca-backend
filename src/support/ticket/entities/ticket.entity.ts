@@ -22,7 +22,7 @@ export class Ticket {
   @Column({ nullable: false, length: 150 })
   description!: string;
 
-  @Column({ enum: TicketStatuses, default: TicketStatuses.OPEN })
+  @Column({ type: 'enum', enum: TicketStatuses, default: TicketStatuses.OPEN })
   status!: TicketStatuses;
 
   @CreateDateColumn()

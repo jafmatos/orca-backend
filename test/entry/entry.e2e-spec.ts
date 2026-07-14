@@ -120,7 +120,7 @@ describe('Entries (e2e)', () => {
 
     const categoryId = randomEntry.category.id;
 
-    const filter = encodeURIComponent(JSON.stringify({ categoryId }));
+    const filter = encodeURIComponent(JSON.stringify({ category: categoryId }));
 
     const { body: data } = await api()
       .get(`/entries?paginated=false&filter=${filter}`)
