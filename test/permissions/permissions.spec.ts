@@ -20,12 +20,12 @@ describe('Permissions (e2e)', () => {
   const endpoints = [
     // Admin & SuperUser Only
     {
-      path: '/admin/users',
+      path: '/administrative/users',
       method: 'get',
       allowedRoles: ['admin', 'super-user'],
     },
     {
-      path: '/admin/overview/kpis',
+      path: '/administrative/overview/kpis',
       method: 'get',
       allowedRoles: ['admin', 'super-user'],
     },

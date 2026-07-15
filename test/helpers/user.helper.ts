@@ -8,7 +8,7 @@ export class UserHelper {
     const {
       body: { data: users },
     } = await api()
-      .get(`/admin/users?filter[role]=${role}&filter[isEmailConfirmed]=true`)
+      .get(`/administrative/users?filter[role]=${role}&filter[isEmailConfirmed]=true`)
       .set('Authorization', `Bearer ${superToken}`)
       .expect(200);
 
@@ -20,7 +20,7 @@ export class UserHelper {
     const {
       body: { data: users },
     } = await api()
-      .get(`/admin/users?filter[role]=${role}&filter[isEmailConfirmed]=true`)
+      .get(`/administrative/users?filter[role]=${role}&filter[isEmailConfirmed]=true`)
       .set('Authorization', `Bearer ${superToken}`)
       .expect(200);
 
@@ -38,7 +38,7 @@ export class UserHelper {
       body: { data: users },
     } = await api()
       .get(
-        `/admin/users?filter[role]=user&filter[subscription][status]=active&filter[isEmailConfirmed]=true&paginated=false`,
+        `/administrative/users?filter[role]=user&filter[subscription][status]=active&filter[isEmailConfirmed]=true&paginated=false`,
       )
       .set('Authorization', `Bearer ${superToken}`)
       .expect(200);
@@ -52,7 +52,7 @@ export class UserHelper {
       body: { data: users },
     } = await api()
       .get(
-        `/admin/users?filter[role]=${role}&filter[subscription][status]=active&filter[isEmailConfirmed]=true&paginated=false`,
+        `/administrative/users?filter[role]=${role}&filter[subscription][status]=active&filter[isEmailConfirmed]=true&paginated=false`,
       )
       .set('Authorization', `Bearer ${superToken}`)
       .expect(200);
