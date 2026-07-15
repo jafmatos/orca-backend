@@ -6,6 +6,7 @@ import { Entry } from '@/entry/entities/entry.entity';
 import { PushSubscription } from '@/notifications/push-subscription/entities/push-subscription.entity';
 import { Schedule } from '@/schedule/entities/schedule.entity';
 import { Subscription } from '@/subscription/entities/subscription.entity';
+import { Ticket } from '@/support/ticket/entities/ticket.entity';
 import { Avatar } from '@/user/entities/avatar.entity';
 import { Exclude } from 'class-transformer';
 import {
@@ -51,6 +52,9 @@ export class User {
   isEmailConfirmed!: boolean;
 
   @Column({ type: 'boolean', default: false })
+  isBetaTester!: boolean;
+
+  @Column({ type: 'boolean', default: false })
   acceptsNotifications!: boolean;
 
   @OneToMany(
@@ -71,6 +75,9 @@ export class User {
 
   @OneToMany(() => Limit, (limit) => limit.userId)
   limits?: Limit[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.user)
+  tickets?: Ticket[];
 
   @Exclude()
   @Column()

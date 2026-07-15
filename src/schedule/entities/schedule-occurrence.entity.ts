@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -36,4 +37,7 @@ export class ScheduleOccurrence {
   })
   @JoinColumn({ name: 'entryId' })
   entry!: Entry;
+
+  @CreateDateColumn()
+  createdAt!: Date;
 }

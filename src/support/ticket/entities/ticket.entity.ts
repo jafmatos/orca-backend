@@ -1,9 +1,12 @@
 import { TicketStatuses } from '@/common/enums/ticket-statuses.enum';
+import { User } from '@/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -33,4 +36,11 @@ export class Ticket {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  @ManyToOne(() => User, (user) => user.tickets, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  user!: User;
 }
