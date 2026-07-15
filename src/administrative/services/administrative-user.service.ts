@@ -1,9 +1,10 @@
+import { Plan } from '@/subscription/entities/plan.entity';
+import { Subscription } from '@/subscription/entities/subscription.entity';
+import { SubscriptionStatuses } from '@/subscription/enums/subscription-status.enum';
+import { User, UserRoles } from '@/user/entities/user.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '@/user/entities/user.entity';
-import { UserRoles } from '@/user/entities/user.entity';
-import { SubscriptionStatuses } from '@/subscription/enums/subscription-status.enum';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
 export type AdminUserListOptions = {
   order?: {
@@ -29,10 +30,14 @@ export type AdminUserListOptions = {
 };
 
 @Injectable()
-export class AdminUserService {
+export class AdministrativeUserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Subscription)
+    private readonly subscriptionRepository: Repository<Subscription>,
+    @InjectRepository(Plan)
+    private readonly planRepository: Repository<Plan>,
   ) {}
 
   public async find(options: AdminUserListOptions) {
@@ -46,22 +51,27 @@ export class AdminUserService {
         stripeId: options.filter.stripeId,
       });
     }
+
     if (options.filter?.role) {
       queryBuilder.andWhere('user.role = :role', { role: options.filter.role });
     }
+
     if (options.filter?.email) {
       queryBuilder.andWhere('user.email = :email', {
         email: options.filter.email,
       });
     }
+
     if (options.filter?.name) {
       queryBuilder.andWhere('user.name = :name', { name: options.filter.name });
     }
+
     if (options.filter?.isEmailConfirmed !== undefined) {
       queryBuilder.andWhere('user.isEmailConfirmed = :isEmailConfirmed', {
         isEmailConfirmed: options.filter.isEmailConfirmed,
       });
     }
+
     if (options.filter?.text) {
       queryBuilder.andWhere(
         '(user.email ILIKE :text OR user.name ILIKE :text)',
@@ -94,12 +104,45 @@ export class AdminUserService {
     return await queryBuilder.getManyAndCount();
   }
 
-  public async updateRole(id: string, role: UserRoles) {
+  public async updateUser(id: string, data: Partial<User>) {
     const user = await this.userRepository.findOneBy({ id });
-    if (!user) {
-      throw new Error('User not found');
-    }
-    user.role = role;
+    if (!user) return null;
+    
+    this.userRepository.merge(user, data);
     return await this.userRepository.save(user);
+  }
+
+  public async findOneBy(where: FindOptionsWhere<User>) {
+    return await this.userRepository.findOne({
+      where,
+      relations: { subscription: true },
+    });
+  }
+
+  public async findPlan(planId: string) {
+    return await this.planRepository.findOneBy({ id: planId });
+  }
+
+  public createSubscriptionWithoutSaving(data: Partial<Subscription>) {
+    return this.subscriptionRepository.create(data);
+  }
+
+  public async saveSubscription(subscription: Subscription) {
+    return await this.subscriptionRepository.save(subscription);
+  }
+
+  public async findSubscriptionByUserId(userId: string) {
+    return await this.subscriptionRepository.findOneBy({ userId });
+  }
+
+  public async updateSubscriptionEntity(
+    subscription: Subscription,
+    updateData: Partial<Subscription>,
+  ) {
+    const updatedSubscription = this.subscriptionRepository.merge(
+      subscription,
+      updateData,
+    );
+    return await this.subscriptionRepository.save(updatedSubscription);
   }
 }

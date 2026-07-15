@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Subscription } from './subscription.entity';
 
 export enum PlanDurationInterval {
+  Lifetime = 'lifetime',
   Yearly = 'yearly',
   Monthly = 'monthly',
 }
@@ -35,6 +36,9 @@ export class Plan {
     },
   })
   duration!: PlanDuration;
+
+  @Column({ type: 'boolean', default: false })
+  isPrivate!: boolean;
 
   @OneToMany(() => Subscription, (subscription) => subscription.plan)
   subscriptions?: Subscription[];

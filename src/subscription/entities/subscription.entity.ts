@@ -21,8 +21,8 @@ export class Subscription {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
-  stripeId!: string;
+  @Column({ nullable: true })
+  stripeId?: string;
 
   @Column('uuid')
   userId!: string;
@@ -36,14 +36,11 @@ export class Subscription {
   @Column({ nullable: true, type: 'timestamp' })
   trialEnd?: Date | null;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  currentPeriodStart!: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  currentPeriodStart?: Date | null;
 
-  @Column({
-    type: 'timestamp',
-    default: () => "CURRENT_TIMESTAMP + '1 MONTH'::interval",
-  })
-  currentPeriodEnd!: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  currentPeriodEnd?: Date | null;
 
   @Column({ type: 'enum', enum: SubscriptionStatuses })
   status!: SubscriptionStatuses;

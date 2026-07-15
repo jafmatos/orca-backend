@@ -25,6 +25,8 @@ export class SubscribedGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user: User = request.user;
 
+    if (user.isBetaTester) return true;
+
     const subscription =
       user.subscription ??
       (await this.subscriptionRepository.findOneBy({ userId: user.id }));

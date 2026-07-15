@@ -1,26 +1,25 @@
-import { validate } from '@/config/.env.validate';
 import { AppService } from '@/app.service';
-import { AdminModule } from './admin/admin.module';
-import { AnalysisModule } from './analysis/analysis.module';
 import { AuthModule } from '@/auth/auth.module';
+import { validate } from '@/config/.env.validate';
 import { DatabaseModule } from '@/database/database.module';
 import { UserModule } from '@/user/user.module';
+import { ExpressAdapter } from '@bull-board/express';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { join } from 'path';
-import { NotificationsModule } from './notifications/notifications.module';
+import { AdministrativeModule } from './administrative/administrative.module';
+import { AnalysisModule } from './analysis/analysis.module';
 import { CategoryModule } from './category/category.module';
 import { EntryModule } from './entry/entry.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { OverviewModule } from './overview/overview.module';
-import { BullModule } from '@nestjs/bull';
-import { ConfigService } from '@nestjs/config';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { ExpressAdapter } from '@bull-board/express';
 import { ScheduleModule } from './schedule/schedule.module';
 import { SubscriptionModule } from './subscription/subscription.module';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { SupportModule } from './support/support.module';
 
 @Module({
@@ -45,7 +44,7 @@ import { SupportModule } from './support/support.module';
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
-    AdminModule,
+    AdministrativeModule,
     AnalysisModule,
     DatabaseModule,
     UserModule,

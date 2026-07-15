@@ -8,7 +8,7 @@ export interface KPIsOptions {
 }
 
 @Injectable()
-export class AdminOverviewService {
+export class AdministrativeOverviewService {
   constructor(private readonly dataSource: DataSource) {}
 
   public async getKPIs(_options?: KPIsOptions) {
