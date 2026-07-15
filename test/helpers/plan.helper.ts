@@ -1,4 +1,4 @@
-import { Plan } from '@/subscription/entities/plan.entity';
+import { Plan, PlanDurationInterval } from '@/subscription/entities/plan.entity';
 import { $faker } from './$faker';
 import { api } from './api.helper';
 import { AuthHelper } from './auth.helper';
@@ -30,10 +30,15 @@ export class PlanHelper {
         $faker.lorem.words(3),
         $faker.lorem.words(3),
       ],
+      duration: data?.duration || {
+        interval: PlanDurationInterval.Monthly,
+        intervalCount: 1,
+      },
+      isPrivate: data?.isPrivate ?? false,
     };
 
     const response = await api()
-      .post('/plans')
+      .post('/administrative/plans')
       .set('Authorization', `Bearer ${superToken}`)
       .send(payload)
       .expect(201);

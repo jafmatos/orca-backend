@@ -19,6 +19,7 @@ export type AdminUserListOptions = {
     email?: string;
     name?: string;
     isEmailConfirmed?: boolean;
+    isBetaTester?: boolean;
     subscription?: {
       status?: SubscriptionStatuses;
     };
@@ -107,7 +108,7 @@ export class AdministrativeUserService {
   public async updateUser(id: string, data: Partial<User>) {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) return null;
-    
+
     this.userRepository.merge(user, data);
     return await this.userRepository.save(user);
   }

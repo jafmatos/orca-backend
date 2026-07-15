@@ -40,6 +40,7 @@ const userListQuerySchema = z
             status: z.enum(SubscriptionStatuses).optional(),
           })
           .optional(),
+        isBetaTester: z.boolean().optional(),
       })
       .optional(),
     order: z

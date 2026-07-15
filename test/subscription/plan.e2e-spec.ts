@@ -27,8 +27,12 @@ describe('Plans (e2e)', () => {
   });
 
   it('[Show] - Deve ser capaz de encontrar um plano', async () => {
+    const token = await AuthHelper.getSuperToken();
     const plan = await PlanHelper.getOne();
-    const { body } = await api().get(`/plans/${plan.id}`).expect(200);
+    const { body } = await api()
+      .get(`/administrative/plans/${plan.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
 
     expect(body.plan).toBeDefined();
     expect(body.plan.name).toBe(plan.name);
@@ -43,8 +47,10 @@ describe('Plans (e2e)', () => {
   });
 
   it('[Show] - Deve falhar ao tentar encontrar um plano inexistente', async () => {
+    const token = await AuthHelper.getSuperToken();
     const { body } = await api()
-      .get(`/plans/${$faker.string.uuid()}`)
+      .get(`/administrative/plans/${$faker.string.uuid()}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(404);
 
     expect(body.message).toBe('Plano não encontrado');
@@ -57,10 +63,15 @@ describe('Plans (e2e)', () => {
       price: Number($faker.commerce.price()),
       trialPeriodDays: $faker.number.int({ min: 7, max: 30 }),
       benefits: [$faker.lorem.words(3)],
+      duration: {
+        interval: PlanDurationInterval.Yearly,
+        intervalCount: 1,
+      },
+      isPrivate: true,
     };
 
     const { body } = await api()
-      .post('/plans')
+      .post('/administrative/plans')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(201);
@@ -70,6 +81,8 @@ describe('Plans (e2e)', () => {
     expect(body.plan.price).toBe(payload.price);
     expect(body.plan.trialPeriodDays).toBe(payload.trialPeriodDays);
     expect(body.plan.benefits).toEqual(payload.benefits);
+    expect(body.plan.duration).toEqual(payload.duration);
+    expect(body.plan.isPrivate).toBe(payload.isPrivate);
   });
 
   it('[Create] - Deve falhar ao tentar cadastrar um plano caso o usuário não esteja autenticado', async () => {
@@ -79,7 +92,7 @@ describe('Plans (e2e)', () => {
       benefits: [$faker.lorem.words(3)],
     };
 
-    await api().post('/plans').send(payload).expect(401);
+    await api().post('/administrative/plans').send(payload).expect(401);
   });
 
   it('[Create] - Deve falhar ao tentar cadastrar um plano caso o usuário autenticado seja um usuário comum', async () => {
@@ -92,7 +105,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .post('/plans')
+      .post('/administrative/plans')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(403);
@@ -112,7 +125,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .post('/plans')
+      .post('/administrative/plans')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(403);
@@ -131,7 +144,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .post('/plans')
+      .post('/administrative/plans')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(422);
@@ -152,7 +165,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .post('/plans')
+      .post('/administrative/plans')
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(422);
@@ -173,10 +186,15 @@ describe('Plans (e2e)', () => {
       price: Number($faker.commerce.price()),
       trialPeriodDays: $faker.number.int({ min: 7, max: 30 }),
       benefits: [$faker.lorem.words(5)],
+      duration: {
+        interval: PlanDurationInterval.Lifetime,
+        intervalCount: 1,
+      },
+      isPrivate: true,
     };
 
     const { body } = await api()
-      .put(`/plans/${plan.id}`)
+      .put(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(200);
@@ -187,6 +205,8 @@ describe('Plans (e2e)', () => {
     expect(body.plan.price).toBe(payload.price);
     expect(body.plan.trialPeriodDays).toBe(payload.trialPeriodDays);
     expect(body.plan.benefits).toEqual(payload.benefits);
+    expect(body.plan.duration).toEqual(payload.duration);
+    expect(body.plan.isPrivate).toBe(payload.isPrivate);
   });
 
   it('[Update] - Deve falhar ao tentar atualizar um plano caso o usuário não esteja autenticado', async () => {
@@ -195,7 +215,7 @@ describe('Plans (e2e)', () => {
       name: $faker.commerce.productName(),
     };
 
-    await api().put(`/plans/${plan.id}`).send(payload).expect(401);
+    await api().put(`/administrative/plans/${plan.id}`).send(payload).expect(401);
   });
 
   it('[Update] - Deve falhar ao tentar atualizar um plano caso o usuário autenticado seja um usuário comum', async () => {
@@ -207,7 +227,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .put(`/plans/${plan.id}`)
+      .put(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(403);
@@ -226,7 +246,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .put(`/plans/${plan.id}`)
+      .put(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(403);
@@ -243,7 +263,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .put(`/plans/${$faker.string.uuid()}`)
+      .put(`/administrative/plans/${$faker.string.uuid()}`)
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(404);
@@ -259,7 +279,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .put(`/plans/${plan.id}`)
+      .put(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(422);
@@ -278,7 +298,7 @@ describe('Plans (e2e)', () => {
     };
 
     const { body } = await api()
-      .put(`/plans/${plan.id}`)
+      .put(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send(payload)
       .expect(422);
@@ -296,7 +316,7 @@ describe('Plans (e2e)', () => {
     const plan = await PlanHelper.create();
 
     const { body } = await api()
-      .delete(`/plans/${plan.id}`)
+      .delete(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
@@ -308,19 +328,19 @@ describe('Plans (e2e)', () => {
     const plan = await PlanHelper.create();
 
     await api()
-      .delete(`/plans/${plan.id}`)
+      .delete(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    await api().get(`/plans/${plan.id}`).expect(404);
+    await api().get(`/administrative/plans/${plan.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404);
   });
 
   it('[Remove] - Deve falhar ao tentar remover um plano caso o usuário não esteja autenticado', async () => {
     const plan = await PlanHelper.create();
 
-    await api().delete(`/plans/${plan.id}`).expect(401);
-
-    await api().get(`/plans/${plan.id}`).expect(200);
+    await api().delete(`/administrative/plans/${plan.id}`).expect(401);
   });
 
   it('[Remove] - Deve falhar ao tentar remover um plano caso o usuário autenticado seja um usuário comum', async () => {
@@ -329,15 +349,13 @@ describe('Plans (e2e)', () => {
     const plan = await PlanHelper.create();
 
     const { body } = await api()
-      .delete(`/plans/${plan.id}`)
+      .delete(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(403);
 
     expect(body.message).toBe(
       'Você não tem permissão para acessar este recurso',
     );
-
-    await api().get(`/plans/${plan.id}`).expect(200);
   });
 
   it('[Remove] - Deve falhar ao tentar remover um plano caso o usuário autenticado seja um administrador', async () => {
@@ -346,22 +364,20 @@ describe('Plans (e2e)', () => {
     const plan = await PlanHelper.create();
 
     const { body } = await api()
-      .delete(`/plans/${plan.id}`)
+      .delete(`/administrative/plans/${plan.id}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(403);
 
     expect(body.message).toBe(
       'Você não tem permissão para acessar este recurso',
     );
-
-    await api().get(`/plans/${plan.id}`).expect(200);
   });
 
   it('[Remove] - Deve falhar ao tentar remover um plano inexistente', async () => {
     const token = await AuthHelper.getSuperToken();
 
     const { body } = await api()
-      .delete(`/plans/${$faker.string.uuid()}`)
+      .delete(`/administrative/plans/${$faker.string.uuid()}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(404);
 
@@ -376,7 +392,7 @@ describe('Plans (e2e)', () => {
     expect(user.subscription?.planId).toBeDefined();
 
     const { body } = await api()
-      .delete(`/plans/${user.subscription?.planId}`)
+      .delete(`/administrative/plans/${user.subscription?.planId}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(409);
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeepPartial } from 'typeorm';
+import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { Plan } from '../entities/plan.entity';
 
 @Injectable()
@@ -11,6 +11,12 @@ export class PlanService {
 
   async findAll() {
     return await this.planRepository.find();
+  }
+
+  async findAllWhere(where?: FindOptionsWhere<Plan>) {
+    return await this.planRepository.find({
+      where,
+    });
   }
 
   async findById(id: string) {

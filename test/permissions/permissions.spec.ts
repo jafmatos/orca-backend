@@ -31,9 +31,11 @@ describe('Permissions (e2e)', () => {
     },
 
     // SuperUser Only
-    { path: '/plans', method: 'post', allowedRoles: ['super-user'] },
-    { path: '/plans/fake-id', method: 'put', allowedRoles: ['super-user'] },
-    { path: '/plans/fake-id', method: 'delete', allowedRoles: ['super-user'] },
+    { path: '/administrative/plans', method: 'get', allowedRoles: ['super-user'] },
+    { path: '/administrative/plans/fake-id', method: 'get', allowedRoles: ['super-user'] },
+    { path: '/administrative/plans', method: 'post', allowedRoles: ['super-user'] },
+    { path: '/administrative/plans/fake-id', method: 'put', allowedRoles: ['super-user'] },
+    { path: '/administrative/plans/fake-id', method: 'delete', allowedRoles: ['super-user'] },
 
     // User Only
     { path: '/limits', method: 'get', allowedRoles: ['user'] },
@@ -131,11 +133,6 @@ describe('Permissions (e2e)', () => {
 
     {
       path: '/plans',
-      method: 'get',
-      allowedRoles: ['user', 'admin', 'super-user'],
-    },
-    {
-      path: '/plans/00000000-0000-0000-0000-000000000000',
       method: 'get',
       allowedRoles: ['user', 'admin', 'super-user'],
     },
