@@ -215,6 +215,8 @@ export class AdministrativeUserController {
       if (!plan) {
         throw new NotFoundException('Plano não encontrado');
       }
+
+      subscription.plan = plan;
     }
 
     const updatedSubscription = await this.subscriptionService.update(
