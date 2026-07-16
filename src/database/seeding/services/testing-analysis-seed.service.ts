@@ -29,7 +29,7 @@ export class TestingAnalysisSeedService implements Seeder<Analysis[]> {
     const allAnalyses: Analysis[] = [];
 
     for (const user of users) {
-      const numAnalyses = $faker.number.int({ min: 2, max: 5 });
+      const numAnalyses = $faker.number.int({ min: 10, max: 15 });
       const userAnalysesData: DeepPartial<Analysis>[] = [];
 
       for (let i = 0; i < numAnalyses; i++) {
@@ -55,7 +55,7 @@ export class TestingAnalysisSeedService implements Seeder<Analysis[]> {
               ],
               expectation: $faker.lorem.paragraph(),
             },
-            createdAt: $faker.date.recent({ days: 30 }),
+            createdAt: $faker.date.recent({ days: 180 }),
           }),
         );
       }

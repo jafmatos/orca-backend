@@ -30,6 +30,7 @@ export class SubscriptionService {
     options?: { manager: EntityManager },
   ) {
     const repository = this.getRepository(options?.manager);
+		
     return await repository.save(repository.create(data));
   }
 
@@ -39,6 +40,7 @@ export class SubscriptionService {
     options?: { manager: EntityManager },
   ) {
     const repository = this.getRepository(options?.manager);
+
     return await repository.save(repository.merge(subscription, data));
   }
 }

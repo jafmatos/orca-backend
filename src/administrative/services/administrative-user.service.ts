@@ -37,8 +37,6 @@ export class AdministrativeUserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-    @InjectRepository(Plan)
-    private readonly planRepository: Repository<Plan>,
   ) {}
 
   public async find(options: AdminUserListOptions) {
@@ -105,12 +103,10 @@ export class AdministrativeUserService {
     return await queryBuilder.getManyAndCount();
   }
 
-  public async updateUser(id: string, data: Partial<User>) {
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) return null;
-
-    this.userRepository.merge(user, data);
-    return await this.userRepository.save(user);
+  public async update(user: User, data: Partial<User>) {
+    return await this.userRepository.save(
+      this.userRepository.merge(user, data),
+    );
   }
 
   public async findOneBy(where: FindOptionsWhere<User>) {
@@ -120,16 +116,10 @@ export class AdministrativeUserService {
     });
   }
 
-  public async findPlan(planId: string) {
-    return await this.planRepository.findOneBy({ id: planId });
-  }
-
-  public createSubscriptionWithoutSaving(data: Partial<Subscription>) {
-    return this.subscriptionRepository.create(data);
-  }
-
-  public async saveSubscription(subscription: Subscription) {
-    return await this.subscriptionRepository.save(subscription);
+  public async create(subscription: Subscription) {
+    return await this.subscriptionRepository.save(
+      this.subscriptionRepository.create(subscription),
+    );
   }
 
   public async findSubscriptionByUserId(userId: string) {

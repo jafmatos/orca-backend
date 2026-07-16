@@ -30,7 +30,7 @@ export class TestingEntrySeedService implements Seeder<Entry[]> {
     const allEntries: Entry[] = [];
 
     for (const user of users) {
-      const numEntries = $faker.number.int({ min: 100, max: 400 });
+      const numEntries = $faker.number.int({ min: 300, max: 600 });
       const categories = user.categories!;
       const userEntriesData: DeepPartial<Entry>[] = [];
 

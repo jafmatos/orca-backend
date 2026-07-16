@@ -35,6 +35,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	git \
 	procps \
 	ca-certificates \
+	lsof \
+	sudo \
+	&& echo "node ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/node \
+	&& chmod 0440 /etc/sudoers.d/node \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Criar pasta de uploads no container e garantir permissões de acesso a ela.

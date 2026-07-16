@@ -27,7 +27,7 @@ export class TestingCategorySeedService implements Seeder<Category[]> {
     const categoriesData: DeepPartial<Category>[] = [];
 
     for (const user of users) {
-      const numCategories = $faker.number.int({ min: 15, max: 20 });
+      const numCategories = $faker.number.int({ min: 20, max: 30 });
 
       for (let i = 0; i < numCategories; i++) {
         const type =

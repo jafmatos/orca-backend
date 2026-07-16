@@ -3,6 +3,7 @@
 	"workspaceFolder": "/workspace",
 	"dockerComposeFile": "./compose.yaml",
 	"shutdownAction": "stopCompose",
+	"remoteUser": "root",
 	"service": "app-dev",
 	"runServices": [
 		"app-dev",

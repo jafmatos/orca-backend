@@ -21,6 +21,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { z } from 'zod';
 import { AdministrativeUserService } from '../services/administrative-user.service';
+import { PlanService } from '@/subscription/services/plan.service';
+import { SubscriptionService } from '@/subscription/services/subscription.service';
 
 const userListQuerySchema = z
   .object({
@@ -108,6 +110,8 @@ const updateSubscriptionSchema = z.object({
 export class AdministrativeUserController {
   constructor(
     private readonly administrativeUserService: AdministrativeUserService,
+    private readonly planService: PlanService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   @Get()
@@ -136,18 +140,20 @@ export class AdministrativeUserController {
 
   @Put(':id')
   @Roles(UserRoles.SuperUser)
-  async updateUser(
+  async update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateUserSchema))
     data: z.infer<typeof updateUserSchema>,
   ) {
-    const user = await this.administrativeUserService.updateUser(id, data);
+    const user = await this.administrativeUserService.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return { user };
+    const updatedUser = await this.administrativeUserService.update(user, data);
+
+    return { user: updatedUser };
   }
 
   @Post(':id/subscription')
@@ -167,20 +173,19 @@ export class AdministrativeUserController {
       throw new BadRequestException('Este usuário já possui uma inscrição');
     }
 
-    const plan = await this.administrativeUserService.findPlan(data.planId);
+    const plan = await this.planService.findById(data.planId);
 
     if (!plan) {
       throw new NotFoundException('Plano não encontrado');
     }
 
-    const subscriptionData =
-      this.administrativeUserService.createSubscriptionWithoutSaving({
-        userId: id,
-        ...data,
-      });
-
-    const subscription =
-      await this.administrativeUserService.saveSubscription(subscriptionData);
+    const subscription = await this.subscriptionService.create({
+      userId: id,
+      planId: data.planId,
+      status: data.status,
+      currentPeriodStart: data.currentPeriodStart,
+      currentPeriodEnd: data.currentPeriodEnd,
+    });
 
     return { subscription };
   }
@@ -192,20 +197,31 @@ export class AdministrativeUserController {
     @Body(new ZodValidationPipe(updateSubscriptionSchema))
     data: z.infer<typeof updateSubscriptionSchema>,
   ) {
-    const subscription =
-      await this.administrativeUserService.findSubscriptionByUserId(id);
+    const user = await this.administrativeUserService.findOneBy({ id });
 
-    if (!subscription) {
-      throw new NotFoundException(
-        'Inscrição não encontrada para este usuário.',
-      );
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
     }
 
-    const updatedSubscription =
-      await this.administrativeUserService.updateSubscriptionEntity(
-        subscription,
-        data,
-      );
+    const subscription = user.subscription;
+
+    if (!subscription) {
+      throw new NotFoundException('Inscrição não encontrada');
+    }
+
+    if (data.planId) {
+      const plan = await this.planService.findById(data.planId);
+
+      if (!plan) {
+        throw new NotFoundException('Plano não encontrado');
+      }
+    }
+
+    const updatedSubscription = await this.subscriptionService.update(
+      subscription,
+      data,
+    );
+
     return { subscription: updatedSubscription };
   }
 }

@@ -33,7 +33,7 @@ export class TestingScheduleSeedService implements Seeder<Schedule[]> {
     const allSchedules: Schedule[] = [];
 
     for (const user of users) {
-      const numSchedules = $faker.number.int({ min: 6, max: 12 });
+      const numSchedules = $faker.number.int({ min: 12, max: 18 });
       const userSchedulesData: DeepPartial<Schedule>[] = [];
       const categories = user.categories || [];
 
