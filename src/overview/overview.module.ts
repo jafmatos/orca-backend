@@ -7,5 +7,6 @@ import { CategoryModule } from '@/category/category.module';
   imports: [CategoryModule],
   controllers: [OverviewController],
   providers: [OverviewService],
+  exports: [OverviewService],
 })
 export class OverviewModule {}

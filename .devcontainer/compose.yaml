@@ -51,6 +51,7 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
+      network: host
     depends_on:
       - postgresdb
       - redis

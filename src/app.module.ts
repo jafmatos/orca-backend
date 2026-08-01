@@ -21,6 +21,7 @@ import { OverviewModule } from './overview/overview.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { SupportModule } from './support/support.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { SupportModule } from './support/support.module';
       adapter: ExpressAdapter,
     }),
     SupportModule,
+    ChatModule,
   ],
   providers: [
     AppService,

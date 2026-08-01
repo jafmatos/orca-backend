@@ -28,7 +28,8 @@ FROM base AS final
 ENV NODE_ENV development
 
 # Instalar dependências necessárias para o VS Code Server e ferramentas de dev.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN echo "Acquire::ForceIPv4 \"true\";" > /etc/apt/apt.conf.d/99force-ipv4 && \
+    apt-get update && apt-get install -y --no-install-recommends \
 	bash \
 	curl \
 	wget \

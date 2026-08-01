@@ -30,7 +30,7 @@
     "migration:prod:revert": "npm run typeorm:prod -- migration:revert",
     "migration:prod:show": "npm run typeorm:prod -- migration:show",
     "docker:dev": "docker compose --project-name backend_devcontainer -f ./.devcontainer/compose.yaml --env-file ./.devcontainer/.env",
-    "docker:dev:up": "npm run docker:dev -- up --build -d && docker compose --project-name backend_devcontainer exec -d app-dev npm run start:dev",
+    "docker:dev:up": "npm run docker:dev -- up --build -d && docker compose --project-name backend_devcontainer exec -d app-dev bash -c 'npm run start:dev > /proc/1/fd/1 2> /proc/1/fd/2'",
     "docker:dev:down": "npm run docker:dev -- down",
     "docker:dev:stop": "npm run docker:dev -- stop",
     "docker:dev:restart": "npm run docker:dev -- restart",

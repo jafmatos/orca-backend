@@ -1,9 +1,19 @@
 import { z } from 'zod';
 
-const requiredForTesting = (value: unknown) => {
-  if (process.env.NODE_ENV !== 'testing') return true;
+const requiredForEnv = (env: 'development' | 'production' | 'testing') => {
+  return (value: unknown) => {
+    if (process.env.NODE_ENV !== env) return true;
 
-  return !!value;
+    return !!value;
+  };
+};
+
+const optionalForEnv = (env: 'development' | 'production' | 'testing') => {
+  return (value: unknown) => {
+    if (process.env.NODE_ENV === env) return true;
+
+    return !!value;
+  };
 };
 
 const requiredForSeeding = (value: unknown) => {
@@ -77,14 +87,14 @@ export const envSchema = z.object({
   BULLBOARD_USER_PASSWORD: z.string(),
 
   // OpenAI
-  OPENAI_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().optional(),
+  OPENAI_KEY: z.string().refine(optionalForEnv('testing')),
+  OPENAI_MODEL: z.string().refine(optionalForEnv('testing')),
 
   // Testing & Seeding
   TESTING_API_URL: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(requiredForTesting),
+    .refine(requiredForEnv('testing')),
   SEED_ON_BOOTSTRAP: z
     .enum(['true', 'false'])
     .default('false')
@@ -92,27 +102,27 @@ export const envSchema = z.object({
   SEED_USER_DEFAULT_PASSWORD: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(requiredForTesting)
+    .refine(requiredForEnv('testing'))
     .refine(requiredForSeeding),
   SEED_DEFAULT_OTP_CODE: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(requiredForTesting)
+    .refine(requiredForEnv('testing'))
     .refine(requiredForSeeding),
   SEED_SUPER_USER_NAME: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(requiredForTesting)
+    .refine(requiredForEnv('testing'))
     .refine(requiredForSeeding),
   SEED_SUPER_USER_EMAIL: z
     .union([z.email(), z.literal('')])
     .optional()
-    .refine(requiredForTesting)
+    .refine(requiredForEnv('testing'))
     .refine(requiredForSeeding),
   SEED_SUPER_USER_PASSWORD: z
     .union([z.string(), z.literal('')])
     .optional()
-    .refine(requiredForTesting)
+    .refine(requiredForEnv('testing'))
     .refine(requiredForSeeding),
 });
 

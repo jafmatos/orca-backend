@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { ScheduleService } from '../services/schedule.service';
 
 const createOccurrenceSchema = z.object({
-  when: z.string().datetime('Data inválida'),
+  when: z.iso.datetime('Data inválida'),
 });
 
 @ApiTags('ScheduleOccurrence')

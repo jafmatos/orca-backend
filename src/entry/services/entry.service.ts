@@ -77,24 +77,27 @@ export class EntryService {
       });
     }
 
-    if (options.pagination && options.pagination.cursor) {
-      options.order.mode === 'DESC'
-        ? queryBuilder.andWhere(
-            '(entry.when < :cursorWhen OR (entry.when = :cursorWhen AND entry.id < :cursorId))',
-            {
-              cursorWhen: options.pagination.cursor.when,
-              cursorId: options.pagination.cursor.id,
-            },
-          )
-        : queryBuilder.andWhere(
-            '(entry.when > :cursorWhen OR (entry.when = :cursorWhen AND entry.id > :cursorId))',
-            {
-              cursorWhen: options.pagination.cursor.when,
-              cursorId: options.pagination.cursor.id,
-            },
-          );
-
-      queryBuilder.take(options.pagination.take);
+    if (options.pagination) {
+      if (options.pagination.take !== undefined) {
+        queryBuilder.take(options.pagination.take);
+      }
+      if (options.pagination.cursor) {
+        options.order.mode === 'DESC'
+          ? queryBuilder.andWhere(
+              '(entry.when < :cursorWhen OR (entry.when = :cursorWhen AND entry.id < :cursorId))',
+              {
+                cursorWhen: options.pagination.cursor.when,
+                cursorId: options.pagination.cursor.id,
+              },
+            )
+          : queryBuilder.andWhere(
+              '(entry.when > :cursorWhen OR (entry.when = :cursorWhen AND entry.id > :cursorId))',
+              {
+                cursorWhen: options.pagination.cursor.when,
+                cursorId: options.pagination.cursor.id,
+              },
+            );
+      }
     }
 
     queryBuilder
