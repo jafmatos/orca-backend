@@ -45,6 +45,7 @@ export class TestingAnalysisSeedService implements Seeder<Analysis[]> {
                 {
                   title: $faker.lorem.sentence(),
                   effect: $faker.lorem.sentence(),
+                  reason: $faker.lorem.sentence(),
                 },
               ],
               actions: [

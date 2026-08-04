@@ -25,6 +25,7 @@ const analysisSchema = z.object({
     z.object({
       title: z.string(),
       effect: z.string(),
+      reason: z.string(),
     }),
   ),
   actions: z.array(
@@ -57,7 +58,13 @@ export class AnalysisService {
         usage: { prompt_tokens: 100, completion_tokens: 50 },
         output_text: JSON.stringify({
           diagnostic: 'Diagnóstico mockado para testes',
-          issues: [{ title: 'Problema 1', effect: 'Efeito do problema 1' }],
+          issues: [
+            {
+              title: 'Problema 1',
+              effect: 'Efeito do problema 1',
+              reason: 'Razão do problema 1',
+            },
+          ],
           actions: [{ title: 'Ação 1', effect: 'Efeito da ação 1' }],
           expectation: 'Expectativa mockada',
         }),

@@ -35,6 +35,8 @@ describe('Analysis (e2e)', () => {
         expect(typeof issue.title).toBe('string');
         expect(issue.effect).toBeTruthy();
         expect(typeof issue.effect).toBe('string');
+        expect(issue.reason).toBeTruthy();
+        expect(typeof issue.reason).toBe('string');
       }
 
       expect(Array.isArray(analysis.output.actions)).toBe(true);
@@ -118,6 +120,8 @@ describe('Analysis (e2e)', () => {
       expect(typeof issue.title).toBe('string');
       expect(issue.effect).toBeTruthy();
       expect(typeof issue.effect).toBe('string');
+      expect(issue.reason).toBeTruthy();
+      expect(typeof issue.reason).toBe('string');
     }
 
     expect(Array.isArray(data.analysis.output.actions)).toBe(true);
@@ -184,6 +188,8 @@ describe('Analysis (e2e)', () => {
       expect(typeof issue.title).toBe('string');
       expect(issue.effect).toBeTruthy();
       expect(typeof issue.effect).toBe('string');
+      expect(issue.reason).toBeTruthy();
+      expect(typeof issue.reason).toBe('string');
     }
 
     expect(Array.isArray(data.analysis.output.actions)).toBe(true);

@@ -21,6 +21,12 @@ export class PushSubscriptionService {
     return await this.pushSubscriptionRepository.findOneBy(where);
   }
 
+  async findAllBy(
+    where: FindOptionsWhere<PushSubscription>,
+  ): Promise<PushSubscription[]> {
+    return await this.pushSubscriptionRepository.findBy(where);
+  }
+
   async remove(subscription: PushSubscription): Promise<PushSubscription> {
     return await this.pushSubscriptionRepository.remove(subscription);
   }

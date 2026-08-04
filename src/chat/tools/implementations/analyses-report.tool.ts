@@ -13,17 +13,20 @@ export class AnalysesReportTool implements IChatTool {
     return {
       type: 'function',
       name: this.name,
-      description: 'Retorna o histórico dos relatórios e análises financeiras anteriores com diagnósticos, problemas e planos de ação recomendados para o usuário.',
+      description:
+        'Retorna o histórico das análises financeiras anteriores com diagnósticos, problemas e planos de ação recomendados para o usuário.',
       parameters: {
         type: 'object',
         properties: {
           pagination: {
             type: ['object', 'null'],
-            description: 'Opções de paginação e limite para a consulta dos relatórios de análise. Nulo para usar os valores padrões.',
+            description:
+              'Opções de paginação e limite para a consulta dos relatórios de análise. Nulo para usar os valores padrões.',
             properties: {
               take: {
                 type: ['number', 'null'],
-                description: 'Quantidade máxima de relatórios mais recentes a consultar (padrão 3, máximo 10). Nulo para usar o padrão.',
+                description:
+                  'Quantidade máxima de relatórios mais recentes a consultar (padrão 3, máximo 10). Nulo para usar o padrão.',
               },
             },
             required: ['take'],
@@ -38,21 +41,16 @@ export class AnalysesReportTool implements IChatTool {
   }
 
   async execute(userId: string, args?: any): Promise<string> {
-    const take = args?.pagination?.take && typeof args.pagination.take === 'number' ? Math.min(args.pagination.take, 10) : 3;
+    const take =
+      args?.pagination?.take && typeof args.pagination.take === 'number'
+        ? Math.min(args.pagination.take, 10)
+        : 3;
 
     const [analyses] = await this.analysisService.list({
       filter: { userId },
       pagination: { take },
     });
 
-    return JSON.stringify(
-      analyses.map((a) => ({
-        createdAt: a.createdAt,
-        diagnostic: a.output?.diagnostic || null,
-        issues: a.output?.issues || [],
-        actions: a.output?.actions || [],
-        expectation: a.output?.expectation || null,
-      })),
-    );
+    return JSON.stringify(analyses);
   }
 }

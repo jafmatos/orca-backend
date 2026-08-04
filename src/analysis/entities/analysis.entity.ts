@@ -28,7 +28,7 @@ export class Analysis {
   @Column({ type: 'jsonb' })
   output: {
     diagnostic: string;
-    issues: { title: string; effect: string }[];
+    issues: { title: string; effect: string; reason?: string }[];
     actions: { title: string; effect: string }[];
     expectation: string;
   };

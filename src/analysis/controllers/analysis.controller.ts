@@ -181,19 +181,6 @@ export class AnalysisController {
       }
     }
 
-    const previousAnalysesCSV = await new CSVGenerator(
-      new AnalysisDataTokenOptimizedExtractor(),
-    ).generate(
-      {
-        date: 'Data',
-        diagnostic: 'Diagnóstico',
-        issues: 'Problemas',
-        actions: 'Ações',
-        expectation: 'Expectativa',
-      },
-      pastAnalyses,
-    );
-
     const [categories] = await this.categoryService.list({
       filter: {
         userId: user.id,
@@ -246,7 +233,7 @@ export class AnalysisController {
       userPayDay: user.salaryDay,
       userCurrentCycleStart: user.currentCycle.start,
       userCurrentCycleEnd: user.currentCycle.end,
-      previousAnalysesCSV,
+      analysesJSON: JSON.stringify(pastAnalyses),
       entriesCSV,
       monthlySummaryCSV,
       categoriesCSV,
@@ -269,8 +256,8 @@ export class AnalysisController {
         entries: entriesCSV,
         categories: categoriesCSV,
         schedules: schedulesCSV,
+        analyses: JSON.stringify(pastAnalyses),
         monthlySummary: monthlySummaryCSV,
-        previousAnalyses: previousAnalysesCSV,
       },
     };
   }

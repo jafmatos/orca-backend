@@ -40,20 +40,21 @@ FORMATO DE RESPOSTA EM JSON (ESTRITO):
 (O número de issues e actions pode variar de 0 a 3. Adapte a quantidade à necessidade real do usuário.)
 
 {
-\t"diagnostic": "[Diagnóstico direto, empático e acolhedor (1 a 2 frases) abordando o momento financeiro atual comparado ao objetivo]",
-\t"issues": [
-\t\t{
-\t\t\t"title": "[Ponto de atenção principal (opcional). Ex: Gasto excessivo em Delivery, OU Necessidade de recompor reserva após imprevisto médico]",
-\t\t\t"effect": "[Impacto na situação financeira. Ex: Compromete 15% da sua renda, OU Reduz a margem de segurança momentaneamente]"
-\t\t}
-\t],
-\t"actions": [
-\t\t{
-\t\t\t"title": "[Recomendação prática (opcional), ex: Definir limite semanal de R$ 50,00 para Delivery]",
-\t\t\t"effect": "[Impacto Esperado. Ex: Pode gerar economia de R$ 200,00/mês]"
-\t\t}
-\t],
-\t"expectation": "[Visão de futuro: como as ações vão ajudar a atingir o objetivo e a economia total projetada]"
+	"diagnostic": "[Diagnóstico direto, empático e acolhedor (1 a 2 frases) abordando o momento financeiro atual comparado ao objetivo]",
+	"issues": [
+		{
+			"title": "[Ponto de atenção principal (opcional). Ex: Gasto excessivo em Delivery, OU Necessidade de recompor reserva após imprevisto médico]",
+			"effect": "[Impacto na situação financeira. Ex: Compromete 15% da sua renda, OU Reduz a margem de segurança momentaneamente]",
+			"reason": "[Razão pela qual este ponto de atenção foi incluído na análise. Ex: O gasto com Delivery dobrou em relação ao mês passado e representa a maior parte das despesas não essenciais]"
+		}
+	],
+	"actions": [
+		{
+			"title": "[Recomendação prática (opcional), ex: Definir limite semanal de R$ 50,00 para Delivery]",
+			"effect": "[Impacto Esperado. Ex: Pode gerar economia de R$ 200,00/mês]"
+		}
+	],
+	"expectation": "[Visão de futuro: como as ações vão ajudar a atingir o objetivo e a economia total projetada]"
 }
 `;
 };
@@ -63,7 +64,7 @@ export interface UserPromptData {
   userPayDay: number;
   userCurrentCycleStart: Date;
   userCurrentCycleEnd: Date;
-  previousAnalysesCSV: string;
+  analysesJSON: string;
   entriesCSV: string;
   monthlySummaryCSV: string;
   categoriesCSV: string;
@@ -77,8 +78,8 @@ OBJETIVO PESSOAL: ${data.userGoal || 'Não definido (focar em manter uma reserva
 CICLO FINANCEIRO ATUAL (MÊS DE PLANEJAMENTO):
 De ${data.userCurrentCycleStart.toLocaleDateString('pt-BR')} até ${data.userCurrentCycleEnd.toLocaleDateString('pt-BR')}. (O ciclo financeiro sempre se inicia no "Dia da Renda Principal" do usuário, que é dia ${data.userPayDay}).
 
-ANÁLISES ANTERIORES EM CSV:
-${data.previousAnalysesCSV || 'Nenhuma análise anterior disponível. Esta é a nossa primeira consultoria.'}
+ANÁLISES ANTERIORES EM JSON:
+${data.analysesJSON || 'Nenhuma análise anterior disponível. Esta é a nossa primeira consultoria.'}
 
 CATEGORIAS E LIMITES NO CICLO ATUAL EM CSV:
 ${data.categoriesCSV || 'Nenhuma categoria cadastrada.'}

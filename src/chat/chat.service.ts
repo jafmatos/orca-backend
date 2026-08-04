@@ -75,7 +75,7 @@ export class ChatService {
       balanceData.balance,
       balanceData.totalIncome,
       balanceData.totalExpense,
-      latestAnalysis?.output?.diagnostic || null,
+      latestAnalysis ? JSON.stringify(latestAnalysis) : null,
       user.currentCycle.start,
       user.currentCycle.end,
       user.createdAt || new Date(),

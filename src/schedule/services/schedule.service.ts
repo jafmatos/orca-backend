@@ -40,10 +40,13 @@ export class ScheduleService {
         `"occurrences"."entryId" IN (SELECT e.id FROM entry e WHERE e."when" >= :periodGe AND e."when" <= :periodLe)`,
       )
       .leftJoinAndSelect('occurrences.entry', 'entry')
-      .where('(schedule."userId" = :userId)', { userId: options.filter.userId })
-      .setParameter('periodGe', options.filter.when?.ge)
-      .setParameter('periodLe', options.filter.when?.le)
-      .orderBy('schedule.createdAt', 'ASC');
+      .where('(schedule."userId" = :userId)')
+      .orderBy('schedule.createdAt', 'ASC')
+      .setParameters({
+        userId: options.filter.userId,
+        periodGe: options.filter.when?.ge,
+        periodLe: options.filter.when?.le,
+      });
 
     if (options.pagination?.skip !== undefined) {
       queryBuilder.skip(options.pagination.skip);

@@ -17,6 +17,7 @@ import { FinancialSummaryTool } from './tools/implementations/financial-summary.
 import { FutureSchedulesTool } from './tools/implementations/future-schedules.tool';
 import { MonthlyEvolutionTool } from './tools/implementations/monthly-evolution.tool';
 import { RecentTransactionsTool } from './tools/implementations/recent-transactions.tool';
+import { ListCategoriesTool } from './tools/implementations/list-categories.tool';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RecentTransactionsTool } from './tools/implementations/recent-transacti
     ExpenseByCategoryTool,
     AnalysesReportTool,
     MonthlyEvolutionTool,
+    ListCategoriesTool,
     {
       provide: CHAT_TOOLS_TOKEN,
       useFactory: (
@@ -47,7 +49,8 @@ import { RecentTransactionsTool } from './tools/implementations/recent-transacti
         t4: ExpenseByCategoryTool,
         t5: AnalysesReportTool,
         t6: MonthlyEvolutionTool,
-      ) => [t1, t2, t3, t4, t5, t6],
+        t7: ListCategoriesTool,
+      ) => [t1, t2, t3, t4, t5, t6, t7],
       inject: [
         FinancialSummaryTool,
         RecentTransactionsTool,
@@ -55,6 +58,7 @@ import { RecentTransactionsTool } from './tools/implementations/recent-transacti
         ExpenseByCategoryTool,
         AnalysesReportTool,
         MonthlyEvolutionTool,
+        ListCategoriesTool,
       ],
     },
   ],

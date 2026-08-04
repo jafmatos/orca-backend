@@ -28,9 +28,11 @@ export class SchedulesProcessor {
       const schedule = await this.scheduleService.findOneBy({
         id: job.data.scheduleId,
       });
+
       if (!schedule) throw new Error('Agendamento não encontrado');
 
       const user = await this.userService.findById(schedule.userId);
+
       if (!user) throw new Error('Usuário não encontrado');
       if (!user.acceptsNotifications) return;
 

@@ -43,12 +43,16 @@ export class NotificationService implements OnModuleInit {
     payload: NotificationPayload,
     onFailure?: (error: any) => void,
   ) {
-    if (!user.pushSubscriptions?.length) return;
+    const pushSubscriptions =
+      user.pushSubscriptions ??
+      (await this.pushSubscriptionService.findAllBy({ userId: user.id }));
 
-    const webpushSubscriptions = user.pushSubscriptions.filter(
+    if (!pushSubscriptions?.length) return;
+
+    const webpushSubscriptions = pushSubscriptions.filter(
       (sub) => sub.provider === 'webpush',
     );
-    const expoSubscriptions = user.pushSubscriptions.filter(
+    const expoSubscriptions = pushSubscriptions.filter(
       (sub) => sub.provider === 'expo',
     );
 
@@ -80,9 +84,13 @@ export class NotificationService implements OnModuleInit {
       const messages: ExpoPushMessage[] = [];
 
       for (const pushSubscription of expoSubscriptions) {
+        this.logger.log(
+          `[NotificationService] - Sending notification to user ${user.id} via expo`,
+        );
+
         if (!Expo.isExpoPushToken(pushSubscription.expoPushToken)) {
-          this.logger.warn(
-            `Invalid Expo push token: ${pushSubscription.expoPushToken}`,
+          this.logger.log(
+            `Invalid Expo push token: ${pushSubscription.expoPushToken} for user ${user.id}`,
           );
           continue;
         }
@@ -100,8 +108,14 @@ export class NotificationService implements OnModuleInit {
       const chunks = this.expo.chunkPushNotifications(messages);
       const expoPromises = chunks.map(async (chunk) => {
         try {
+          this.logger.log(
+            `[NotificationService] - Sending notification chunk to user ${user.id} via expo`,
+          );
           await this.expo.sendPushNotificationsAsync(chunk);
         } catch (error: any) {
+          this.logger.log(
+            `[NotificationService] - Error sending notification to user ${user.id} via expo: ${error.message}`,
+          );
           onFailure && onFailure(error);
           throw error;
         }
