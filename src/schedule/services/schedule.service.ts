@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
@@ -18,7 +18,9 @@ export type ScheduleListOptions = {
 };
 
 @Injectable()
-export class ScheduleService {
+export class ScheduleService implements OnApplicationBootstrap {
+  private readonly logger = new Logger(ScheduleService.name);
+
   constructor(
     @InjectRepository(Schedule)
     private readonly scheduleRepository: Repository<Schedule>,
@@ -191,5 +193,60 @@ export class ScheduleService {
     } catch (e) {
       console.error('Error removing bull jobs', e);
     }
+  }
+
+  async onApplicationBootstrap() {
+    if (process.env.NODE_ENV === 'testing') return;
+    try {
+      await this.reconcileRepeatableJobs();
+    } catch (error: any) {
+      this.logger.error(
+        `Error during schedules reconciliation: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  private async reconcileRepeatableJobs() {
+    this.logger.log('Starting Redis schedule jobs reconciliation...');
+    const repeatableJobs = await this.schedulesQueue.getRepeatableJobs();
+    const processedScheduleIds = new Set<string>();
+
+    for (const job of repeatableJobs) {
+      const jobId = job.id || '';
+      const isLegacyId =
+        !jobId.startsWith('before-') && !jobId.startsWith('exact-');
+      const isMissingTz = !job.tz;
+      const is6FieldCron = job.cron.split(' ').length === 6;
+
+      if (isLegacyId || isMissingTz || is6FieldCron) {
+        this.logger.log(
+          `Found legacy/mismatched repeatable job (key: ${job.key}, id: ${jobId}). Upgrading...`,
+        );
+
+        await this.schedulesQueue.removeRepeatableByKey(job.key);
+
+        const scheduleId = jobId.replace(/^(before|exact)-/, '');
+        if (!scheduleId || processedScheduleIds.has(scheduleId)) continue;
+        processedScheduleIds.add(scheduleId);
+
+        const schedule = await this.scheduleRepository.findOne({
+          where: { id: scheduleId },
+        });
+
+        if (schedule) {
+          this.logger.log(
+            `Re-registering upgraded repeatable jobs for schedule: ${schedule.id} (tz: ${schedule.timezone})`,
+          );
+          await this.addBullJobs(schedule);
+        } else {
+          this.logger.warn(
+            `Schedule ${scheduleId} not found in database; cleaned up orphaned Redis job.`,
+          );
+        }
+      }
+    }
+
+    this.logger.log('Redis schedule jobs reconciliation completed.');
   }
 }
