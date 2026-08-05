@@ -25,16 +25,8 @@ export class SchedulesProcessor {
   @Process()
   async handleScheduleJob(job: Job<BullScheduleNotificationJob>) {
     try {
-      const repeatOpts = job.opts?.repeat as
-        | { jobId?: string }
-        | undefined;
-      const scheduleId =
-        job.data?.scheduleId ||
-        job.data?.id ||
-        repeatOpts?.jobId?.replace(/^(before|exact)-/, '');
-
       const schedule = await this.scheduleService.findOneBy({
-        id: scheduleId,
+        id: job.data.scheduleId,
       });
 
       if (!schedule) throw new Error('Agendamento não encontrado');
