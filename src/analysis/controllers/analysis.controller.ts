@@ -130,7 +130,7 @@ export class AnalysisController {
     const summaryMap: Record<string, number> = {};
 
     for (const entry of entries) {
-      if (entry.type !== 'expense') continue;
+      if (entry.type !== EntryTypes.Expense) continue;
 
       const date = new Date(entry.when);
       const monthStr = `${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;

@@ -137,6 +137,7 @@ export class ScheduleController {
     });
 
     const pages = Math.ceil(count / (queryPagination.take || 1));
+
     return {
       data: schedules.map((s) => s.toJSON()),
       meta: { ...pagination.toResponse(), count, pages },

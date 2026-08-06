@@ -71,7 +71,7 @@ export class AnalysisService {
       } as any;
     }
 
-    const completion = await (this.openai as any).beta.chat.completions.parse({
+    const completion = await this.openai.chat.completions.parse({
       model: 'gpt-4o-mini',
       messages: [
         {
