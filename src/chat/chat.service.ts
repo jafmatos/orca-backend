@@ -7,6 +7,8 @@ import OpenAI from 'openai';
 import { Repository } from 'typeorm';
 import { chatSystemPrompt } from './prompts/chat.prompt';
 import { ChatToolsService } from './tools/chat-tools.service';
+import { AiUsageService } from '@/ai-usage/services/ai-usage.service';
+import { AiUsageType } from '@/ai-usage/entities/ai-usage.entity';
 
 type SendMessageOptions = {
   userId: string;
@@ -26,6 +28,7 @@ export class ChatService {
     private readonly configService: ConfigService,
     private readonly analysisService: AnalysisService,
     private readonly chatToolsService: ChatToolsService,
+    private readonly aiUsageService: AiUsageService,
   ) {
     this.isTesting = this.configService.get<string>('NODE_ENV') === 'testing';
     this.openai = new OpenAI({
@@ -157,6 +160,15 @@ export class ChatService {
         tools: this.chatToolsService.getTools(),
         input: functionOutputs,
       });
+    }
+
+    if (response.usage) {
+      await this.aiUsageService.registerUsage(
+        options.userId,
+        AiUsageType.Assistant,
+        response.usage.input_tokens || 0,
+        response.usage.output_tokens || 0,
+      );
     }
 
     return {

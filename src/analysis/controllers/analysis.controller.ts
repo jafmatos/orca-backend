@@ -228,17 +228,20 @@ export class AnalysisController {
       schedules,
     );
 
-    const aiResponse = await this.analysisService.generate({
-      userGoal: user.financialGoal || null,
-      userPayDay: user.salaryDay,
-      userCurrentCycleStart: user.currentCycle.start,
-      userCurrentCycleEnd: user.currentCycle.end,
-      analysesJSON: JSON.stringify(pastAnalyses),
-      entriesCSV,
-      monthlySummaryCSV,
-      categoriesCSV,
-      schedulesCSV,
-    });
+    const aiResponse = await this.analysisService.generate(
+      {
+        userGoal: user.financialGoal || null,
+        userPayDay: user.salaryDay,
+        userCurrentCycleStart: user.currentCycle.start,
+        userCurrentCycleEnd: user.currentCycle.end,
+        analysesJSON: JSON.stringify(pastAnalyses),
+        entriesCSV,
+        monthlySummaryCSV,
+        categoriesCSV,
+        schedulesCSV,
+      },
+      user.id,
+    );
 
     const analysis = await this.analysisService.create({
       openaiId: aiResponse.id,

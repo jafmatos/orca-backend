@@ -1,9 +1,20 @@
+import { AiUsage } from '@/ai-usage/entities/ai-usage.entity';
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 export interface KPIsOptions {
   filter?: {
     months?: number;
+  };
+}
+
+export interface AIUsageOptions {
+  filter?: {
+    when?: {
+      ge: Date;
+      le: Date;
+    };
+    userId?: string;
   };
 }
 
@@ -30,6 +41,30 @@ export class AdministrativeOverviewService {
       totalUsers,
       activeSubscriptions,
       mrr: mrrResult ? Number(mrrResult.expectedIncome) : 0,
+    };
+  }
+
+  public async getAIUsage(options?: AIUsageOptions) {
+    const queryBuilder = this.dataSource
+      .getRepository(AiUsage)
+      .createQueryBuilder('usage')
+      .select('COALESCE(SUM(usage.inputTokens), 0)', 'inputTokens')
+      .addSelect('COALESCE(SUM(usage.outputTokens), 0)', 'outputTokens');
+
+    if (options?.filter?.when) {
+      queryBuilder.andWhere('usage.createdAt >= :startDate', { startDate: options.filter.when.ge });
+      queryBuilder.andWhere('usage.createdAt <= :endDate', { endDate: options.filter.when.le });
+    }
+
+    if (options?.filter?.userId) {
+      queryBuilder.andWhere('usage.userId = :userId', { userId: options.filter.userId });
+    }
+
+    const usageResult = await queryBuilder.getRawOne();
+
+    return {
+      inputTokens: usageResult ? Number(usageResult.inputTokens) : 0,
+      outputTokens: usageResult ? Number(usageResult.outputTokens) : 0,
     };
   }
 }

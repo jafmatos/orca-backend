@@ -22,6 +22,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { SupportModule } from './support/support.module';
 import { ChatModule } from './chat/chat.module';
+import { AiUsageModule } from './ai-usage/ai-usage.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { ChatModule } from './chat/chat.module';
     }),
     SupportModule,
     ChatModule,
+    AiUsageModule,
   ],
   providers: [
     AppService,

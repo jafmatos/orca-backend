@@ -22,11 +22,11 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { DataSource } from 'typeorm';
 import { z } from 'zod';
 import { Entry } from '../entities/entry.entity';
@@ -229,33 +229,46 @@ export class EntryController {
   }
 
   @Post('smart-extract')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(AnyFilesInterceptor())
   async smartExtract(
     @AuthUser() user: User,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Array<Express.Multer.File>,
     @Body(new ZodValidationPipe(SmartExtractSchema))
     reqBody: z.infer<typeof SmartExtractSchema>,
   ) {
-    if (!file && reqBody.text && reqBody.text.trim().length > 500) {
+    const audioFile = files?.find((f) => f.mimetype.startsWith('audio/'));
+    const imageFiles = files?.filter((f) => f.mimetype.startsWith('image/'));
+
+    if (imageFiles && imageFiles.length > 3) {
+      throw new BadRequestException(
+        'Calma aí! Pode tentar me enviar até três imagens por vez?',
+      );
+    }
+
+    const hasMedia = audioFile || (imageFiles && imageFiles.length > 0);
+
+    if (!hasMedia && reqBody.text && reqBody.text.trim().length > 500) {
       throw new BadRequestException(
         'Que história longa! Consegue resumir e enviar de novo?',
       );
     }
 
-    if (!file && !reqBody.text) {
+    if (!hasMedia && !reqBody.text) {
       throw new BadRequestException(
-        'Me diga o que aconteceu ou envie um áudio!',
+        'Me diga o que aconteceu, ou envie um áudio/imagem!',
       );
     }
 
-    if (file) {
+    if (audioFile) {
       try {
         const transcribedText = await this.smartEntryService.transcribeAudio(
-          file.buffer,
-          file.mimetype,
+          audioFile.buffer,
+          audioFile.mimetype,
         );
 
-        reqBody.text = transcribedText;
+        reqBody.text = reqBody.text
+          ? `${reqBody.text}\n${transcribedText}`
+          : transcribedText;
       } catch {
         throw new InternalServerErrorException(
           'Opa, me perdi aqui! Pode enviar de novo?',
@@ -268,11 +281,14 @@ export class EntryController {
       pagination: {},
     });
 
-    const generatedEntryData = await this.smartEntryService.generate({
-      text: reqBody.text!,
-      categories,
-      now: new Date(reqBody.now),
-    });
+    const [generatedEntryData, openAIResponse] =
+      await this.smartEntryService.generate({
+        text: reqBody.text || '',
+        categories,
+        now: new Date(reqBody.now),
+        images: imageFiles,
+        userId: user.id,
+      });
 
     if (!generatedEntryData)
       throw new InternalServerErrorException(
@@ -310,7 +326,12 @@ export class EntryController {
       entriesWithCategories.push(entry);
     }
 
-    return { entries: entriesWithCategories };
+    return {
+      entries: entriesWithCategories,
+      count: entriesWithCategories.length,
+      inputTokens: openAIResponse?.usage?.prompt_tokens,
+      outputTokens: openAIResponse?.usage?.completion_tokens,
+    };
   }
 
   @Put(':id')

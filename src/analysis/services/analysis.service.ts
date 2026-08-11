@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { Analysis } from '../entities/analysis.entity';
 import { systemPrompt, userPrompt, UserPromptData } from '../prompts/analyses';
+import { AiUsageService } from '@/ai-usage/services/ai-usage.service';
+import { AiUsageType } from '@/ai-usage/entities/ai-usage.entity';
 
 export interface AnalysisListOptions {
   filter: {
@@ -45,13 +47,14 @@ export class AnalysisService {
     @InjectRepository(Analysis)
     private readonly analysisRepository: Repository<Analysis>,
     private readonly configService: ConfigService,
+    private readonly aiUsageService: AiUsageService,
   ) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_KEY') || 'dummy-key',
     });
   }
 
-  public async generate(params: UserPromptData) {
+  public async generate(params: UserPromptData, userId: string) {
     if (process.env.NODE_ENV === 'testing') {
       return {
         id: 'mocked-openai-id',
@@ -85,6 +88,15 @@ export class AnalysisService {
       ],
       response_format: zodResponseFormat(analysisSchema, 'analysis'),
     });
+
+    if (completion.usage) {
+      await this.aiUsageService.registerUsage(
+        userId,
+        AiUsageType.Analysis,
+        completion.usage.prompt_tokens,
+        completion.usage.completion_tokens,
+      );
+    }
 
     return {
       id: completion.id,

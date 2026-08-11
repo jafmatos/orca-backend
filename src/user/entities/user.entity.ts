@@ -8,6 +8,7 @@ import { Schedule } from '@/schedule/entities/schedule.entity';
 import { Subscription } from '@/subscription/entities/subscription.entity';
 import { Ticket } from '@/support/ticket/entities/ticket.entity';
 import { Avatar } from '@/user/entities/avatar.entity';
+import { AiUsage } from '@/ai-usage/entities/ai-usage.entity';
 import { Exclude } from 'class-transformer';
 import {
   AfterInsert,
@@ -114,6 +115,9 @@ export class User {
 
   @OneToMany(() => Analysis, (analysis) => analysis.user)
   analyses: Analysis[];
+
+  @OneToMany(() => AiUsage, (aiUsage) => aiUsage.user)
+  aiUsages?: AiUsage[];
 
   balance?: number;
   currentCycle!: {

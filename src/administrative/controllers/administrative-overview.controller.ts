@@ -1,6 +1,9 @@
 import { ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { AdministrativeOverviewService } from '../services/administrative-overview.service';
+import {
+  AdministrativeOverviewService,
+  type AIUsageOptions,
+} from '../services/administrative-overview.service';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { UserRoles } from '@/user/entities/user.entity';
@@ -25,13 +28,23 @@ export type KPIsQuery = z.infer<typeof kpisQuerySchema>;
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRoles.Admin, UserRoles.SuperUser)
 export class AdministrativeOverviewController {
-  constructor(private readonly administrativeOverviewService: AdministrativeOverviewService) {}
+  constructor(
+    private readonly administrativeOverviewService: AdministrativeOverviewService,
+  ) {}
 
   @Get('kpis')
   async getKPIs(
     @Query(new ZodValidationPipe(kpisQuerySchema)) query?: KPIsQuery,
   ) {
     const kpis = await this.administrativeOverviewService.getKPIs(query);
+		
     return { kpis };
+  }
+
+  @Get('ai-usage')
+  async getAiUsage(@Query() query?: AIUsageOptions) {
+    const usage = await this.administrativeOverviewService.getAIUsage(query);
+
+    return { usage };
   }
 }

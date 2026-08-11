@@ -8,6 +8,7 @@ import { SubscribedGuard } from '@/auth/guards/subscribed.guard';
 import { EntryModule } from '@/entry/entry.module';
 import { CategoryModule } from '@/category/category.module';
 import { ScheduleModule } from '@/schedule/schedule.module';
+import { AiUsageModule } from '@/ai-usage/ai-usage.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ScheduleModule } from '@/schedule/schedule.module';
     EntryModule,
     CategoryModule,
     ScheduleModule,
+    AiUsageModule,
   ],
   controllers: [AnalysisController],
   providers: [AnalysisService, SubscribedGuard],

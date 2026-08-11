@@ -4,6 +4,7 @@ import { EntryModule } from '@/entry/entry.module';
 import { OverviewModule } from '@/overview/overview.module';
 import { ScheduleModule } from '@/schedule/schedule.module';
 import { User } from '@/user/entities/user.entity';
+import { AiUsageModule } from '@/ai-usage/ai-usage.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,6 +29,7 @@ import { ListCategoriesTool } from './tools/implementations/list-categories.tool
     EntryModule,
     ScheduleModule,
     CategoryModule,
+    AiUsageModule,
   ],
   controllers: [ChatController],
   providers: [
