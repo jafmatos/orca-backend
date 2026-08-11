@@ -465,6 +465,6 @@ describe('Entries (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(400);
 
-    expect(data.message).toBe('Me diga o que aconteceu ou envie um áudio!');
+    expect(data.message).toBe('Me diga o que aconteceu, ou envie um áudio ou imagem!');
   });
 });

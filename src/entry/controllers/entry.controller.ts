@@ -255,7 +255,7 @@ export class EntryController {
 
     if (!hasMedia && !reqBody.text) {
       throw new BadRequestException(
-        'Me diga o que aconteceu, ou envie um áudio/imagem!',
+        'Me diga o que aconteceu, ou envie um áudio ou imagem!',
       );
     }
 
