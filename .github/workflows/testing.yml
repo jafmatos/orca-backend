@@ -13,15 +13,15 @@ on:
 jobs:
   testing:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     environment:
       name: testing
     steps:
       - name: Github Checkout
         uses: actions/checkout@v4
-        with: 
-          repository: ${{ secrets.GH_REPOSITORY }}
-          token: ${{ secrets.GH_TOKEN }}
-          path: .
+        with:
+          fetch-depth: 0
       - name: Creating docker volumes and networks
         run: |
           docker volume create orca_backend_database_test
